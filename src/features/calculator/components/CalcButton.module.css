@@ -39,6 +39,15 @@
   filter: saturate(0.72) brightness(0.84);
 }
 
+.content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  width: 100%;
+  padding-inline: var(--calc-key-content-padding-inline);
+}
+
 .label {
   display: inline-flex;
   align-items: center;
@@ -64,7 +73,10 @@
 .wide {
   grid-column: span 2;
   justify-content: flex-start;
-  padding-inline-start: var(--calc-zero-padding-inline-start);
+}
+
+.wide .content {
+  width: calc(50% - (var(--calc-key-gap) / 2));
 }
 
 .active {

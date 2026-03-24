@@ -12,7 +12,6 @@ export const layoutTokens = {
     stageGapLandscape: 'clamp(16px, 2.6vw, 24px)',
     keyGapPortrait: '12px',
     keyGapLandscape: '14px',
-    zeroPaddingInlineStart: '30px',
   },
   display: {
     minHeightPortrait: 'clamp(136px, 24vh, 176px)',
@@ -27,6 +26,8 @@ export const layoutTokens = {
     sizeLandscape: 'clamp(68px, 8vw, 88px)',
     fontSizePortrait: 'clamp(1.7rem, 4vw, 2.15rem)',
     fontSizeLandscape: 'clamp(1.5rem, 2.8vw, 1.95rem)',
+    contentPaddingInlinePortrait: '12px',
+    contentPaddingInlineLandscape: '10px',
     zeroColumnSpan: 2,
   },
   colors: {

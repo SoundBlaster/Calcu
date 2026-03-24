@@ -31,7 +31,7 @@
   --calc-key-size: clamp(72px, 12vw, 92px);
   --calc-key-font-size: clamp(1.7rem, 4vw, 2.15rem);
   --calc-key-radius: 999px;
-  --calc-zero-padding-inline-start: 30px;
+  --calc-key-content-padding-inline: 12px;
 }
 
 @media (min-aspect-ratio: 1 / 1) {
@@ -44,5 +44,6 @@
     --calc-key-gap: 14px;
     --calc-key-size: clamp(68px, 8vw, 88px);
     --calc-key-font-size: clamp(1.5rem, 2.8vw, 1.95rem);
+    --calc-key-content-padding-inline: 10px;
   }
 }

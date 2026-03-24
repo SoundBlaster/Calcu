@@ -22,6 +22,8 @@ export function CalcButton({
   wide = false,
   ...buttonProps
 }: CalcButtonProps) {
+  const contentLayout = wide ? 'leading-column' : 'centered';
+
   return (
     <button
       className={[
@@ -39,7 +41,13 @@ export function CalcButton({
       type={type}
       {...buttonProps}
     >
-      <span className={styles.label}>{label}</span>
+      <span
+        className={styles.content}
+        data-content-layout={contentLayout}
+        data-slot="button-content"
+      >
+        <span className={styles.label}>{label}</span>
+      </span>
     </button>
   );
 }

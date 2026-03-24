@@ -36,6 +36,18 @@ describe('CalcButton', () => {
     return button;
   }
 
+  function getContentFrame() {
+    const contentFrame = container.querySelector(
+      '[data-slot="button-content"]',
+    );
+
+    if (!contentFrame) {
+      throw new Error('Expected calculator button content frame to render.');
+    }
+
+    return contentFrame;
+  }
+
   it('renders a semantic button with the provided label', () => {
     render(<CalcButton label="AC" variant="system" />);
 
@@ -65,5 +77,19 @@ describe('CalcButton', () => {
 
     expect(button.getAttribute('data-wide')).toBe('true');
     expect(button.getAttribute('data-active')).toBe('true');
+  });
+
+  it('uses a shared content frame with layout markers for narrow and wide keys', () => {
+    render(<CalcButton label="1" />);
+
+    expect(getContentFrame().getAttribute('data-content-layout')).toBe(
+      'centered',
+    );
+
+    render(<CalcButton label="0" wide />);
+
+    expect(getContentFrame().getAttribute('data-content-layout')).toBe(
+      'leading-column',
+    );
   });
 });
