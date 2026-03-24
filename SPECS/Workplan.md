@@ -188,7 +188,7 @@ Add keyboard support, test coverage, visual QA, and final readiness checks. This
 
 ## Phase 3 — Adaptive UI
 
-#### ⬜️ P3-T1: Define portrait, scientific, and `2nd` key metadata
+#### ✅ P3-T1: Define portrait, scientific, and `2nd` key metadata
 - **Description:** Create data-driven key definitions for portrait mode, scientific mode, and `2nd` mode so the rendered layouts match the PRD row-by-row.
 - **Priority:** P0
 - **Dependencies:** P1-T4, P2-T1

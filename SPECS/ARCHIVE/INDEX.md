@@ -6,6 +6,7 @@
 
 | Task ID | Folder | Archived | Verdict |
 |---------|--------|----------|---------|
+| P3-T1 | [P3-T1_Define_portrait_scientific_and_2nd_key_metadata/](P3-T1_Define_portrait_scientific_and_2nd_key_metadata/) | 2026-03-25 | PASS |
 | P4-T6 | [P4-T6_Refine_wide_0_key_label_alignment/](P4-T6_Refine_wide_0_key_label_alignment/) | 2026-03-25 | PASS |
 | P3-T2 | [P3-T2_Build_the_display_and_button_primitives/](P3-T2_Build_the_display_and_button_primitives/) | 2026-03-24 | PASS |
 | P1-T5 | [P1-T5_Define_layout_tokens_and_base_styling_contracts/](P1-T5_Define_layout_tokens_and_base_styling_contracts/) | 2026-03-24 | PASS |
@@ -27,6 +28,7 @@
 
 | Date | Task ID | Action |
 |------|---------|--------|
+| 2026-03-25 | P3-T1 | Archived task with validation report (PASS) |
 | 2026-03-25 | P4-T6 | Archived REVIEW_p4_t6_zero_key_alignment report |
 | 2026-03-25 | P4-T6 | Archived task with validation report (PASS) |
 | 2026-03-24 | P3-T2 | Archived REVIEW_p3_t2_display_button_primitives report |
