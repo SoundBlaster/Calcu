@@ -27,6 +27,7 @@
 | [_Historical/REVIEW_p3_t3_portrait_keypad.md](_Historical/REVIEW_p3_t3_portrait_keypad.md) | Post-archive review report for the portrait keypad task |
 | [_Historical/REVIEW_p3_t1_key_metadata.md](_Historical/REVIEW_p3_t1_key_metadata.md) | Post-archive review report for the key metadata task |
 | [_Historical/REVIEW_p4_t6_zero_key_alignment.md](_Historical/REVIEW_p4_t6_zero_key_alignment.md) | Post-archive review report for the wide `0` key alignment task |
+| [_Historical/REVIEW_p4_t1_keyboard_input_handling.md](_Historical/REVIEW_p4_t1_keyboard_input_handling.md) | Post-archive review report for the keyboard input handling task |
 | [_Historical/REVIEW_p3_t2_display_button_primitives.md](_Historical/REVIEW_p3_t2_display_button_primitives.md) | Post-archive review report for the display and button primitives task |
 | [_Historical/REVIEW_p1_t5_visual_tokens_contract.md](_Historical/REVIEW_p1_t5_visual_tokens_contract.md) | Post-archive review report for the layout token foundation task |
 | [_Historical/REVIEW_p1_t1_task_system_contract.md](_Historical/REVIEW_p1_t1_task_system_contract.md) | Post-archive review report for P1-T1 |
@@ -36,6 +37,7 @@
 
 | Date | Task ID | Action |
 |------|---------|--------|
+| 2026-03-25 | P4-T1 | Archived REVIEW_p4_t1_keyboard_input_handling report |
 | 2026-03-25 | P4-T1 | Archived task with validation report (PASS) |
 | 2026-03-25 | P3-T5 | Archived REVIEW_p3_t5_calculator_composition report |
 | 2026-03-25 | P3-T5 | Archived task with validation report (PASS) |
