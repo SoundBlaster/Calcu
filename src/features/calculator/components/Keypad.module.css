@@ -1,0 +1,15 @@
+.keypad {
+  display: grid;
+  width: 100%;
+  gap: var(--calc-key-gap);
+}
+
+.row {
+  display: grid;
+  gap: var(--calc-key-gap);
+  align-items: stretch;
+}
+
+.portrait .row {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
