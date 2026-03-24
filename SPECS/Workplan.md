@@ -227,7 +227,7 @@ Add keyboard support, test coverage, visual QA, and final readiness checks. This
   - [ ] The operator column remains visually dominant
   - [ ] The `0` key renders as a pill without breaking grid rhythm
 
-#### ⬜️ P3-T4: Build the landscape scientific layout and `2nd` rendering
+#### ✅ P3-T4: Build the landscape scientific layout and `2nd` rendering
 - **Description:** Implement the landscape keypad grid with scientific rows, `2nd` mode label swaps, and visual density rules from the PRD.
 - **Priority:** P0
 - **Dependencies:** P3-T1, P3-T2, P2-T4, P2-T5
