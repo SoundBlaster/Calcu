@@ -48,7 +48,7 @@ Add keyboard support, test coverage, visual QA, and final readiness checks. This
 
 ## Phase 1 — Foundation and Tooling
 
-#### ⬜️ P1-T1: Scaffold the Vite React application
+#### ✅ P1-T1: Scaffold the Vite React application
 - **Description:** Initialize the app shell using Vite with React and TypeScript, create the `src/` structure required by the PRD, and ensure the repo contains a runnable browser app.
 - **Priority:** P0
 - **Dependencies:** none
