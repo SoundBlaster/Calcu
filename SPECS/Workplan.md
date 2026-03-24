@@ -340,3 +340,31 @@ Add keyboard support, test coverage, visual QA, and final readiness checks. This
 - The engine tasks form a directed acyclic graph: standard behavior first, then percent/memory, then scientific behavior, then parentheses and formatting.
 - UI tasks split cleanly between key metadata, visual primitives, portrait layout, and landscape layout before final composition.
 - Verification tasks run in parallel where possible after the composed calculator exists.
+
+## 6. Follow-up Tasks
+
+#### ⬜️ FU-T1: Normalize calculator task IDs against existing archive history
+- **Description:** Introduce a stable calculator-specific task ID naming approach or archive migration so newly archived calculator tasks cannot collide with legacy Flow task IDs already present in `SPECS/ARCHIVE/INDEX.md`.
+- **Priority:** P1
+- **Dependencies:** none
+- **Parallelizable:** yes
+- **Outputs/Artifacts:**
+  - updated `SPECS/Workplan.md` task IDs or documented namespace policy
+  - updated `SPECS/ARCHIVE/INDEX.md` references if migration is performed
+- **Acceptance Criteria:**
+  - [ ] Archived calculator tasks are uniquely identifiable without ambiguous duplicate task IDs
+  - [ ] `next.md`, archive entries, and future PRDs can reference calculator tasks unambiguously
+  - [ ] The chosen naming policy is documented in repository workflow artifacts
+
+#### ⬜️ FU-T2: Re-scope remaining Phase 1 setup tasks after scaffold delivery
+- **Description:** Reconcile `P1-T2`, `P1-T3`, and `P1-T4` with the work already delivered in `P1-T1` so future FLOW runs do not duplicate completed setup work.
+- **Priority:** P1
+- **Dependencies:** none
+- **Parallelizable:** yes
+- **Outputs/Artifacts:**
+  - updated `SPECS/Workplan.md`
+  - updated task descriptions, statuses, or replacements for remaining Phase 1 tasks
+- **Acceptance Criteria:**
+  - [ ] Remaining Phase 1 tasks no longer duplicate delivered scaffold work
+  - [ ] Each open setup task has a distinct deliverable boundary
+  - [ ] The next selectable task is clear and execution-ready
