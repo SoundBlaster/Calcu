@@ -1,53 +1,48 @@
+import {
+  CalcButton,
+  type CalcButtonVariant,
+  Display,
+} from '../features/calculator/components';
 import styles from './App.module.css';
 
 type PreviewKey = {
   label: string;
-  tone?: 'operator' | 'system';
+  active?: boolean;
+  variant?: CalcButtonVariant;
   wide?: boolean;
 };
 
 const keypadRows: ReadonlyArray<ReadonlyArray<PreviewKey>> = [
   [
-    { label: 'AC', tone: 'system' },
-    { label: '+/-', tone: 'system' },
-    { label: '%', tone: 'system' },
-    { label: '÷', tone: 'operator' },
+    { label: 'AC', variant: 'system' },
+    { label: '+/-', variant: 'system' },
+    { label: '%', variant: 'system' },
+    { label: '÷', variant: 'operator' },
   ],
   [
     { label: '7' },
     { label: '8' },
     { label: '9' },
-    { label: '×', tone: 'operator' },
+    { label: '×', variant: 'operator' },
   ],
   [
     { label: '4' },
     { label: '5' },
     { label: '6' },
-    { label: '-', tone: 'operator' },
+    { label: '-', variant: 'operator' },
   ],
   [
     { label: '1' },
     { label: '2' },
     { label: '3' },
-    { label: '+', tone: 'operator' },
+    { label: '+', variant: 'operator' },
   ],
   [
     { label: '0', wide: true },
     { label: ',' },
-    { label: '=', tone: 'operator' },
+    { label: '=', variant: 'operator' },
   ],
 ];
-
-function getKeyClassName(tone?: 'operator' | 'system', wide?: boolean) {
-  return [
-    styles.key,
-    tone === 'system' ? styles.system : '',
-    tone === 'operator' ? styles.operator : '',
-    wide ? styles.zero : '',
-  ]
-    .filter(Boolean)
-    .join(' ');
-}
 
 export function App() {
   return (
@@ -56,9 +51,7 @@ export function App() {
         className={styles.stage}
         aria-label="Calculator visual foundation"
       >
-        <div className={styles.display}>
-          <span className={styles.displayValue}>0</span>
-        </div>
+        <Display value="0" />
 
         <div className={styles.keypad}>
           {keypadRows.map((row) => (
@@ -67,12 +60,14 @@ export function App() {
               key={row.map((key) => key.label).join('-')}
             >
               {row.map((key) => (
-                <span
-                  className={getKeyClassName(key.tone, key.wide)}
+                <CalcButton
+                  active={key.active}
+                  aria-label={key.label}
                   key={key.label}
-                >
-                  {key.label}
-                </span>
+                  label={key.label}
+                  variant={key.variant}
+                  wide={key.wide}
+                />
               ))}
             </div>
           ))}

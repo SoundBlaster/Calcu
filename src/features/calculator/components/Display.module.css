@@ -1,0 +1,39 @@
+.display {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  min-height: var(--calc-display-min-height);
+  padding: var(--calc-display-padding-top) var(--calc-display-padding-inline) 0;
+  overflow: hidden;
+}
+
+.frame {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  min-width: 0;
+}
+
+.value {
+  display: block;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--calc-text-primary);
+  font-size: var(--calc-display-font-size);
+  font-variant-numeric: lining-nums tabular-nums;
+  letter-spacing: var(--calc-display-letter-spacing);
+  line-height: 0.84;
+  text-align: right;
+  text-overflow: clip;
+  white-space: nowrap;
+}
+
+.value[data-scale="compact"] {
+  font-size: calc(var(--calc-display-font-size) * 0.84);
+}
+
+.value[data-scale="compressed"] {
+  font-size: calc(var(--calc-display-font-size) * 0.68);
+  letter-spacing: calc(var(--calc-display-letter-spacing) * 0.72);
+}

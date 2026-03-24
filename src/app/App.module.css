@@ -20,20 +20,6 @@
   align-content: end;
 }
 
-.display {
-  display: flex;
-  justify-content: flex-end;
-  align-items: flex-end;
-  min-height: var(--calc-display-min-height);
-  padding: var(--calc-display-padding-top) var(--calc-display-padding-inline) 0;
-}
-
-.displayValue {
-  font-size: var(--calc-display-font-size);
-  line-height: 0.84;
-  letter-spacing: var(--calc-display-letter-spacing);
-}
-
 .keypad {
   display: grid;
   gap: var(--calc-key-gap);
@@ -43,31 +29,4 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--calc-key-gap);
-}
-
-.key {
-  min-height: var(--calc-key-size);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--calc-key-radius);
-  background: var(--calc-surface-input);
-  color: var(--calc-text-primary);
-  font-size: var(--calc-key-font-size);
-  box-shadow: var(--calc-key-shadow);
-}
-
-.system {
-  background: var(--calc-surface-system);
-  color: var(--calc-text-system);
-}
-
-.operator {
-  background: var(--calc-surface-operator);
-}
-
-.zero {
-  grid-column: span 2;
-  justify-content: flex-start;
-  padding-inline-start: var(--calc-zero-padding-inline-start);
 }
