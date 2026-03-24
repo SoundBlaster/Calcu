@@ -1,14 +1,19 @@
-# Next Task Queue
+# Next Task: P3-T1 — Define portrait, scientific, and `2nd` key metadata
 
-No active task currently selected.
+**Priority:** P0
+**Phase:** Phase 3 — Adaptive UI
+**Effort:** 2
+**Dependencies:** P1-T4, P2-T1
+**Status:** Selected
 
-## Recently Archived
+## Description
 
-- P4-T6 — Refine wide `0` key label alignment (PASS)
-- P3-T2 — Build the display and button primitives (PASS)
-- P1-T5 — Define layout tokens and base styling contracts (PASS)
+Create the data-driven key definition module that describes the portrait keypad plus the landscape scientific keypad in both normal and `2nd` modes. The output of this task should capture labels, visual variants, row placement, wide-key behavior, and stable semantic action identifiers that later engine and keypad work can consume without hard-coding button rows in components.
 
-## Suggested Next Tasks
+## Why This Task Now
 
-1. P3-T1 — Define portrait, scientific, and `2nd` key metadata
-2. P2-T1 — Define typed calculator state and action contracts
+The project already has layout tokens and button/display primitives, so the next highest-value UI step is to replace the preview-only row literals with a reusable keypad contract. Although the engine action types are not implemented yet, this task can still define a UI-facing metadata layer that stays serializable and narrow enough for the engine contracts to adopt in the next phase.
+
+## Next Step
+
+Run the PLAN command to create the task PRD for `P3-T1`.
