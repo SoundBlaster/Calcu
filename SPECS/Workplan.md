@@ -200,7 +200,7 @@ Add keyboard support, test coverage, visual QA, and final readiness checks. This
   - [ ] Landscape keys match the non-`2nd` and `2nd` row layouts defined in PRD section 6.8
   - [ ] Key metadata captures label, semantic action, style variant, and layout span
 
-#### ⬜️ P3-T2: Build the display and button primitives
+#### ✅ P3-T2: Build the display and button primitives
 - **Description:** Implement the `Display` and `CalcButton` components using CSS Modules and tokenized styling so the app has stable visual primitives before full keypad composition.
 - **Priority:** P0
 - **Dependencies:** P1-T5

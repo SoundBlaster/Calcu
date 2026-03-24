@@ -6,6 +6,7 @@
 
 | Task ID | Folder | Archived | Verdict |
 |---------|--------|----------|---------|
+| P3-T2 | [P3-T2_Build_the_display_and_button_primitives/](P3-T2_Build_the_display_and_button_primitives/) | 2026-03-24 | PASS |
 | P1-T5 | [P1-T5_Define_layout_tokens_and_base_styling_contracts/](P1-T5_Define_layout_tokens_and_base_styling_contracts/) | 2026-03-24 | PASS |
 | P1-T1 | [P1-T1_Add_task_system_section_to_flow_params_yaml/](P1-T1_Add_task_system_section_to_flow_params_yaml/) | 2026-02-26 | PASS |
 | P1-T1 | [P1-T1_Scaffold_the_Vite_React_application/](P1-T1_Scaffold_the_Vite_React_application/) | 2026-03-24 | PASS |
@@ -23,6 +24,7 @@
 
 | Date | Task ID | Action |
 |------|---------|--------|
+| 2026-03-24 | P3-T2 | Archived task with validation report (PASS) |
 | 2026-03-24 | P1-T5 | Archived REVIEW_p1_t5_visual_tokens_contract report |
 | 2026-03-24 | P1-T5 | Archived task with validation report (PASS) |
 | 2026-03-24 | P1-T1 | Archived REVIEW_p1_t1_scaffold_visual_foundation report |
