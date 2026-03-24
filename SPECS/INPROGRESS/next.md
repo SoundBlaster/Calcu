@@ -1,6 +1,11 @@
 # Next Task Queue
 
-No active task currently selected.
+## Current Task
+
+- Task ID: P4-T1
+- Task: Add keyboard input handling
+- Status: selected
+- Branch: `feature/P4-T1-add-keyboard-input-handling`
 
 ## Recently Archived
 
@@ -10,5 +15,5 @@ No active task currently selected.
 
 ## Suggested Next Tasks
 
-1. P4-T1 — Add keyboard input handling
-2. P2-T1 — Define typed calculator state and action contracts
+1. P2-T1 — Define typed calculator state and action contracts
+2. P4-T2 — Write engine tests for standard and scientific behavior
