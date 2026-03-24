@@ -319,7 +319,7 @@ Add keyboard support, test coverage, visual QA, and final readiness checks. This
   - [ ] Script names are consistent with the tooling configured in Phase 1
   - [ ] The documented workflow reflects the implemented stack accurately
 
-#### ⬜️ P4-T6: Refine wide `0` key label alignment
+#### ✅ P4-T6: Refine wide `0` key label alignment
 - **Description:** Fix the optical alignment of the wide `0` key so the `0` glyph sits directly under the `1` column instead of drifting because the pill button is wider than the standard digit buttons.
 - **Priority:** P1
 - **Dependencies:** P3-T5

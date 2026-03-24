@@ -1,19 +1,14 @@
-# Next Task: P4-T6 — Refine wide `0` key label alignment
+# Next Task Queue
 
-**Priority:** P1
-**Phase:** Phase 4 — Verification and Polish
-**Effort:** 1
-**Dependencies:** P3-T5
-**Status:** Selected
+No active task currently selected.
 
-## Description
+## Recently Archived
 
-Fix the visual drift of the wide `0` key label so the `0` glyph sits directly under the `1` column rather than appearing pushed off because the pill button is wider than the standard digit buttons. The solution should use a shared content-alignment or padding strategy that keeps small buttons visually centered while making the wide button line up with the digit column.
+- P4-T6 — Refine wide `0` key label alignment (PASS)
+- P3-T2 — Build the display and button primitives (PASS)
+- P1-T5 — Define layout tokens and base styling contracts (PASS)
 
-## Why This Task Now
+## Suggested Next Tasks
 
-The button primitive task established the current shape and styling contracts, which makes this a focused visual correction instead of a broader component redesign. The issue is already visible in the running preview, so it is efficient to address the alignment contract now before more keypad and layout work layers additional assumptions on top of the current button spacing behavior.
-
-## Next Step
-
-Run the PLAN command to create the task PRD for `P4-T6`.
+1. P3-T1 — Define portrait, scientific, and `2nd` key metadata
+2. P2-T1 — Define typed calculator state and action contracts
