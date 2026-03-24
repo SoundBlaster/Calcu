@@ -1,18 +1,23 @@
 # .flow/params.yaml
-# Project-specific config for Flow self-development.
+# Project-specific config for the Calcu app.
 
 project:
-  name: Flow
-  description: Documentation-driven workflow framework implemented as Markdown specs and shell tooling
-  language: Markdown/Bash
-  package_manager: make
+  name: Calcu
+  description: Visual-first responsive calculator app built with React and TypeScript
+  language: TypeScript
+  package_manager: npm
   default_branch: main
 
 verify:
-  tests: make test
-  lint: make lint
+  tests: npm run test -- --run
+  lint: npm run lint
+  format: npm run format
+  typecheck: npm run typecheck
 
 task_system:
   kind: file                # file | github | jira | linear | none
-  project_key: Flow         # optional lightweight scope key
-  task_url_template: "SPECS/Workplan.md#p1-t1-add-task_system-section-to-flow-paramsyaml"  # optional markdown anchor template
+  project_key: Calcu        # optional lightweight scope key
+  task_url_template: "SPECS/Workplan.md#phase-1--foundation-and-tooling"  # optional markdown anchor template
+
+structure:
+  source: src/
