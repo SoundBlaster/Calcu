@@ -41,3 +41,7 @@ Implement desktop keyboard support for the calculator feature using the existing
 
 - Prefer a small, testable translation layer from `KeyboardEvent` to calculator action IDs.
 - Keep the handler resilient to non-printable keys and modifier combinations that should not affect calculator input.
+
+---
+**Archived:** 2026-03-25
+**Verdict:** PASS

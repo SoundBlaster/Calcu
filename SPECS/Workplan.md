@@ -255,7 +255,7 @@ Add keyboard support, test coverage, visual QA, and final readiness checks. This
 
 ## Phase 4 — Verification and Polish
 
-#### ⬜️ P4-T1: Add keyboard input handling
+#### ✅ P4-T1: Add keyboard input handling
 - **Description:** Implement desktop keyboard support for digits, decimal, operators, equals, clear, and backspace using the PRD input mapping.
 - **Priority:** P1
 - **Dependencies:** P3-T5
