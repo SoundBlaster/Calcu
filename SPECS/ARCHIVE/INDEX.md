@@ -6,6 +6,7 @@
 
 | Task ID | Folder | Archived | Verdict |
 |---------|--------|----------|---------|
+| P3-T3 | [P3-T3_Build_the_portrait_keypad_layout/](P3-T3_Build_the_portrait_keypad_layout/) | 2026-03-25 | PASS |
 | P3-T1 | [P3-T1_Define_portrait_scientific_and_2nd_key_metadata/](P3-T1_Define_portrait_scientific_and_2nd_key_metadata/) | 2026-03-25 | PASS |
 | P4-T6 | [P4-T6_Refine_wide_0_key_label_alignment/](P4-T6_Refine_wide_0_key_label_alignment/) | 2026-03-25 | PASS |
 | P3-T2 | [P3-T2_Build_the_display_and_button_primitives/](P3-T2_Build_the_display_and_button_primitives/) | 2026-03-24 | PASS |
@@ -29,6 +30,7 @@
 
 | Date | Task ID | Action |
 |------|---------|--------|
+| 2026-03-25 | P3-T3 | Archived task with validation report (PASS) |
 | 2026-03-25 | P3-T1 | Archived REVIEW_p3_t1_key_metadata report |
 | 2026-03-25 | P3-T1 | Archived task with validation report (PASS) |
 | 2026-03-25 | P4-T6 | Archived REVIEW_p4_t6_zero_key_alignment report |

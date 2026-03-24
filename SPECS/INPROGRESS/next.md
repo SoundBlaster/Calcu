@@ -1,19 +1,14 @@
-# Next Task: P3-T3 — Build the portrait keypad layout
+# Next Task Queue
 
-**Priority:** P0
-**Phase:** Phase 3 — Adaptive UI
-**Effort:** 3
-**Dependencies:** P3-T1, P3-T2, P2-T2
-**Status:** Selected
+No active task currently selected.
 
-## Description
+## Recently Archived
 
-Implement the portrait keypad as a dedicated component that renders the standard calculator rows from shared key metadata, preserves the bottom-weighted visual rhythm from the reference screenshot, and keeps the operator column visually dominant without ad hoc page-level row markup.
+- P3-T3 — Build the portrait keypad layout (PASS)
+- P3-T1 — Define portrait, scientific, and `2nd` key metadata (PASS)
+- P4-T6 — Refine wide `0` key label alignment (PASS)
 
-## Why This Task Now
+## Suggested Next Tasks
 
-The portrait metadata and button primitives are both in place, which means the remaining work is composition and layout rather than inventing new visual contracts. Even though the engine work is still incomplete, the portrait keypad can be built and verified as a UI layer that later calculator state wiring can consume directly.
-
-## Next Step
-
-Run the PLAN command to create the task PRD for `P3-T3`.
+1. P3-T4 — Build the landscape scientific layout and `2nd` rendering
+2. P2-T1 — Define typed calculator state and action contracts

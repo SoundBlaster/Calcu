@@ -214,7 +214,7 @@ Add keyboard support, test coverage, visual QA, and final readiness checks. This
   - [ ] Button variants cover system, input/scientific, and operator styles
   - [ ] Buttons preserve stable geometry and label centering across interaction states
 
-#### ⬜️ P3-T3: Build the portrait keypad layout
+#### ✅ P3-T3: Build the portrait keypad layout
 - **Description:** Implement the portrait keypad grid, including the bottom-weighted standard layout and double-width `0` button, using CSS Modules and key metadata.
 - **Priority:** P0
 - **Dependencies:** P3-T1, P3-T2, P2-T2
