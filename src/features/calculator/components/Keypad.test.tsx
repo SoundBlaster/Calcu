@@ -1,6 +1,7 @@
 import { act, type ReactElement } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { getLandscapeScientificKeyRows } from '../config';
 import { Keypad } from './Keypad';
 
 describe('Keypad', () => {
@@ -26,14 +27,16 @@ describe('Keypad', () => {
     });
   }
 
+  function getButtonTexts() {
+    return Array.from(container.querySelectorAll('button')).map(
+      (button) => button.textContent,
+    );
+  }
+
   it('renders the portrait keypad rows from shared metadata', () => {
     render(<Keypad />);
 
-    const buttons = Array.from(container.querySelectorAll('button')).map(
-      (button) => button.textContent,
-    );
-
-    expect(buttons).toEqual([
+    expect(getButtonTexts()).toEqual([
       'AC',
       '+/-',
       '%',
@@ -54,6 +57,43 @@ describe('Keypad', () => {
       ',',
       '=',
     ]);
+  });
+
+  it('renders the landscape scientific rows in normal mode', () => {
+    render(
+      <Keypad layout="landscape" rows={getLandscapeScientificKeyRows(false)} />,
+    );
+
+    expect(getButtonTexts()).toContain('10ˣ');
+    expect(getButtonTexts()).toContain('ln');
+    expect(getButtonTexts()).toContain('Rand');
+    expect(getButtonTexts()).not.toContain('2ˣ');
+    expect(getButtonTexts()).not.toContain('logᵧ');
+  });
+
+  it('renders the landscape scientific rows in 2nd mode with an active toggle', () => {
+    render(
+      <Keypad
+        activeActionIds={new Set(['mode:toggle-second'])}
+        layout="landscape"
+        rows={getLandscapeScientificKeyRows(true)}
+      />,
+    );
+
+    const secondButton = Array.from(container.querySelectorAll('button')).find(
+      (button) => button.textContent === '2nd',
+    );
+
+    if (!secondButton) {
+      throw new Error('Expected 2nd button to render.');
+    }
+
+    expect(secondButton.getAttribute('data-active')).toBe('true');
+    expect(secondButton.getAttribute('data-variant')).toBe('system');
+    expect(getButtonTexts()).toContain('yˣ');
+    expect(getButtonTexts()).toContain('logᵧ');
+    expect(getButtonTexts()).toContain('sin⁻¹');
+    expect(getButtonTexts()).toContain('Deg');
   });
 
   it('preserves the wide zero key treatment inside the portrait grid', () => {

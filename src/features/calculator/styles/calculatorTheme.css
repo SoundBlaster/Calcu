@@ -38,7 +38,7 @@
   :root {
     --calc-page-padding: clamp(20px, 3vw, 36px);
     --calc-stage-gap: clamp(16px, 2.6vw, 24px);
-    --calc-shell-max-width: 640px;
+    --calc-shell-max-width: 1180px;
     --calc-display-min-height: clamp(120px, 22vh, 150px);
     --calc-display-padding-inline: 10px;
     --calc-display-font-size: clamp(4.5rem, 10vw, 6.5rem);

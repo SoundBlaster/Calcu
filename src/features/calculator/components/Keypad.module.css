@@ -13,3 +13,14 @@
 .portrait .row {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
+
+.landscape {
+  --calc-key-gap: clamp(12px, 1.2vw, 18px);
+  --calc-key-size: clamp(66px, 6vw, 88px);
+  --calc-key-font-size: clamp(1.15rem, 1.9vw, 1.85rem);
+  --calc-key-content-padding-inline: clamp(8px, 1vw, 12px);
+}
+
+.landscape .row {
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+}

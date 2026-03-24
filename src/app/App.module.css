@@ -19,3 +19,28 @@
   gap: var(--calc-stage-gap);
   align-content: end;
 }
+
+.landscapeStage {
+  width: 100%;
+  margin-inline-start: 0;
+  align-content: stretch;
+}
+
+.topBar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: clamp(12px, 2vw, 24px);
+}
+
+.modeStatus {
+  margin: 0;
+  align-self: center;
+  color: var(--calc-text-primary);
+  font-size: clamp(1rem, 1.5vw, 1.45rem);
+  letter-spacing: -0.03em;
+}
+
+.landscapeDisplay {
+  min-width: min(220px, 24vw);
+}

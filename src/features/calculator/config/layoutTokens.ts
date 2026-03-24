@@ -52,7 +52,7 @@ export const layoutTokens = {
   },
   shell: {
     maxWidthPortrait: '520px',
-    maxWidthLandscape: '640px',
+    maxWidthLandscape: '1180px',
   },
 } as const;
 

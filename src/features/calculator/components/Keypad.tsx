@@ -2,13 +2,14 @@ import {
   type CalculatorKeyActionId,
   type CalculatorKeyDefinition,
   type CalculatorKeyRow,
+  getLandscapeScientificKeyRows,
   isWideCalculatorKey,
   portraitKeyRows,
 } from '../config';
 import { CalcButton } from './CalcButton';
 import styles from './Keypad.module.css';
 
-export type KeypadLayout = 'portrait';
+export type KeypadLayout = 'landscape' | 'portrait';
 
 export type KeypadProps = {
   activeActionIds?: ReadonlySet<CalculatorKeyActionId>;
@@ -25,7 +26,9 @@ export function Keypad({
   className,
   layout = 'portrait',
   onKeyPress,
-  rows = portraitKeyRows,
+  rows = layout === 'landscape'
+    ? getLandscapeScientificKeyRows(false)
+    : portraitKeyRows,
 }: KeypadProps) {
   return (
     <section
@@ -36,17 +39,25 @@ export function Keypad({
     >
       {rows.map((row) => (
         <div className={styles.row} key={row.map((key) => key.label).join('-')}>
-          {row.map((key) => (
-            <CalcButton
-              active={activeActionIds?.has(key.actionId) ?? false}
-              aria-label={key.label}
-              key={key.actionId}
-              label={key.label}
-              onClick={onKeyPress ? () => onKeyPress(key) : undefined}
-              variant={key.variant}
-              wide={isWideCalculatorKey(key)}
-            />
-          ))}
+          {row.map((key) => {
+            const isActive = activeActionIds?.has(key.actionId) ?? false;
+            const variant =
+              isActive && key.actionId === 'mode:toggle-second'
+                ? 'system'
+                : key.variant;
+
+            return (
+              <CalcButton
+                active={isActive}
+                aria-label={key.label}
+                key={key.actionId}
+                label={key.label}
+                onClick={onKeyPress ? () => onKeyPress(key) : undefined}
+                variant={variant}
+                wide={isWideCalculatorKey(key)}
+              />
+            );
+          })}
         </div>
       ))}
     </section>
