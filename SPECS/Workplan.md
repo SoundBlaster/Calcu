@@ -319,6 +319,19 @@ Add keyboard support, test coverage, visual QA, and final readiness checks. This
   - [ ] Script names are consistent with the tooling configured in Phase 1
   - [ ] The documented workflow reflects the implemented stack accurately
 
+#### ⬜️ P4-T6: Refine wide `0` key label alignment
+- **Description:** Fix the optical alignment of the wide `0` key so the `0` glyph sits directly under the `1` column instead of drifting because the pill button is wider than the standard digit buttons.
+- **Priority:** P1
+- **Dependencies:** P3-T5
+- **Parallelizable:** yes
+- **Outputs/Artifacts:**
+  - button alignment CSS updates
+  - keypad layout tuning if needed
+- **Acceptance Criteria:**
+  - [ ] The `0` label aligns optically with the left digit column, especially relative to the `1` key above it
+  - [ ] Standard and wide buttons use a shared padding or content-alignment strategy instead of a one-off `0` offset
+  - [ ] The alignment fix preserves centered labels on single-width buttons and keeps the `0` pill visually balanced
+
 ## 4. Traceability
 
 | PRD Area | Covered By |
