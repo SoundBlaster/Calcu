@@ -1,19 +1,13 @@
-# Next Task: P1-T5 — Define layout tokens and base styling contracts
+# Next Task Queue
 
-**Priority:** P0
-**Phase:** Phase 1 — Foundation and Tooling
-**Effort:** 1
-**Dependencies:** P1-T4
-**Status:** Selected
+No active task currently selected.
 
-## Description
+## Recently Archived
 
-Define the shared layout token contract for the calculator UI so spacing, button geometry, radii, display sizing, color roles, and portrait/landscape breakpoints stop living as scattered one-off values. This task establishes the visual foundation that later display, button, and keypad components can reuse without mixing styling rules into calculator logic.
+- P1-T5 — Define layout tokens and base styling contracts (PASS)
+- P1-T1 — Scaffold the Vite React application (PASS)
 
-## Why This Task Now
+## Suggested Next Tasks
 
-The current scaffold already renders a visual shell, but its key dimensions and color roles are hardcoded inside the preview styles. Because the direction is to start from the visual look rather than calculation logic, the next highest-value task is centralizing those constants into reusable TypeScript and CSS token layers before building real button and display primitives.
-
-## Next Step
-
-Run the PLAN command to create the task PRD for `P1-T5`.
+1. P3-T2 — Build the display and button primitives
+2. P2-T1 — Define typed calculator state and action contracts

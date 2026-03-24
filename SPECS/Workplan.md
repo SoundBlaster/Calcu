@@ -108,7 +108,7 @@ Add keyboard support, test coverage, visual QA, and final readiness checks. This
   - [ ] Placeholder modules exist for engine, types, key definitions, and layout tokens
   - [ ] No calculator logic is embedded in the app shell by default
 
-#### ⬜️ P1-T5: Define layout tokens and base styling contracts
+#### ✅ P1-T5: Define layout tokens and base styling contracts
 - **Description:** Establish shared CSS and TypeScript layout tokens for spacing, button sizing, radii, viewport breakpoints, and color roles so the visual system is stable before component styling begins.
 - **Priority:** P0
 - **Dependencies:** P1-T4
