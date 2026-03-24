@@ -18,6 +18,7 @@
 | Folder | Description |
 |--------|-------------|
 | [_Historical/](_Historical/) | Non-task artifacts |
+| [_Historical/REVIEW_p3_t1_key_metadata.md](_Historical/REVIEW_p3_t1_key_metadata.md) | Post-archive review report for the key metadata task |
 | [_Historical/REVIEW_p4_t6_zero_key_alignment.md](_Historical/REVIEW_p4_t6_zero_key_alignment.md) | Post-archive review report for the wide `0` key alignment task |
 | [_Historical/REVIEW_p3_t2_display_button_primitives.md](_Historical/REVIEW_p3_t2_display_button_primitives.md) | Post-archive review report for the display and button primitives task |
 | [_Historical/REVIEW_p1_t5_visual_tokens_contract.md](_Historical/REVIEW_p1_t5_visual_tokens_contract.md) | Post-archive review report for the layout token foundation task |
@@ -28,6 +29,7 @@
 
 | Date | Task ID | Action |
 |------|---------|--------|
+| 2026-03-25 | P3-T1 | Archived REVIEW_p3_t1_key_metadata report |
 | 2026-03-25 | P3-T1 | Archived task with validation report (PASS) |
 | 2026-03-25 | P4-T6 | Archived REVIEW_p4_t6_zero_key_alignment report |
 | 2026-03-25 | P4-T6 | Archived task with validation report (PASS) |
