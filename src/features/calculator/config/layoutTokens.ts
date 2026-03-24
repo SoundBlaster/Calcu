@@ -16,6 +16,8 @@ export const layoutTokens = {
   display: {
     minHeightPortrait: 'clamp(136px, 24vh, 176px)',
     minHeightLandscape: 'clamp(120px, 22vh, 150px)',
+    paddingInlinePortrait: '12px',
+    paddingInlineLandscape: '10px',
     fontSizePortrait: 'clamp(4.25rem, 14vw, 7rem)',
     fontSizeLandscape: 'clamp(4.5rem, 10vw, 6.5rem)',
     letterSpacing: '-0.08em',

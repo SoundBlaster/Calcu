@@ -24,7 +24,7 @@
   --calc-mode-copy-size: 0.9rem;
   --calc-display-min-height: clamp(136px, 24vh, 176px);
   --calc-display-padding-top: 12px;
-  --calc-display-padding-inline: 6px;
+  --calc-display-padding-inline: 12px;
   --calc-display-font-size: clamp(4.25rem, 14vw, 7rem);
   --calc-display-letter-spacing: -0.08em;
   --calc-key-gap: 12px;
@@ -40,6 +40,7 @@
     --calc-stage-gap: clamp(16px, 2.6vw, 24px);
     --calc-shell-max-width: 640px;
     --calc-display-min-height: clamp(120px, 22vh, 150px);
+    --calc-display-padding-inline: 10px;
     --calc-display-font-size: clamp(4.5rem, 10vw, 6.5rem);
     --calc-key-gap: 14px;
     --calc-key-size: clamp(68px, 8vw, 88px);

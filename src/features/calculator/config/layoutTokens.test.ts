@@ -9,6 +9,8 @@ describe('layoutTokens', () => {
     ]);
     expect(layoutTokens.breakpoints.landscapeMinAspectRatio).toBe(1);
     expect(layoutTokens.breakpoints.wideStageMinWidth).toBe(900);
+    expect(layoutTokens.display.paddingInlinePortrait).toBe('12px');
+    expect(layoutTokens.display.paddingInlineLandscape).toBe('10px');
   });
 
   it('preserves stable button geometry and color roles', () => {

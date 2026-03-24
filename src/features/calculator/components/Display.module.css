@@ -24,6 +24,7 @@
   font-variant-numeric: lining-nums tabular-nums;
   letter-spacing: var(--calc-display-letter-spacing);
   line-height: 0.84;
+  padding-inline-end: 0.08em;
   text-align: right;
   text-overflow: clip;
   white-space: nowrap;
