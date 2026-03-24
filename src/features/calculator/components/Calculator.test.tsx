@@ -100,4 +100,81 @@ describe('Calculator', () => {
     expect(getDisplayValue()).toBe('9');
     expect(container.textContent).toContain('yˣ');
   });
+
+  it('routes keyboard input through the reducer-backed calculator flow', () => {
+    setViewportSize(430, 932);
+    render(<Calculator />);
+
+    act(() => {
+      window.dispatchEvent(
+        new KeyboardEvent('keydown', { key: '1', bubbles: true }),
+      );
+      window.dispatchEvent(
+        new KeyboardEvent('keydown', { key: '+', bubbles: true }),
+      );
+      window.dispatchEvent(
+        new KeyboardEvent('keydown', { key: '2', bubbles: true }),
+      );
+      window.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }),
+      );
+    });
+
+    expect(getDisplayValue()).toBe('3');
+
+    act(() => {
+      window.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
+      );
+    });
+
+    expect(getDisplayValue()).toBe('0');
+  });
+
+  it('deletes active digits with backspace and ignores it after equals', () => {
+    setViewportSize(430, 932);
+    render(<Calculator />);
+
+    act(() => {
+      window.dispatchEvent(
+        new KeyboardEvent('keydown', { key: '1', bubbles: true }),
+      );
+      window.dispatchEvent(
+        new KeyboardEvent('keydown', { key: '2', bubbles: true }),
+      );
+      window.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true }),
+      );
+    });
+
+    expect(getDisplayValue()).toBe('1');
+
+    act(() => {
+      window.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true }),
+      );
+    });
+
+    expect(getDisplayValue()).toBe('0');
+
+    act(() => {
+      window.dispatchEvent(
+        new KeyboardEvent('keydown', { key: '1', bubbles: true }),
+      );
+      window.dispatchEvent(
+        new KeyboardEvent('keydown', { key: '+', bubbles: true }),
+      );
+      window.dispatchEvent(
+        new KeyboardEvent('keydown', { key: '2', bubbles: true }),
+      );
+      window.dispatchEvent(
+        new KeyboardEvent('keydown', { key: '=', bubbles: true }),
+      );
+      window.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true }),
+      );
+    });
+
+    expect(getDisplayValue()).toBe('3');
+  });
 });

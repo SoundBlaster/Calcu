@@ -9,6 +9,7 @@ import { initialCalculatorState, reduceCalculatorState } from '../model';
 import styles from './Calculator.module.css';
 import { Display } from './Display';
 import { Keypad } from './Keypad';
+import { useCalculatorKeyboardInput } from './useCalculatorKeyboardInput';
 
 function getViewportMode(): CalculatorViewportMode {
   if (typeof window === 'undefined') {
@@ -57,6 +58,8 @@ export function Calculator() {
     ? getLandscapeScientificKeyRows(state.secondMode)
     : undefined;
   const modeStatus = state.angleMode === 'deg' ? 'Deg' : 'Rad';
+
+  useCalculatorKeyboardInput(dispatch);
 
   function handleKeyPress(key: CalculatorKeyDefinition) {
     dispatch(key.actionId);

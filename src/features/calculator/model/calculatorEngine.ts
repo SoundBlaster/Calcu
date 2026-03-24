@@ -98,6 +98,44 @@ function appendDigit(state: CalculatorState, digit: string): CalculatorState {
   };
 }
 
+function canBackspaceCurrentDisplay(state: CalculatorState) {
+  return !(
+    state.replaceDisplayOnNextDigit &&
+    state.pendingBinaryOperator === null &&
+    state.lastBinaryOperator !== null
+  );
+}
+
+function applyBackspace(state: CalculatorState): CalculatorState {
+  if (state.errorState || !canBackspaceCurrentDisplay(state)) {
+    return state;
+  }
+
+  if (state.displayValue === '0') {
+    return state;
+  }
+
+  const nextDisplayValue = state.displayValue.slice(0, -1);
+
+  if (
+    nextDisplayValue === '' ||
+    nextDisplayValue === '-' ||
+    nextDisplayValue === '+'
+  ) {
+    return {
+      ...state,
+      displayValue: '0',
+      replaceDisplayOnNextDigit: false,
+    };
+  }
+
+  return {
+    ...state,
+    displayValue: nextDisplayValue,
+    replaceDisplayOnNextDigit: false,
+  };
+}
+
 function applyPendingOperator(
   state: CalculatorState,
   nextOperator: CalculatorBinaryOperator,
@@ -246,6 +284,8 @@ export function reduceCalculatorState(
         ...state,
         displayValue: `${state.displayValue}.`,
       };
+    case 'command:backspace':
+      return applyBackspace(state);
     case 'command:equals':
       return applyEquals(state);
     case 'command:percent': {

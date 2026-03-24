@@ -51,4 +51,22 @@ describe('reduceCalculatorState', () => {
 
     expect(state.secondMode).toBe(true);
   });
+
+  it('deletes the last active digit when backspace is applied', () => {
+    const state = runActions(['digit:1', 'digit:2', 'command:backspace']);
+
+    expect(state.displayValue).toBe('1');
+  });
+
+  it('ignores backspace after a resolved result has been produced', () => {
+    const state = runActions([
+      'digit:1',
+      'binary:add',
+      'digit:2',
+      'command:equals',
+      'command:backspace',
+    ]);
+
+    expect(state.displayValue).toBe('3');
+  });
 });

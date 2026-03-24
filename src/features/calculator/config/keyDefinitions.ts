@@ -24,6 +24,7 @@ type CalculatorCommandAction =
   | 'all-clear'
   | 'decimal'
   | 'equals'
+  | 'backspace'
   | 'percent'
   | 'scientific-notation'
   | 'toggle-sign';
