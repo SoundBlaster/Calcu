@@ -332,6 +332,19 @@ Add keyboard support, test coverage, visual QA, and final readiness checks. This
   - [ ] Standard and wide buttons use a shared padding or content-alignment strategy instead of a one-off `0` offset
   - [ ] The alignment fix preserves centered labels on single-width buttons and keeps the `0` pill visually balanced
 
+#### ⬜️ P4-T7: Prevent Enter from double-dispatching focused calculator buttons
+- **Description:** Ensure the global keyboard handler does not duplicate native button activation when `Enter` is pressed on a focused calculator button.
+- **Priority:** P1
+- **Dependencies:** P4-T1
+- **Parallelizable:** yes
+- **Outputs/Artifacts:**
+  - keyboard listener guard updates
+  - regression test coverage for focused button Enter handling
+- **Acceptance Criteria:**
+  - [ ] Pressing `Enter` on a focused calculator button triggers a single calculator action
+  - [ ] Global keyboard support remains available for calculator shortcuts when no interactive control should handle the key
+  - [ ] Regression coverage proves the focused-button path does not double-dispatch
+
 ## 4. Traceability
 
 | PRD Area | Covered By |
