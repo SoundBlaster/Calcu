@@ -240,7 +240,7 @@ Add keyboard support, test coverage, visual QA, and final readiness checks. This
   - [ ] Scientific keys keep stable sizing and spacing across wide viewports
   - [ ] `2nd` mode has a clear active-state treatment
 
-#### ⬜️ P3-T5: Compose the calculator feature and viewport switching
+#### ✅ P3-T5: Compose the calculator feature and viewport switching
 - **Description:** Wire the engine, key metadata, display, keypad, and viewport-mode detection into the `Calculator` feature so portrait and landscape layouts preserve a single state model.
 - **Priority:** P0
 - **Dependencies:** P2-T3, P2-T5, P3-T3, P3-T4

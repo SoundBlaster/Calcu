@@ -47,3 +47,7 @@ Compose a real `Calculator` feature component that owns calculator state, render
 - Full scientific operation execution coverage
 - Parentheses evaluation or expression-stack behavior
 - Keyboard support
+
+---
+**Archived:** 2026-03-25
+**Verdict:** PASS
