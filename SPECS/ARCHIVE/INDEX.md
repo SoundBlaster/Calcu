@@ -32,6 +32,7 @@
 | Folder | Description |
 |--------|-------------|
 | [_Historical/](_Historical/) | Non-task artifacts |
+| [_Historical/REVIEW_p4_t3_visual_stability.md](_Historical/REVIEW_p4_t3_visual_stability.md) | Post-archive review report for the P4-T3 visual stability task |
 | [_Historical/REVIEW_p4_t2_engine_tests.md](_Historical/REVIEW_p4_t2_engine_tests.md) | Post-archive review report for the P4-T2 engine tests task |
 | [_Historical/REVIEW_p2_t5_parentheses_formatting.md](_Historical/REVIEW_p2_t5_parentheses_formatting.md) | Post-archive review report for the P2-T5 parentheses and display formatting task |
 | [_Historical/REVIEW_p2_t4_scientific_ops.md](_Historical/REVIEW_p2_t4_scientific_ops.md) | Post-archive review report for the P2-T4 scientific operations task |
@@ -55,6 +56,7 @@
 
 | Date | Task ID | Action |
 |------|---------|--------|
+| 2026-03-25 | REVIEW_p4_t3_visual_stability | Archived REVIEW_p4_t3_visual_stability report |
 | 2026-03-25 | P4-T3 | Archived task with validation report (PASS) |
 | 2026-03-25 | REVIEW_p4_t2_engine_tests | Archived REVIEW_p4_t2_engine_tests report |
 | 2026-03-25 | P4-T2 | Archived task with validation report (PASS) |
