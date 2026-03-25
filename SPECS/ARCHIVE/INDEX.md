@@ -6,6 +6,7 @@
 
 | Task ID | Folder | Archived | Verdict |
 |---------|--------|----------|---------|
+| P4-T3 | [P4-T3_Verify_visual_stability_across_supported_viewport_sizes/](P4-T3_Verify_visual_stability_across_supported_viewport_sizes/) | 2026-03-25 | PASS |
 | P4-T2 | [P4-T2_Write_engine_tests_for_standard_and_scientific_behavior/](P4-T2_Write_engine_tests_for_standard_and_scientific_behavior/) | 2026-03-25 | PASS |
 | P2-T5 | [P2-T5_Implement_parentheses_handling_and_display_formatting/](P2-T5_Implement_parentheses_handling_and_display_formatting/) | 2026-03-25 | PASS |
 | P2-T4 | [P2-T4_Implement_scientific_unary_and_binary_operations/](P2-T4_Implement_scientific_unary_and_binary_operations/) | 2026-03-25 | PASS |
@@ -54,6 +55,7 @@
 
 | Date | Task ID | Action |
 |------|---------|--------|
+| 2026-03-25 | P4-T3 | Archived task with validation report (PASS) |
 | 2026-03-25 | REVIEW_p4_t2_engine_tests | Archived REVIEW_p4_t2_engine_tests report |
 | 2026-03-25 | P4-T2 | Archived task with validation report (PASS) |
 | 2026-03-25 | REVIEW_p2_t5_parentheses_formatting | Archived REVIEW_p2_t5_parentheses_formatting report |

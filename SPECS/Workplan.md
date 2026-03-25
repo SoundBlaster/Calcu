@@ -280,7 +280,7 @@ Add keyboard support, test coverage, visual QA, and final readiness checks. This
   - [ ] Percent examples from the PRD are encoded as fixtures
   - [ ] Parentheses and error-state transitions are covered
 
-#### ⬜️ P4-T3: Verify visual stability across supported viewport sizes
+#### ✅ P4-T3: Verify visual stability across supported viewport sizes
 - **Description:** Perform structured visual QA on narrow portrait, mobile landscape, tablet-sized, and desktop-sized windows to confirm stable button proportions, spacing, and layout hierarchy.
 - **Priority:** P0
 - **Dependencies:** P3-T5
