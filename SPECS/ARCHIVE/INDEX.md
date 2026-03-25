@@ -28,6 +28,7 @@
 | Folder | Description |
 |--------|-------------|
 | [_Historical/](_Historical/) | Non-task artifacts |
+| [_Historical/REVIEW_p2_t3_memory_error.md](_Historical/REVIEW_p2_t3_memory_error.md) | Post-archive review report for the P2-T3 memory and error rules task |
 | [_Historical/REVIEW_p3_t5_calculator_composition.md](_Historical/REVIEW_p3_t5_calculator_composition.md) | Post-archive review report for the calculator composition task |
 | [_Historical/REVIEW_p3_t4_landscape_scientific.md](_Historical/REVIEW_p3_t4_landscape_scientific.md) | Post-archive review report for the landscape scientific keypad task |
 | [_Historical/REVIEW_p3_t3_portrait_keypad.md](_Historical/REVIEW_p3_t3_portrait_keypad.md) | Post-archive review report for the portrait keypad task |
@@ -47,6 +48,7 @@
 
 | Date | Task ID | Action |
 |------|---------|--------|
+| 2026-03-25 | REVIEW_p2_t3_memory_error | Archived REVIEW_p2_t3_memory_error report |
 | 2026-03-25 | P2-T3 | Archived task with validation report (PASS) |
 | 2026-03-25 | P2-T2 | Archived task with validation report (PASS) |
 | 2026-03-25 | P2-T1 | Archived task with validation report (PASS) |
