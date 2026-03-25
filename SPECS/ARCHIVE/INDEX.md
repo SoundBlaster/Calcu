@@ -32,6 +32,7 @@
 | [_Historical/REVIEW_p4_t1_keyboard_input_handling.md](_Historical/REVIEW_p4_t1_keyboard_input_handling.md) | Post-archive review report for the keyboard input handling task |
 | [_Historical/REVIEW_p3_t2_display_button_primitives.md](_Historical/REVIEW_p3_t2_display_button_primitives.md) | Post-archive review report for the display and button primitives task |
 | [_Historical/REVIEW_p1_t5_visual_tokens_contract.md](_Historical/REVIEW_p1_t5_visual_tokens_contract.md) | Post-archive review report for the layout token foundation task |
+| [_Historical/REVIEW_p1_t3_vitest_entrypoints.md](_Historical/REVIEW_p1_t3_vitest_entrypoints.md) | Post-archive review report for the Vitest entrypoints task |
 | [_Historical/REVIEW_p1_t1_task_system_contract.md](_Historical/REVIEW_p1_t1_task_system_contract.md) | Post-archive review report for P1-T1 |
 | [_Historical/REVIEW_p1_t1_scaffold_visual_foundation.md](_Historical/REVIEW_p1_t1_scaffold_visual_foundation.md) | Post-archive review report for the calculator scaffold task |
 
