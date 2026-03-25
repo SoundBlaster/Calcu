@@ -123,7 +123,7 @@ Add keyboard support, test coverage, visual QA, and final readiness checks. This
 
 ## Phase 2 — Calculator Engine
 
-#### ⬜️ P2-T1: Define typed calculator state and action contracts
+#### ✅ P2-T1: Define typed calculator state and action contracts
 - **Description:** Implement the shared types for calculator state, supported actions, operator identifiers, angle mode, `2nd` mode, and error state based on PRD section 6.
 - **Priority:** P0
 - **Dependencies:** P1-T4

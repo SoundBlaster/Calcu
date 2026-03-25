@@ -6,6 +6,7 @@
 
 | Task ID | Folder | Archived | Verdict |
 |---------|--------|----------|---------|
+| P2-T1 | [P2-T1_Define_typed_calculator_state_and_action_contracts/](P2-T1_Define_typed_calculator_state_and_action_contracts/) | 2026-03-25 | PASS |
 | P1-T4 | [P1-T4_Create_calculator_feature_module_boundaries/](P1-T4_Create_calculator_feature_module_boundaries/) | 2026-03-25 | PASS |
 | P1-T3 | [P1-T3_Configure_Vitest_and_test_entrypoints/](P1-T3_Configure_Vitest_and_test_entrypoints/) | 2026-03-25 | PASS |
 | P4-T1 | [P4-T1_Add_keyboard_input_handling/](P4-T1_Add_keyboard_input_handling/) | 2026-03-25 | PASS |
@@ -42,6 +43,7 @@
 
 | Date | Task ID | Action |
 |------|---------|--------|
+| 2026-03-25 | P2-T1 | Archived task with validation report (PASS) |
 | 2026-03-25 | P1-T4 | Archived task with validation report (PASS) |
 | 2026-03-25 | P1-T3 | Archived task with validation report (PASS) |
 | 2026-03-25 | P4-T1 | Archived REVIEW_p4_t1_keyboard_input_handling report |
