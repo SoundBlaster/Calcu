@@ -160,7 +160,7 @@ Add keyboard support, test coverage, visual QA, and final readiness checks. This
   - [ ] `mc`, `m+`, `m-`, and `mr` behave according to PRD section 6.10
   - [ ] Invalid operations enter a stable `Error` state
 
-#### ⬜️ P2-T4: Implement scientific unary and binary operations
+#### ⬜️ P2-T4: Implement scientific unary and binary operations **INPROGRESS**
 - **Description:** Add scientific operations for powers, roots, logarithms, factorial, constants, random, trigonometric functions, hyperbolic functions, and inverse variants used by `2nd` mode.
 - **Priority:** P0
 - **Dependencies:** P2-T1
