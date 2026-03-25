@@ -2,6 +2,19 @@
 
 Calcu is a responsive calculator app built with React, TypeScript, Vite, Vitest, and Biome.
 
+![Calcu screenshot](./screenshot.png)
+
+## Quick Start
+
+For a freshly cloned repo:
+
+```bash
+npm install
+npm run dev
+```
+
+Open the Vite URL printed in the terminal.
+
 ## Getting Started
 
 Install dependencies:
