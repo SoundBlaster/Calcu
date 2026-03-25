@@ -1,15 +1,15 @@
-# Next Task Queue
+# Next Task: P1-T3 — Configure Vitest and test entrypoints
 
-No active task currently selected.
+**Priority:** P0
+**Phase:** Foundation and Tooling
+**Effort:** 2 hours
+**Dependencies:** P1-T1
+**Status:** Selected
 
-## Recently Archived
+## Description
 
-- P1-T2 — Configure Biome and project scripts (PASS)
-- P4-T1 — Add keyboard input handling (PASS)
-- P3-T5 — Compose the calculator feature and viewport switching (PASS)
-- P3-T4 — Build the landscape scientific layout and `2nd` rendering (PASS)
+Set up Vitest for engine-focused unit testing and establish the initial test directory structure.
 
-## Suggested Next Tasks
+## Next Step
 
-1. P1-T3 — Configure Vitest and test entrypoints
-2. P1-T4 — Create calculator feature module boundaries
+Run the PLAN command to generate the implementation-ready PRD.
