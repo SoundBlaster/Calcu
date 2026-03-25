@@ -64,7 +64,7 @@ Add keyboard support, test coverage, visual QA, and final readiness checks. This
   - [ ] The app starts locally with a documented dev script
   - [ ] The source tree supports the PRD module layout
 
-#### ⬜️ P1-T2: Configure Biome and project scripts
+#### ▶️ P1-T2: Configure Biome and project scripts
 - **Description:** Add Biome configuration and package scripts for formatting, linting, and repository-level checks consistent with the PRD constraints.
 - **Priority:** P0
 - **Dependencies:** P1-T1
