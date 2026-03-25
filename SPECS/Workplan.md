@@ -77,7 +77,7 @@ Add keyboard support, test coverage, visual QA, and final readiness checks. This
   - [ ] Scripts for linting and formatting are available in `package.json`
   - [ ] Running the lint/check script succeeds on the scaffold
 
-#### ▶️ P1-T3: Configure Vitest and test entrypoints
+#### ✅ P1-T3: Configure Vitest and test entrypoints
 - **Description:** Set up Vitest for engine-focused unit testing and establish the initial test directory structure.
 - **Priority:** P0
 - **Dependencies:** P1-T1

@@ -1,15 +1,15 @@
-# Next Task: P1-T3 — Configure Vitest and test entrypoints
+# Next Task Queue
 
-**Priority:** P0
-**Phase:** Foundation and Tooling
-**Effort:** 2 hours
-**Dependencies:** P1-T1
-**Status:** Selected
+No active task currently selected.
 
-## Description
+## Recently Archived
 
-Set up Vitest for engine-focused unit testing and establish the initial test directory structure.
+- P1-T3 — Configure Vitest and test entrypoints (PASS)
+- P1-T2 — Configure Biome and project scripts (PASS)
+- P4-T1 — Add keyboard input handling (PASS)
+- P3-T5 — Compose the calculator feature and viewport switching (PASS)
 
-## Next Step
+## Suggested Next Tasks
 
-Run the PLAN command to generate the implementation-ready PRD.
+1. P1-T4 — Create calculator feature module boundaries
+2. P2-T1 — Define typed calculator state and action contracts
