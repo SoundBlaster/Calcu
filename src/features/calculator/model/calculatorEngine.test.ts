@@ -88,6 +88,51 @@ describe('reduceCalculatorState', () => {
     expect(state.displayValue).toBe('220');
   });
 
+  it('updates memory through add, subtract, and recall actions', () => {
+    const state = runActions([
+      'digit:5',
+      'memory:add',
+      'binary:add',
+      'digit:2',
+      'memory:subtract',
+      'memory:recall',
+    ]);
+
+    expect(state.displayValue).toBe('3');
+    expect(state.memoryValue).toBe(3);
+  });
+
+  it('clears memory without disturbing the active display', () => {
+    const state = runActions([
+      'digit:4',
+      'memory:add',
+      'memory:clear',
+      'memory:recall',
+    ]);
+
+    expect(state.displayValue).toBe('0');
+    expect(state.memoryValue).toBe(0);
+  });
+
+  it('enters an error state for invalid arithmetic and resets on all-clear', () => {
+    const erroredState = runActions([
+      'digit:8',
+      'binary:divide',
+      'digit:0',
+      'command:equals',
+    ]);
+
+    expect(erroredState.displayValue).toBe('Error');
+    expect(erroredState.errorState).toBe(true);
+
+    const recoveredState = reduceCalculatorState(
+      erroredState,
+      'command:all-clear',
+    );
+
+    expect(recoveredState).toEqual(initialCalculatorState);
+  });
+
   it('toggles second mode through the reducer', () => {
     const state = runActions(['mode:toggle-second']);
 

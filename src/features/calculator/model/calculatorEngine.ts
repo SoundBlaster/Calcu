@@ -68,6 +68,20 @@ function updateDisplayValue(
   };
 }
 
+function updateMemoryValue(
+  state: CalculatorState,
+  nextValue: number,
+): CalculatorState {
+  if (!Number.isFinite(nextValue)) {
+    return setErrorState(state);
+  }
+
+  return {
+    ...state,
+    memoryValue: nextValue,
+  };
+}
+
 function replaceWithDigit(
   state: CalculatorState,
   digit: string,
@@ -251,6 +265,38 @@ function applyEquals(state: CalculatorState): CalculatorState {
   return state;
 }
 
+function applyMemoryOperation(
+  state: CalculatorState,
+  operation: 'add' | 'clear' | 'recall' | 'subtract',
+): CalculatorState {
+  if (state.errorState) {
+    return state;
+  }
+
+  const currentValue = parseDisplayValue(state.displayValue);
+
+  switch (operation) {
+    case 'add':
+      return updateMemoryValue(state, state.memoryValue + currentValue);
+    case 'clear':
+      return {
+        ...state,
+        memoryValue: 0,
+      };
+    case 'recall':
+      return {
+        ...state,
+        displayValue: normalizeNumber(state.memoryValue) ?? '0',
+        errorState: false,
+        errorKind: null,
+        errorMessage: null,
+        replaceDisplayOnNextDigit: false,
+      };
+    case 'subtract':
+      return updateMemoryValue(state, state.memoryValue - currentValue);
+  }
+}
+
 export function reduceCalculatorState(
   state: CalculatorState,
   actionId: CalculatorKeyActionId,
@@ -309,6 +355,14 @@ export function reduceCalculatorState(
 
       return updateDisplayValue(state, percentValue);
     }
+    case 'memory:add':
+      return applyMemoryOperation(state, 'add');
+    case 'memory:clear':
+      return applyMemoryOperation(state, 'clear');
+    case 'memory:recall':
+      return applyMemoryOperation(state, 'recall');
+    case 'memory:subtract':
+      return applyMemoryOperation(state, 'subtract');
     case 'command:toggle-sign':
       if (state.errorState || state.displayValue === '0') {
         return state;
