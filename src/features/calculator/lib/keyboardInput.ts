@@ -21,6 +21,10 @@ function isEditableTarget(target: EventTarget | null) {
   );
 }
 
+function isButtonEnterActivation(event: KeyboardEvent) {
+  return event.key === 'Enter' && event.target instanceof HTMLButtonElement;
+}
+
 export function mapKeyboardInputToActionId(
   event: KeyboardInput,
 ): CalculatorKeyActionId | null {
@@ -56,5 +60,5 @@ export function mapKeyboardInputToActionId(
 }
 
 export function shouldIgnoreCalculatorKeyboardEvent(event: KeyboardEvent) {
-  return isEditableTarget(event.target);
+  return isEditableTarget(event.target) || isButtonEnterActivation(event);
 }

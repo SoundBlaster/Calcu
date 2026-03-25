@@ -131,6 +131,37 @@ describe('Calculator', () => {
     expect(getDisplayValue()).toBe('0');
   });
 
+  it('ignores Enter on a focused calculator button so native click handling is not duplicated', () => {
+    setViewportSize(430, 932);
+    render(<Calculator />);
+
+    clickButton('1');
+    clickButton('+');
+    clickButton('2');
+
+    const equalsButton = Array.from(container.querySelectorAll('button')).find(
+      (item) => item.textContent === '=',
+    );
+
+    if (!equalsButton) {
+      throw new Error('Expected equals button to render.');
+    }
+
+    act(() => {
+      equalsButton.click();
+    });
+
+    expect(getDisplayValue()).toBe('3');
+
+    act(() => {
+      equalsButton.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }),
+      );
+    });
+
+    expect(getDisplayValue()).toBe('3');
+  });
+
   it('deletes active digits with backspace and ignores it after equals', () => {
     setViewportSize(430, 932);
     render(<Calculator />);
