@@ -352,6 +352,20 @@ Boundary note: P1-T1 delivers the runnable app shell only; the remaining Phase 1
   - [ ] Global keyboard support remains available for calculator shortcuts when no interactive control should handle the key
   - [ ] Regression coverage proves the focused-button path does not double-dispatch
 
+#### ✅ P4-T8: Establish repository quality gates and CI reporting
+- **Description:** Add end-to-end code quality infrastructure for linting, formatting, test coverage thresholds, README badges, and GitHub Actions workflows so repository health is visible and enforced automatically.
+- **Priority:** P0
+- **Dependencies:** P1-T2, P1-T3, P4-T2, P4-T5
+- **Parallelizable:** no
+- **Outputs/Artifacts:**
+  - GitHub Actions workflow files under `.github/workflows/`
+  - coverage and quality badge updates in `README.md`
+  - any supporting scripts or config updates needed to enforce lint, format, test, and coverage checks
+- **Acceptance Criteria:**
+  - [ ] Lint, format, test, and coverage checks run in CI on pull requests and default-branch pushes
+  - [ ] Coverage metrics are generated and surfaced through badges or workflow artifacts
+  - [ ] README communicates the repo's quality status with visible badges and consistent commands
+
 ## 4. Traceability
 
 | PRD Area | Covered By |
@@ -366,6 +380,7 @@ Boundary note: P1-T1 delivers the runnable app shell only; the remaining Phase 1
 | Stable button styling | P1-T5, P3-T2, P3-T3, P3-T4, P4-T3, P4-T4 |
 | Keyboard support | P4-T1 |
 | Accessibility and focus states | P3-T2, P4-T4 |
+| Repository quality gates, coverage, and CI | P1-T2, P1-T3, P4-T5, P4-T8 |
 
 ## 5. Dependency Notes
 

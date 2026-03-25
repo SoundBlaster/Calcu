@@ -1,23 +1,26 @@
 # .flow/params.yaml
-# Project-specific config for the Calcu app.
+# Project configuration for Flow.
 
 project:
   name: Calcu
-  description: Visual-first responsive calculator app built with React and TypeScript
+  description: Responsive calculator app built with React 19, TypeScript, Vite, Vitest, and Biome.
   language: TypeScript
   package_manager: npm
   default_branch: main
 
 verify:
-  tests: npm run test -- --run
+  tests: npm run test:run
   lint: npm run lint
-  format: npm run format
+  format: npm run format:check
   typecheck: npm run typecheck
+  coverage: npm run test:coverage
+  coverage_threshold: 80
 
 task_system:
-  kind: file                # file | github | jira | linear | none
-  project_key: Calcu        # optional lightweight scope key
-  task_url_template: "SPECS/Workplan.md#phase-1--foundation-and-tooling"  # optional markdown anchor template
+  kind: file
+  project_key: CALCU
+  task_url_template: "SPECS/Workplan.md#{task_id}-{task_name_slug}"
 
 structure:
   source: src/
+  tests: src/
