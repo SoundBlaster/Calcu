@@ -6,6 +6,7 @@
 
 | Task ID | Folder | Archived | Verdict |
 |---------|--------|----------|---------|
+| FU-T2 | [FU-T2_Re-scope_remaining_Phase_1_setup_tasks_after_scaffold_delivery/](FU-T2_Re-scope_remaining_Phase_1_setup_tasks_after_scaffold_delivery/) | 2026-03-25 | PASS |
 | P4-T7 | [P4-T7_Prevent_Enter_from_double-dispatching_focused_calculator_buttons/](P4-T7_Prevent_Enter_from_double-dispatching_focused_calculator_buttons/) | 2026-03-25 | PASS |
 | P4-T5 | [P4-T5_Finalize_readiness_scripts_and_developer_guidance/](P4-T5_Finalize_readiness_scripts_and_developer_guidance/) | 2026-03-25 | PASS |
 | P4-T4 | [P4-T4_Add_accessibility_and_interaction_state_checks/](P4-T4_Add_accessibility_and_interaction_state_checks/) | 2026-03-25 | PASS |
@@ -62,6 +63,7 @@
 
 | Date | Task ID | Action |
 |------|---------|--------|
+| 2026-03-25 | FU-T2 | Archived task with validation report (PASS) |
 | 2026-03-25 | REVIEW_p4_phase4_completion | Archived REVIEW_p4_phase4_completion report |
 | 2026-03-25 | P4-T7 | Archived task with validation report (PASS) |
 | 2026-03-25 | REVIEW_p4_t5_readiness_guidance | Archived REVIEW_p4_t5_readiness_guidance report |

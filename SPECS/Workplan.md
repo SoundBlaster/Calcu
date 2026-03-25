@@ -384,7 +384,7 @@ Boundary note: P1-T1 delivers the runnable app shell only; the remaining Phase 1
   - [ ] `next.md`, archive entries, and future PRDs can reference calculator tasks unambiguously
   - [ ] The chosen naming policy is documented in repository workflow artifacts
 
-#### ⬜️ FU-T2: Re-scope remaining Phase 1 setup tasks after scaffold delivery
+#### ✅ FU-T2: Re-scope remaining Phase 1 setup tasks after scaffold delivery
 - **Description:** Reconcile `P1-T2`, `P1-T3`, and `P1-T4` with the work already delivered in `P1-T1` so future FLOW runs do not duplicate completed setup work.
 - **Priority:** P1
 - **Dependencies:** none
