@@ -62,6 +62,7 @@
 
 | Date | Task ID | Action |
 |------|---------|--------|
+| Legacy | P1-T1 | Historical duplicate IDs are disambiguated by archive folder slug; use the folder path as the canonical reference |
 | 2026-03-25 | REVIEW_p4_phase4_completion | Archived REVIEW_p4_phase4_completion report |
 | 2026-03-25 | P4-T7 | Archived task with validation report (PASS) |
 | 2026-03-25 | REVIEW_p4_t5_readiness_guidance | Archived REVIEW_p4_t5_readiness_guidance report |

@@ -18,6 +18,11 @@ Constraints inherited from the PRD:
 - responsive behavior must preserve calculator state across viewport changes
 - button styling must remain stable across supported viewport sizes
 
+Task ID policy:
+- Phase tasks use the `P{phase}-T{task}` convention.
+- Follow-up tasks use the `FU-{task}` convention.
+- When archive history contains legacy duplicate IDs, the archive folder slug is the canonical lookup path.
+
 Non-goals:
 - calculation history
 - persistent storage
