@@ -293,7 +293,7 @@ Add keyboard support, test coverage, visual QA, and final readiness checks. This
   - [ ] Portrait and landscape each feel intentionally designed rather than auto-scaled
   - [ ] Extra screen width does not produce a weak, undersized calculator region
 
-#### ⬜️ P4-T4: Add accessibility and interaction-state checks
+#### ✅ P4-T4: Add accessibility and interaction-state checks
 - **Description:** Verify accessible button semantics, visible focus states, and stable press/hover/focus styling for all button families.
 - **Priority:** P1
 - **Dependencies:** P3-T2, P3-T5
