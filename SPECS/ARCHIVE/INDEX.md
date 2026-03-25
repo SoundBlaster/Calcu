@@ -6,6 +6,7 @@
 
 | Task ID | Folder | Archived | Verdict |
 |---------|--------|----------|---------|
+| FU-T1 | [FU-T1_Normalize_calculator_task_IDs_against_existing_archive_history/](FU-T1_Normalize_calculator_task_IDs_against_existing_archive_history/) | 2026-03-25 | PASS |
 | P4-T7 | [P4-T7_Prevent_Enter_from_double-dispatching_focused_calculator_buttons/](P4-T7_Prevent_Enter_from_double-dispatching_focused_calculator_buttons/) | 2026-03-25 | PASS |
 | P4-T5 | [P4-T5_Finalize_readiness_scripts_and_developer_guidance/](P4-T5_Finalize_readiness_scripts_and_developer_guidance/) | 2026-03-25 | PASS |
 | P4-T4 | [P4-T4_Add_accessibility_and_interaction_state_checks/](P4-T4_Add_accessibility_and_interaction_state_checks/) | 2026-03-25 | PASS |
@@ -62,6 +63,7 @@
 
 | Date | Task ID | Action |
 |------|---------|--------|
+| 2026-03-25 | FU-T1 | Archived task with validation report (PASS) |
 | Legacy | P1-T1 | Historical duplicate IDs are disambiguated by archive folder slug; use the folder path as the canonical reference |
 | 2026-03-25 | REVIEW_p4_phase4_completion | Archived REVIEW_p4_phase4_completion report |
 | 2026-03-25 | P4-T7 | Archived task with validation report (PASS) |

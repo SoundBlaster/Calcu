@@ -374,7 +374,7 @@ Add keyboard support, test coverage, visual QA, and final readiness checks. This
 
 ## 6. Follow-up Tasks
 
-#### ⬜️ FU-T1: Normalize calculator task IDs against existing archive history
+#### ✅ FU-T1: Normalize calculator task IDs against existing archive history
 - **Description:** Introduce a stable calculator-specific task ID naming approach or archive migration so newly archived calculator tasks cannot collide with legacy Flow task IDs already present in `SPECS/ARCHIVE/INDEX.md`.
 - **Priority:** P1
 - **Dependencies:** none
