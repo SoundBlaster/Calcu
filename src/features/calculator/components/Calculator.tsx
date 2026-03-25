@@ -5,6 +5,7 @@ import {
   type CalculatorViewportMode,
   getLandscapeScientificKeyRows,
 } from '../config';
+import { formatDisplayValue } from '../lib';
 import { initialCalculatorState, reduceCalculatorState } from '../model';
 import styles from './Calculator.module.css';
 import { Display } from './Display';
@@ -17,10 +18,6 @@ function getViewportMode(): CalculatorViewportMode {
   }
 
   return window.innerWidth >= window.innerHeight ? 'landscape' : 'portrait';
-}
-
-function formatDisplayValue(value: string) {
-  return value === 'Error' ? value : value.replace('.', ',');
 }
 
 export function Calculator() {

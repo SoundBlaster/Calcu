@@ -5,6 +5,7 @@ import {
 } from '../lib';
 import {
   type CalculatorBinaryOperator,
+  type CalculatorParenthesisFrame,
   type CalculatorState,
   initialCalculatorState,
 } from './calculatorTypes';
@@ -27,6 +28,7 @@ function setErrorState(state: CalculatorState): CalculatorState {
     lastBinaryOperand: null,
     lastBinaryOperator: null,
     pendingBinaryOperator: null,
+    parenthesisStack: [],
     replaceDisplayOnNextDigit: true,
     storedValue: null,
   };
@@ -193,6 +195,88 @@ function applyScientificNotation(state: CalculatorState) {
     : `${state.displayValue}e`;
 
   return applyResolvedDisplayValue(state, nextDisplayValue, false);
+}
+
+function createParenthesisFrame(
+  state: CalculatorState,
+): CalculatorParenthesisFrame {
+  return {
+    lastBinaryOperand: state.lastBinaryOperand,
+    lastBinaryOperator: state.lastBinaryOperator,
+    pendingBinaryOperator: state.pendingBinaryOperator,
+    replaceDisplayOnNextDigit: state.replaceDisplayOnNextDigit,
+    storedValue: state.storedValue,
+  };
+}
+
+function resetExpressionForParenthesis(state: CalculatorState) {
+  return {
+    ...state,
+    displayValue: '0',
+    errorState: false,
+    errorKind: null,
+    errorMessage: null,
+    lastBinaryOperand: null,
+    lastBinaryOperator: null,
+    pendingBinaryOperator: null,
+    replaceDisplayOnNextDigit: false,
+    storedValue: null,
+  };
+}
+
+function applyOpenParenthesis(state: CalculatorState): CalculatorState {
+  if (state.errorState) {
+    return state;
+  }
+
+  const canStartNestedExpression =
+    state.displayValue === '0' ||
+    state.pendingBinaryOperator !== null ||
+    state.parenthesisStack.length > 0;
+
+  if (!canStartNestedExpression) {
+    return state;
+  }
+
+  return {
+    ...resetExpressionForParenthesis(state),
+    parenthesisStack: [
+      ...state.parenthesisStack,
+      createParenthesisFrame(state),
+    ],
+  };
+}
+
+function applyCloseParenthesis(state: CalculatorState): CalculatorState {
+  if (state.errorState || state.parenthesisStack.length === 0) {
+    return state;
+  }
+
+  const resolvedState =
+    state.pendingBinaryOperator && state.storedValue !== null
+      ? applyEquals(state)
+      : state;
+
+  if (resolvedState.errorState) {
+    return resolvedState;
+  }
+
+  const nextStack = resolvedState.parenthesisStack.slice(0, -1);
+  const previousFrame = resolvedState.parenthesisStack.at(-1);
+
+  if (previousFrame === undefined) {
+    return resolvedState;
+  }
+
+  return {
+    ...resolvedState,
+    lastBinaryOperand: previousFrame.lastBinaryOperand,
+    lastBinaryOperator: previousFrame.lastBinaryOperator,
+    parenthesisStack: nextStack,
+    pendingBinaryOperator: previousFrame.pendingBinaryOperator,
+    replaceDisplayOnNextDigit: true,
+    storedValue: previousFrame.storedValue,
+  };
 }
 
 function replaceWithDigit(
@@ -432,6 +516,10 @@ export function reduceCalculatorState(
       return applyPendingOperator(state, 'subtract');
     case 'binary:y-to-x':
       return applyPendingOperator(state, 'y-to-x');
+    case 'group:open-parenthesis':
+      return applyOpenParenthesis(state);
+    case 'group:close-parenthesis':
+      return applyCloseParenthesis(state);
     case 'command:all-clear':
       return {
         ...initialCalculatorState,

@@ -12,6 +12,7 @@ describe('calculatorTypes', () => {
       lastBinaryOperand: null,
       lastBinaryOperator: null,
       memoryValue: 0,
+      parenthesisStack: [],
       pendingBinaryOperator: null,
       replaceDisplayOnNextDigit: false,
       secondMode: false,

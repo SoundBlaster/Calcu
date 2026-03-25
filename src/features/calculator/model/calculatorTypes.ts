@@ -8,6 +8,14 @@ export type CalculatorBinaryOperator =
   | 'subtract'
   | 'y-to-x';
 
+export type CalculatorParenthesisFrame = Readonly<{
+  lastBinaryOperand: number | null;
+  lastBinaryOperator: CalculatorBinaryOperator | null;
+  pendingBinaryOperator: CalculatorBinaryOperator | null;
+  replaceDisplayOnNextDigit: boolean;
+  storedValue: number | null;
+}>;
+
 export type CalculatorAngleMode = 'deg' | 'rad';
 
 export type CalculatorUnaryAction =
@@ -81,6 +89,7 @@ export type CalculatorState = Readonly<{
   lastBinaryOperand: number | null;
   lastBinaryOperator: CalculatorBinaryOperator | null;
   memoryValue: number;
+  parenthesisStack: ReadonlyArray<CalculatorParenthesisFrame>;
   pendingBinaryOperator: CalculatorBinaryOperator | null;
   replaceDisplayOnNextDigit: boolean;
   secondMode: boolean;
@@ -96,6 +105,7 @@ export const initialCalculatorState: CalculatorState = {
   lastBinaryOperand: null,
   lastBinaryOperator: null,
   memoryValue: 0,
+  parenthesisStack: [],
   pendingBinaryOperator: null,
   replaceDisplayOnNextDigit: false,
   secondMode: false,
