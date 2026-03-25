@@ -74,3 +74,7 @@ Verification:
 
 - Keep parentheses handling for P2-T5; do not build a general expression parser here.
 - If any key labels already exist in the metadata but are not meant to execute yet, document the gap in tests instead of silently wiring them to a placeholder.
+
+---
+**Archived:** 2026-03-25
+**Verdict:** PASS

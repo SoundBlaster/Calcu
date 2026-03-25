@@ -1,15 +1,11 @@
-# Next Task: P2-T4 — Implement scientific unary and binary operations
+# Next Task Queue
 
-**Priority:** P0
-**Phase:** Phase 2 — Calculator Engine
-**Effort:** Large
-**Dependencies:** P2-T1
-**Status:** Selected
+No active task currently selected.
 
-## Description
+## Recently Archived
 
-Add the scientific operations required by the landscape calculator, including powers, roots, logarithms, factorial, constants, random, trigonometric functions, hyperbolic functions, and the `2nd`-mode inverse variants. The goal is to extend the pure reducer and math helpers without entangling the UI layer.
+- P2-T4 — Implement scientific unary and binary operations (PASS)
 
-## Next Step
+## Suggested Next Tasks
 
-Run the PLAN command to generate the implementation-ready PRD.
+1. P2-T5 — Implement parentheses handling and display formatting
