@@ -1,6 +1,11 @@
 # Next Task Queue
 
-No active task currently selected.
+## Active Task
+
+- FU-T2 — Re-scope remaining Phase 1 setup tasks after scaffold delivery
+- Priority: P1
+- Dependencies: none
+- Outputs: updated workplan task descriptions and scope boundaries
 
 ## Recently Archived
 
