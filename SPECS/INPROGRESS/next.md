@@ -1,11 +1,15 @@
-# Next Task Queue
+# Next Task: P2-T5 — Implement parentheses handling and display formatting
 
-No active task currently selected.
+**Priority:** P0
+**Phase:** Phase 2 — Calculator Engine
+**Effort:** Large
+**Dependencies:** P2-T2, P2-T4
+**Status:** Selected
 
-## Recently Archived
+## Description
 
-- P2-T4 — Implement scientific unary and binary operations (PASS)
+Add the scientific expression stack needed for parentheses support and implement display formatting that preserves readability without layout breakage. The goal is to keep the reducer deterministic while moving the formatting responsibility out of React rendering.
 
-## Suggested Next Tasks
+## Next Step
 
-1. P2-T5 — Implement parentheses handling and display formatting
+Run the PLAN command to generate the implementation-ready PRD.
