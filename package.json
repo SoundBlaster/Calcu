@@ -9,6 +9,8 @@
     "preview": "vite preview",
     "lint": "biome check . --vcs-use-ignore-file=true",
     "format": "biome format --write . --vcs-use-ignore-file=true",
+    "format:check": "biome format . --vcs-use-ignore-file=true",
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm run test:run",
     "test": "vitest",
     "test:run": "vitest run",
     "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit"

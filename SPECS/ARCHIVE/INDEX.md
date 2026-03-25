@@ -7,6 +7,7 @@
 | Task ID | Folder | Archived | Verdict |
 |---------|--------|----------|---------|
 | P4-T1 | [P4-T1_Add_keyboard_input_handling/](P4-T1_Add_keyboard_input_handling/) | 2026-03-25 | PASS |
+| P1-T2 | [P1-T2_Configure_Biome_and_project_scripts/](P1-T2_Configure_Biome_and_project_scripts/) | 2026-03-25 | PASS |
 | P3-T5 | [P3-T5_Compose_the_calculator_feature_and_viewport_switching/](P3-T5_Compose_the_calculator_feature_and_viewport_switching/) | 2026-03-25 | PASS |
 | P3-T4 | [P3-T4_Build_the_landscape_scientific_layout_and_2nd_rendering/](P3-T4_Build_the_landscape_scientific_layout_and_2nd_rendering/) | 2026-03-25 | PASS |
 | P3-T3 | [P3-T3_Build_the_portrait_keypad_layout/](P3-T3_Build_the_portrait_keypad_layout/) | 2026-03-25 | PASS |
@@ -39,6 +40,7 @@
 |------|---------|--------|
 | 2026-03-25 | P4-T1 | Archived REVIEW_p4_t1_keyboard_input_handling report |
 | 2026-03-25 | P4-T1 | Archived task with validation report (PASS) |
+| 2026-03-25 | P1-T2 | Archived task with validation report (PASS) |
 | 2026-03-25 | P3-T5 | Archived REVIEW_p3_t5_calculator_composition report |
 | 2026-03-25 | P3-T5 | Archived task with validation report (PASS) |
 | 2026-03-25 | P3-T4 | Archived REVIEW_p3_t4_landscape_scientific report |
