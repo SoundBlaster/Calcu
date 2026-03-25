@@ -31,6 +31,7 @@
 | Folder | Description |
 |--------|-------------|
 | [_Historical/](_Historical/) | Non-task artifacts |
+| [_Historical/REVIEW_p4_t2_engine_tests.md](_Historical/REVIEW_p4_t2_engine_tests.md) | Post-archive review report for the P4-T2 engine tests task |
 | [_Historical/REVIEW_p2_t5_parentheses_formatting.md](_Historical/REVIEW_p2_t5_parentheses_formatting.md) | Post-archive review report for the P2-T5 parentheses and display formatting task |
 | [_Historical/REVIEW_p2_t4_scientific_ops.md](_Historical/REVIEW_p2_t4_scientific_ops.md) | Post-archive review report for the P2-T4 scientific operations task |
 | [_Historical/REVIEW_p2_t3_memory_error.md](_Historical/REVIEW_p2_t3_memory_error.md) | Post-archive review report for the P2-T3 memory and error rules task |
@@ -53,6 +54,7 @@
 
 | Date | Task ID | Action |
 |------|---------|--------|
+| 2026-03-25 | REVIEW_p4_t2_engine_tests | Archived REVIEW_p4_t2_engine_tests report |
 | 2026-03-25 | P4-T2 | Archived task with validation report (PASS) |
 | 2026-03-25 | REVIEW_p2_t5_parentheses_formatting | Archived REVIEW_p2_t5_parentheses_formatting report |
 | 2026-03-25 | P2-T5 | Archived task with validation report (PASS) |
