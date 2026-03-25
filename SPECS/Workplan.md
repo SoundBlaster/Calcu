@@ -18,6 +18,11 @@ Constraints inherited from the PRD:
 - responsive behavior must preserve calculator state across viewport changes
 - button styling must remain stable across supported viewport sizes
 
+Task ID policy:
+- Phase tasks use the `P{phase}-T{task}` convention.
+- Follow-up tasks use the `FU-{task}` convention.
+- When archive history contains legacy duplicate IDs, the archive folder slug is the canonical lookup path.
+
 Non-goals:
 - calculation history
 - persistent storage
@@ -369,7 +374,7 @@ Add keyboard support, test coverage, visual QA, and final readiness checks. This
 
 ## 6. Follow-up Tasks
 
-#### ⬜️ FU-T1: Normalize calculator task IDs against existing archive history
+#### ✅ FU-T1: Normalize calculator task IDs against existing archive history
 - **Description:** Introduce a stable calculator-specific task ID naming approach or archive migration so newly archived calculator tasks cannot collide with legacy Flow task IDs already present in `SPECS/ARCHIVE/INDEX.md`.
 - **Priority:** P1
 - **Dependencies:** none
