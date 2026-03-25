@@ -36,6 +36,7 @@
 | [_Historical/REVIEW_p1_t5_visual_tokens_contract.md](_Historical/REVIEW_p1_t5_visual_tokens_contract.md) | Post-archive review report for the layout token foundation task |
 | [_Historical/REVIEW_p1_t3_vitest_entrypoints.md](_Historical/REVIEW_p1_t3_vitest_entrypoints.md) | Post-archive review report for the Vitest entrypoints task |
 | [_Historical/REVIEW_p1_t4_module_boundaries.md](_Historical/REVIEW_p1_t4_module_boundaries.md) | Post-archive review report for the module boundaries task |
+| [_Historical/REVIEW_p2_t1_state_contracts.md](_Historical/REVIEW_p2_t1_state_contracts.md) | Post-archive review report for the state contracts task |
 | [_Historical/REVIEW_p1_t1_task_system_contract.md](_Historical/REVIEW_p1_t1_task_system_contract.md) | Post-archive review report for P1-T1 |
 | [_Historical/REVIEW_p1_t1_scaffold_visual_foundation.md](_Historical/REVIEW_p1_t1_scaffold_visual_foundation.md) | Post-archive review report for the calculator scaffold task |
 
