@@ -1,15 +1,15 @@
-# Next Task: P2-T2 — Implement standard arithmetic state transitions
+# Next Task Queue
 
-**Priority:** P0
-**Phase:** Calculator Engine
-**Effort:** 4 hours
-**Dependencies:** P2-T1
-**Status:** Selected
+No active task currently selected.
 
-## Description
+## Recently Archived
 
-Implement the core engine for digits, decimal entry, clear, sign toggle, binary operators, equals, and repeated equals using the immediate-execution model.
+- P2-T2 — Implement standard arithmetic state transitions (PASS)
+- P2-T1 — Define typed calculator state and action contracts (PASS)
+- P1-T4 — Create calculator feature module boundaries (PASS)
+- P1-T3 — Configure Vitest and test entrypoints (PASS)
 
-## Next Step
+## Suggested Next Tasks
 
-Run the PLAN command to generate the implementation-ready PRD.
+1. P2-T3 — Implement percent, memory, and error rules
+2. P2-T4 — Implement scientific unary and binary operations

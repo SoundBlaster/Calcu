@@ -135,7 +135,7 @@ Add keyboard support, test coverage, visual QA, and final readiness checks. This
   - [ ] Types distinguish unary operations, binary operations, memory actions, and layout-driven actions
   - [ ] Type definitions compile without `any`
 
-#### ▶️ P2-T2: Implement standard arithmetic state transitions
+#### ✅ P2-T2: Implement standard arithmetic state transitions
 - **Description:** Implement the core engine for digits, decimal entry, clear, sign toggle, binary operators, equals, and repeated equals using the immediate-execution model.
 - **Priority:** P0
 - **Dependencies:** P2-T1
