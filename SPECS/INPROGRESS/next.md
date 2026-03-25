@@ -1,6 +1,13 @@
 # Next Task Queue
 
-No active task currently selected.
+Selected task: P4-T8
+
+## Active Task
+
+- Task ID: P4-T8
+- Task Name: Establish repository quality gates and CI reporting
+- Branch: feature/P4-T8-repository-quality-gates
+- Status: selected for FLOW execution
 
 ## Recently Archived
 
