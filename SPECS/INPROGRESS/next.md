@@ -1,6 +1,11 @@
 # Next Task Queue
 
-No active task currently selected.
+## Active Task
+
+- FU-T1 — Normalize calculator task IDs against existing archive history
+- Priority: P1
+- Dependencies: none
+- Outputs: updated task ID policy and archive references if needed
 
 ## Recently Archived
 
