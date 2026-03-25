@@ -36,6 +36,7 @@
 | Folder | Description |
 |--------|-------------|
 | [_Historical/](_Historical/) | Non-task artifacts |
+| [_Historical/REVIEW_fu_t1_namespace_policy.md](_Historical/REVIEW_fu_t1_namespace_policy.md) | Post-archive review report for the FU-T1 namespace policy task |
 | [_Historical/REVIEW_p4_phase4_completion.md](_Historical/REVIEW_p4_phase4_completion.md) | Post-archive review report for the Phase 4 completion task |
 | [_Historical/REVIEW_p4_t5_readiness_guidance.md](_Historical/REVIEW_p4_t5_readiness_guidance.md) | Post-archive review report for the P4-T5 readiness guidance task |
 | [_Historical/REVIEW_p4_t4_accessibility.md](_Historical/REVIEW_p4_t4_accessibility.md) | Post-archive review report for the P4-T4 accessibility task |
@@ -63,6 +64,7 @@
 
 | Date | Task ID | Action |
 |------|---------|--------|
+| 2026-03-25 | REVIEW_fu_t1_namespace_policy | Archived REVIEW_fu_t1_namespace_policy report |
 | 2026-03-25 | FU-T1 | Archived task with validation report (PASS) |
 | Legacy | P1-T1 | Historical duplicate IDs are disambiguated by archive folder slug; use the folder path as the canonical reference |
 | 2026-03-25 | REVIEW_p4_phase4_completion | Archived REVIEW_p4_phase4_completion report |
