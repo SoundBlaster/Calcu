@@ -8,6 +8,48 @@ function runActions(actions: ReadonlyArray<CalculatorKeyActionId>) {
 }
 
 describe('reduceCalculatorState', () => {
+  it('resets all state on all-clear', () => {
+    const state = runActions([
+      'digit:9',
+      'binary:add',
+      'digit:1',
+      'command:all-clear',
+    ]);
+
+    expect(state).toEqual(initialCalculatorState);
+  });
+
+  it('ignores duplicate decimal entry in a single number', () => {
+    const state = runActions([
+      'digit:1',
+      'command:decimal',
+      'digit:2',
+      'command:decimal',
+      'digit:3',
+    ]);
+
+    expect(state.displayValue).toBe('1.23');
+  });
+
+  it('toggles sign for a non-zero number', () => {
+    const state = runActions(['digit:5', 'command:toggle-sign']);
+
+    expect(state.displayValue).toBe('-5');
+  });
+
+  it('chains binary operators through immediate execution', () => {
+    const state = runActions([
+      'digit:1',
+      'binary:add',
+      'digit:2',
+      'binary:add',
+      'digit:3',
+      'command:equals',
+    ]);
+
+    expect(state.displayValue).toBe('6');
+  });
+
   it('resolves standard arithmetic input', () => {
     const state = runActions([
       'digit:1',
