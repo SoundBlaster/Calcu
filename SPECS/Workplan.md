@@ -91,7 +91,7 @@ Add keyboard support, test coverage, visual QA, and final readiness checks. This
   - [ ] At least one initial test file is discoverable by Vitest
   - [ ] Test execution succeeds on the scaffold
 
-#### ⬜️ P1-T4: Create calculator feature module boundaries
+#### ▶️ P1-T4: Create calculator feature module boundaries
 - **Description:** Create the top-level feature folders and placeholder modules required by the PRD so engine, config, components, and styles evolve independently.
 - **Priority:** P0
 - **Dependencies:** P1-T1

@@ -1,15 +1,15 @@
-# Next Task Queue
+# Next Task: P1-T4 — Create calculator feature module boundaries
 
-No active task currently selected.
+**Priority:** P0
+**Phase:** Foundation and Tooling
+**Effort:** 2 hours
+**Dependencies:** P1-T1
+**Status:** Selected
 
-## Recently Archived
+## Description
 
-- P1-T3 — Configure Vitest and test entrypoints (PASS)
-- P1-T2 — Configure Biome and project scripts (PASS)
-- P4-T1 — Add keyboard input handling (PASS)
-- P3-T5 — Compose the calculator feature and viewport switching (PASS)
+Create the top-level feature folders and placeholder modules required by the PRD so engine, config, components, and styles evolve independently.
 
-## Suggested Next Tasks
+## Next Step
 
-1. P1-T4 — Create calculator feature module boundaries
-2. P2-T1 — Define typed calculator state and action contracts
+Run the PLAN command to generate the implementation-ready PRD.
