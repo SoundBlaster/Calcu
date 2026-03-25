@@ -30,6 +30,7 @@
 | Folder | Description |
 |--------|-------------|
 | [_Historical/](_Historical/) | Non-task artifacts |
+| [_Historical/REVIEW_p2_t5_parentheses_formatting.md](_Historical/REVIEW_p2_t5_parentheses_formatting.md) | Post-archive review report for the P2-T5 parentheses and display formatting task |
 | [_Historical/REVIEW_p2_t4_scientific_ops.md](_Historical/REVIEW_p2_t4_scientific_ops.md) | Post-archive review report for the P2-T4 scientific operations task |
 | [_Historical/REVIEW_p2_t3_memory_error.md](_Historical/REVIEW_p2_t3_memory_error.md) | Post-archive review report for the P2-T3 memory and error rules task |
 | [_Historical/REVIEW_p3_t5_calculator_composition.md](_Historical/REVIEW_p3_t5_calculator_composition.md) | Post-archive review report for the calculator composition task |
@@ -51,6 +52,7 @@
 
 | Date | Task ID | Action |
 |------|---------|--------|
+| 2026-03-25 | REVIEW_p2_t5_parentheses_formatting | Archived REVIEW_p2_t5_parentheses_formatting report |
 | 2026-03-25 | P2-T5 | Archived task with validation report (PASS) |
 | 2026-03-25 | REVIEW_p2_t4_scientific_ops | Archived REVIEW_p2_t4_scientific_ops report |
 | 2026-03-25 | P2-T4 | Archived task with validation report (PASS) |
