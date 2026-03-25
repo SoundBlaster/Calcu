@@ -71,3 +71,7 @@ Verification:
 
 - Keep scientific unary/binary work out of scope for this task.
 - If the reducer already satisfies an acceptance criterion, prefer adding the regression test rather than changing behavior unnecessarily.
+
+---
+**Archived:** 2026-03-25
+**Verdict:** PASS
