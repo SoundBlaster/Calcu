@@ -1,8 +1,12 @@
 export type CalculatorBinaryOperator =
   | 'add'
   | 'divide'
+  | 'log-base'
   | 'multiply'
-  | 'subtract';
+  | 'power'
+  | 'root'
+  | 'subtract'
+  | 'y-to-x';
 
 export type CalculatorAngleMode = 'deg' | 'rad';
 

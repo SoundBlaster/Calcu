@@ -114,6 +114,18 @@ describe('reduceCalculatorState', () => {
     expect(state.memoryValue).toBe(0);
   });
 
+  it('recalls memory as a fresh entry', () => {
+    const state = runActions([
+      'digit:4',
+      'memory:add',
+      'digit:2',
+      'memory:recall',
+    ]);
+
+    expect(state.displayValue).toBe('4');
+    expect(state.replaceDisplayOnNextDigit).toBe(true);
+  });
+
   it('enters an error state for invalid arithmetic and resets on all-clear', () => {
     const erroredState = runActions([
       'digit:8',

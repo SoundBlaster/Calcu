@@ -1,5 +1,9 @@
 import type { CalculatorKeyActionId } from '../config';
 import {
+  evaluateScientificBinaryOperation,
+  evaluateScientificUnaryOperation,
+} from '../lib';
+import {
   type CalculatorBinaryOperator,
   type CalculatorState,
   initialCalculatorState,
@@ -37,16 +41,24 @@ function applyBinaryOperator(
   operator: CalculatorBinaryOperator,
   rightValue: number,
 ) {
-  switch (operator) {
-    case 'add':
-      return leftValue + rightValue;
-    case 'divide':
-      return rightValue === 0 ? null : leftValue / rightValue;
-    case 'multiply':
-      return leftValue * rightValue;
-    case 'subtract':
-      return leftValue - rightValue;
-  }
+  return evaluateScientificBinaryOperation(leftValue, operator, rightValue);
+}
+
+function applyResolvedDisplayValue(
+  state: CalculatorState,
+  displayValue: string,
+  replaceDisplayOnNextDigit = true,
+) {
+  return {
+    ...state,
+    displayValue,
+    errorState: false,
+    errorKind: null,
+    errorMessage: null,
+    lastBinaryOperand: null,
+    lastBinaryOperator: null,
+    replaceDisplayOnNextDigit,
+  };
 }
 
 function updateDisplayValue(
@@ -80,6 +92,107 @@ function updateMemoryValue(
     ...state,
     memoryValue: nextValue,
   };
+}
+
+function normalizeAndReplaceDisplay(
+  state: CalculatorState,
+  nextValue: number,
+  replaceDisplayOnNextDigit = true,
+) {
+  const normalizedValue = normalizeNumber(nextValue);
+
+  if (normalizedValue === null) {
+    return setErrorState(state);
+  }
+
+  return applyResolvedDisplayValue(
+    state,
+    normalizedValue,
+    replaceDisplayOnNextDigit,
+  );
+}
+
+function applyScientificUnaryOperation(
+  state: CalculatorState,
+  operation:
+    | 'arccos'
+    | 'arccosh'
+    | 'arcsin'
+    | 'arcsinh'
+    | 'arctan'
+    | 'arctanh'
+    | 'cos'
+    | 'cosh'
+    | 'cube'
+    | 'cube-root'
+    | 'exp-10'
+    | 'exp-2'
+    | 'exp-e'
+    | 'factorial'
+    | 'ln'
+    | 'log-10'
+    | 'log-2'
+    | 'reciprocal'
+    | 'sin'
+    | 'sinh'
+    | 'square'
+    | 'square-root'
+    | 'tan'
+    | 'tanh',
+) {
+  if (state.errorState) {
+    return state;
+  }
+
+  const currentValue = parseDisplayValue(state.displayValue);
+  const result = evaluateScientificUnaryOperation(
+    currentValue,
+    operation,
+    state.angleMode,
+  );
+
+  if (result === null) {
+    return setErrorState(state);
+  }
+
+  return normalizeAndReplaceDisplay(state, result, true);
+}
+
+function applyScientificConstant(
+  state: CalculatorState,
+  constant: 'e' | 'pi' | 'rand',
+) {
+  if (state.errorState) {
+    return state;
+  }
+
+  let nextValue: number;
+
+  switch (constant) {
+    case 'e':
+      nextValue = Math.E;
+      break;
+    case 'pi':
+      nextValue = Math.PI;
+      break;
+    case 'rand':
+      nextValue = Math.random();
+      break;
+  }
+
+  return normalizeAndReplaceDisplay(state, nextValue, true);
+}
+
+function applyScientificNotation(state: CalculatorState) {
+  if (state.errorState || state.displayValue.includes('e')) {
+    return state;
+  }
+
+  const nextDisplayValue = state.replaceDisplayOnNextDigit
+    ? '0e'
+    : `${state.displayValue}e`;
+
+  return applyResolvedDisplayValue(state, nextDisplayValue, false);
 }
 
 function replaceWithDigit(
@@ -284,14 +397,11 @@ function applyMemoryOperation(
         memoryValue: 0,
       };
     case 'recall':
-      return {
-        ...state,
-        displayValue: normalizeNumber(state.memoryValue) ?? '0',
-        errorState: false,
-        errorKind: null,
-        errorMessage: null,
-        replaceDisplayOnNextDigit: false,
-      };
+      return applyResolvedDisplayValue(
+        state,
+        normalizeNumber(state.memoryValue) ?? '0',
+        true,
+      );
     case 'subtract':
       return updateMemoryValue(state, state.memoryValue - currentValue);
   }
@@ -310,10 +420,18 @@ export function reduceCalculatorState(
       return applyPendingOperator(state, 'add');
     case 'binary:divide':
       return applyPendingOperator(state, 'divide');
+    case 'binary:log-base':
+      return applyPendingOperator(state, 'log-base');
     case 'binary:multiply':
       return applyPendingOperator(state, 'multiply');
+    case 'binary:power':
+      return applyPendingOperator(state, 'power');
+    case 'binary:root':
+      return applyPendingOperator(state, 'root');
     case 'binary:subtract':
       return applyPendingOperator(state, 'subtract');
+    case 'binary:y-to-x':
+      return applyPendingOperator(state, 'y-to-x');
     case 'command:all-clear':
       return {
         ...initialCalculatorState,
@@ -330,7 +448,10 @@ export function reduceCalculatorState(
         };
       }
 
-      if (state.displayValue.includes('.')) {
+      if (
+        state.displayValue.includes('.') ||
+        state.displayValue.includes('e')
+      ) {
         return state;
       }
 
@@ -353,7 +474,7 @@ export function reduceCalculatorState(
           ? (state.storedValue * currentValue) / 100
           : currentValue / 100;
 
-      return updateDisplayValue(state, percentValue);
+      return normalizeAndReplaceDisplay(state, percentValue, true);
     }
     case 'memory:add':
       return applyMemoryOperation(state, 'add');
@@ -368,12 +489,69 @@ export function reduceCalculatorState(
         return state;
       }
 
-      return {
-        ...state,
-        displayValue: state.displayValue.startsWith('-')
+      return applyResolvedDisplayValue(
+        state,
+        state.displayValue.startsWith('-')
           ? state.displayValue.slice(1)
           : `-${state.displayValue}`,
-      };
+        true,
+      );
+    case 'command:scientific-notation':
+      return applyScientificNotation(state);
+    case 'constant:e':
+      return applyScientificConstant(state, 'e');
+    case 'constant:pi':
+      return applyScientificConstant(state, 'pi');
+    case 'constant:rand':
+      return applyScientificConstant(state, 'rand');
+    case 'unary:arccos':
+      return applyScientificUnaryOperation(state, 'arccos');
+    case 'unary:arccosh':
+      return applyScientificUnaryOperation(state, 'arccosh');
+    case 'unary:arcsin':
+      return applyScientificUnaryOperation(state, 'arcsin');
+    case 'unary:arcsinh':
+      return applyScientificUnaryOperation(state, 'arcsinh');
+    case 'unary:arctan':
+      return applyScientificUnaryOperation(state, 'arctan');
+    case 'unary:arctanh':
+      return applyScientificUnaryOperation(state, 'arctanh');
+    case 'unary:cos':
+      return applyScientificUnaryOperation(state, 'cos');
+    case 'unary:cosh':
+      return applyScientificUnaryOperation(state, 'cosh');
+    case 'unary:cube':
+      return applyScientificUnaryOperation(state, 'cube');
+    case 'unary:cube-root':
+      return applyScientificUnaryOperation(state, 'cube-root');
+    case 'unary:exp-10':
+      return applyScientificUnaryOperation(state, 'exp-10');
+    case 'unary:exp-2':
+      return applyScientificUnaryOperation(state, 'exp-2');
+    case 'unary:exp-e':
+      return applyScientificUnaryOperation(state, 'exp-e');
+    case 'unary:factorial':
+      return applyScientificUnaryOperation(state, 'factorial');
+    case 'unary:ln':
+      return applyScientificUnaryOperation(state, 'ln');
+    case 'unary:log-10':
+      return applyScientificUnaryOperation(state, 'log-10');
+    case 'unary:log-2':
+      return applyScientificUnaryOperation(state, 'log-2');
+    case 'unary:reciprocal':
+      return applyScientificUnaryOperation(state, 'reciprocal');
+    case 'unary:sin':
+      return applyScientificUnaryOperation(state, 'sin');
+    case 'unary:sinh':
+      return applyScientificUnaryOperation(state, 'sinh');
+    case 'unary:square':
+      return applyScientificUnaryOperation(state, 'square');
+    case 'unary:square-root':
+      return applyScientificUnaryOperation(state, 'square-root');
+    case 'unary:tan':
+      return applyScientificUnaryOperation(state, 'tan');
+    case 'unary:tanh':
+      return applyScientificUnaryOperation(state, 'tanh');
     case 'mode:angle-deg':
       return {
         ...state,
