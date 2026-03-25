@@ -147,7 +147,7 @@ Add keyboard support, test coverage, visual QA, and final readiness checks. This
   - [ ] Repeated equals uses the last resolved binary operand consistently
   - [ ] Standard operations do not depend on React state APIs
 
-#### ⬜️ P2-T3: Implement percent, memory, and error rules
+#### ⬜️ P2-T3: Implement percent, memory, and error rules **INPROGRESS**
 - **Description:** Extend the engine with the fixed percent semantics, memory operations, domain error handling, and error-state reset behavior defined in the PRD.
 - **Priority:** P0
 - **Dependencies:** P2-T2

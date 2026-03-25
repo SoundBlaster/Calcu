@@ -1,15 +1,15 @@
-# Next Task Queue
+# Next Task: P2-T3 — Implement percent, memory, and error rules
 
-No active task currently selected.
+**Priority:** P0
+**Phase:** Phase 2 — Calculator Engine
+**Effort:** Medium
+**Dependencies:** P2-T2
+**Status:** Selected
 
-## Recently Archived
+## Description
 
-- P2-T2 — Implement standard arithmetic state transitions (PASS)
-- P2-T1 — Define typed calculator state and action contracts (PASS)
-- P1-T4 — Create calculator feature module boundaries (PASS)
-- P1-T3 — Configure Vitest and test entrypoints (PASS)
+Extend the calculator engine with fixed percent semantics, memory operations, and stable domain error handling from the PRD. This keeps the reducer isolated from React while bringing the state machine closer to the full calculator behavior required by the landscape scientific UI.
 
-## Suggested Next Tasks
+## Next Step
 
-1. P2-T3 — Implement percent, memory, and error rules
-2. P2-T4 — Implement scientific unary and binary operations
+Run the PLAN command to generate the implementation-ready PRD.
