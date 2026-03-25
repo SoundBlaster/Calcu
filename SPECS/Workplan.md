@@ -306,7 +306,7 @@ Add keyboard support, test coverage, visual QA, and final readiness checks. This
   - [ ] Focus visibility is preserved for keyboard navigation
   - [ ] Interaction states do not shift button size or layout
 
-#### ⬜️ P4-T5: Finalize readiness scripts and developer guidance
+#### ✅ P4-T5: Finalize readiness scripts and developer guidance
 - **Description:** Ensure the repository exposes the scripts and minimal documentation needed to run, lint, and test the calculator app consistently.
 - **Priority:** P1
 - **Dependencies:** P1-T2, P1-T3, P4-T2

@@ -6,6 +6,7 @@
 
 | Task ID | Folder | Archived | Verdict |
 |---------|--------|----------|---------|
+| P4-T5 | [P4-T5_Finalize_readiness_scripts_and_developer_guidance/](P4-T5_Finalize_readiness_scripts_and_developer_guidance/) | 2026-03-25 | PASS |
 | P4-T4 | [P4-T4_Add_accessibility_and_interaction_state_checks/](P4-T4_Add_accessibility_and_interaction_state_checks/) | 2026-03-25 | PASS |
 | P4-T3 | [P4-T3_Verify_visual_stability_across_supported_viewport_sizes/](P4-T3_Verify_visual_stability_across_supported_viewport_sizes/) | 2026-03-25 | PASS |
 | P4-T2 | [P4-T2_Write_engine_tests_for_standard_and_scientific_behavior/](P4-T2_Write_engine_tests_for_standard_and_scientific_behavior/) | 2026-03-25 | PASS |
@@ -58,6 +59,7 @@
 
 | Date | Task ID | Action |
 |------|---------|--------|
+| 2026-03-25 | P4-T5 | Archived task with validation report (PASS) |
 | 2026-03-25 | REVIEW_p4_t4_accessibility | Archived REVIEW_p4_t4_accessibility report |
 | 2026-03-25 | P4-T4 | Archived task with validation report (PASS) |
 | 2026-03-25 | REVIEW_p4_t3_visual_stability | Archived REVIEW_p4_t3_visual_stability report |
