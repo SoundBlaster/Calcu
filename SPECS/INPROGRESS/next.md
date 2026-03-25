@@ -1,15 +1,14 @@
-# Next Task: P1-T2 — Configure Biome and project scripts
+# Next Task Queue
 
-**Priority:** P0
-**Phase:** Foundation and Tooling
-**Effort:** 2 hours
-**Dependencies:** P1-T1
-**Status:** Selected
+No active task currently selected.
 
-## Description
+## Recently Archived
 
-Add Biome configuration and package scripts for formatting, linting, and repository-level checks consistent with the PRD constraints.
+- P1-T2 — Configure Biome and project scripts (PASS)
+- P3-T5 — Compose the calculator feature and viewport switching (PASS)
+- P3-T4 — Build the landscape scientific layout and `2nd` rendering (PASS)
 
-## Next Step
+## Suggested Next Tasks
 
-Run the PLAN command to generate the implementation-ready PRD.
+1. P1-T3 — Configure Vitest and test entrypoints
+2. P1-T4 — Create calculator feature module boundaries
