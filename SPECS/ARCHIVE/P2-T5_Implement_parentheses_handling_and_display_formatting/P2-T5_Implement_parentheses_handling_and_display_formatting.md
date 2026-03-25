@@ -69,3 +69,7 @@ Verification:
 
 - Keep the scope limited to the calculator’s immediate-execution model; do not introduce a general expression editor.
 - Any remaining visual polish or layout tuning belongs to later UI tasks.
+
+---
+**Archived:** 2026-03-25
+**Verdict:** PASS

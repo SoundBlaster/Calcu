@@ -173,7 +173,7 @@ Add keyboard support, test coverage, visual QA, and final readiness checks. This
   - [ ] `Rad` and `Deg` are respected for trig and inverse trig behavior
   - [ ] `EE` and constants integrate with active display entry rules
 
-#### ⬜️ P2-T5: Implement parentheses handling and display formatting **INPROGRESS**
+#### ✅ P2-T5: Implement parentheses handling and display formatting
 - **Description:** Add the scientific expression stack needed for parentheses support and implement display formatting that preserves readability without layout breakage.
 - **Priority:** P0
 - **Dependencies:** P2-T2, P2-T4

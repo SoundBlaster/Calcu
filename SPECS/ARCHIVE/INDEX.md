@@ -6,6 +6,7 @@
 
 | Task ID | Folder | Archived | Verdict |
 |---------|--------|----------|---------|
+| P2-T5 | [P2-T5_Implement_parentheses_handling_and_display_formatting/](P2-T5_Implement_parentheses_handling_and_display_formatting/) | 2026-03-25 | PASS |
 | P2-T4 | [P2-T4_Implement_scientific_unary_and_binary_operations/](P2-T4_Implement_scientific_unary_and_binary_operations/) | 2026-03-25 | PASS |
 | P2-T3 | [P2-T3_Implement_percent_memory_and_error_rules/](P2-T3_Implement_percent_memory_and_error_rules/) | 2026-03-25 | PASS |
 | P2-T2 | [P2-T2_Implement_standard_arithmetic_state_transitions/](P2-T2_Implement_standard_arithmetic_state_transitions/) | 2026-03-25 | PASS |
@@ -50,6 +51,7 @@
 
 | Date | Task ID | Action |
 |------|---------|--------|
+| 2026-03-25 | P2-T5 | Archived task with validation report (PASS) |
 | 2026-03-25 | REVIEW_p2_t4_scientific_ops | Archived REVIEW_p2_t4_scientific_ops report |
 | 2026-03-25 | P2-T4 | Archived task with validation report (PASS) |
 | 2026-03-25 | REVIEW_p2_t3_memory_error | Archived REVIEW_p2_t3_memory_error report |
