@@ -268,7 +268,7 @@ Add keyboard support, test coverage, visual QA, and final readiness checks. This
   - [ ] Backspace behavior matches the PRD
   - [ ] Keyboard input uses the same engine pathways as button input
 
-#### ⬜️ P4-T2: Write engine tests for standard and scientific behavior
+#### ✅ P4-T2: Write engine tests for standard and scientific behavior
 - **Description:** Add Vitest coverage for standard arithmetic, percent semantics, scientific functions, memory behavior, `Rad`/`Deg`, `2nd` mode operation mapping, parentheses, and error handling.
 - **Priority:** P0
 - **Dependencies:** P2-T3, P2-T4, P2-T5, P1-T3
