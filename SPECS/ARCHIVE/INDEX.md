@@ -38,6 +38,7 @@
 | Folder | Description |
 |--------|-------------|
 | [_Historical/](_Historical/) | Non-task artifacts |
+| [_Historical/REVIEW_p4_t8_quality_gates_ci.md](_Historical/REVIEW_p4_t8_quality_gates_ci.md) | Post-archive review report for the P4-T8 quality gates and CI reporting task |
 | [_Historical/REVIEW_fu_t2_phase1_rescope.md](_Historical/REVIEW_fu_t2_phase1_rescope.md) | Post-archive review report for the FU-T2 phase 1 rescope task |
 | [_Historical/REVIEW_fu_t1_namespace_policy.md](_Historical/REVIEW_fu_t1_namespace_policy.md) | Post-archive review report for the FU-T1 namespace policy task |
 | [_Historical/REVIEW_p4_phase4_completion.md](_Historical/REVIEW_p4_phase4_completion.md) | Post-archive review report for the Phase 4 completion task |
@@ -67,6 +68,7 @@
 
 | Date | Task ID | Action |
 |------|---------|--------|
+| 2026-03-25 | REVIEW_p4_t8_quality_gates_ci | Archived REVIEW_p4_t8_quality_gates_ci report |
 | 2026-03-25 | P4-T8 | Archived task with validation report (PASS) |
 | 2026-03-25 | REVIEW_fu_t2_phase1_rescope | Archived REVIEW_fu_t2_phase1_rescope report |
 | 2026-03-25 | REVIEW_fu_t1_namespace_policy | Archived REVIEW_fu_t1_namespace_policy report |
