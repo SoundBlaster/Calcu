@@ -64,8 +64,10 @@ Add keyboard support, test coverage, visual QA, and final readiness checks. This
   - [ ] The app starts locally with a documented dev script
   - [ ] The source tree supports the PRD module layout
 
+Boundary note: P1-T1 delivers the runnable app shell only; the remaining Phase 1 tasks add tooling and structure on top of that scaffold instead of recreating it.
+
 #### ✅ P1-T2: Configure Biome and project scripts
-- **Description:** Add Biome configuration and package scripts for formatting, linting, and repository-level checks consistent with the PRD constraints.
+- **Description:** Add Biome configuration and package scripts for formatting, linting, and repository-level checks on top of the existing scaffold.
 - **Priority:** P0
 - **Dependencies:** P1-T1
 - **Parallelizable:** yes
@@ -78,7 +80,7 @@ Add keyboard support, test coverage, visual QA, and final readiness checks. This
   - [ ] Running the lint/check script succeeds on the scaffold
 
 #### ✅ P1-T3: Configure Vitest and test entrypoints
-- **Description:** Set up Vitest for engine-focused unit testing and establish the initial test directory structure.
+- **Description:** Set up Vitest for engine-focused unit testing and establish the initial test directory structure without recreating the app shell.
 - **Priority:** P0
 - **Dependencies:** P1-T1
 - **Parallelizable:** yes
@@ -92,7 +94,7 @@ Add keyboard support, test coverage, visual QA, and final readiness checks. This
   - [ ] Test execution succeeds on the scaffold
 
 #### ✅ P1-T4: Create calculator feature module boundaries
-- **Description:** Create the top-level feature folders and placeholder modules required by the PRD so engine, config, components, and styles evolve independently.
+- **Description:** Create the top-level feature folders and placeholder modules required by the PRD so engine, config, components, and styles evolve independently from the existing scaffold.
 - **Priority:** P0
 - **Dependencies:** P1-T1
 - **Parallelizable:** yes
