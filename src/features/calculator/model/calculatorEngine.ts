@@ -18,6 +18,8 @@ function setErrorState(state: CalculatorState): CalculatorState {
     ...state,
     displayValue: 'Error',
     errorState: true,
+    errorKind: 'domain',
+    errorMessage: 'Error',
     lastBinaryOperand: null,
     lastBinaryOperator: null,
     pendingBinaryOperator: null,
@@ -61,6 +63,8 @@ function updateDisplayValue(
     ...state,
     displayValue: normalizedValue,
     errorState: false,
+    errorKind: null,
+    errorMessage: null,
   };
 }
 
@@ -72,6 +76,8 @@ function replaceWithDigit(
     ...state,
     displayValue: digit,
     errorState: false,
+    errorKind: null,
+    errorMessage: null,
     replaceDisplayOnNextDigit: false,
   };
 }
@@ -272,6 +278,8 @@ export function reduceCalculatorState(
           ...state,
           displayValue: '0.',
           errorState: false,
+          errorKind: null,
+          errorMessage: null,
           replaceDisplayOnNextDigit: false,
         };
       }
