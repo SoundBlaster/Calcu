@@ -6,6 +6,7 @@
 
 | Task ID | Folder | Archived | Verdict |
 |---------|--------|----------|---------|
+| FU-T2 | [FU-T2_Re-scope_remaining_Phase_1_setup_tasks_after_scaffold_delivery/](FU-T2_Re-scope_remaining_Phase_1_setup_tasks_after_scaffold_delivery/) | 2026-03-25 | PASS |
 | FU-T1 | [FU-T1_Normalize_calculator_task_IDs_against_existing_archive_history/](FU-T1_Normalize_calculator_task_IDs_against_existing_archive_history/) | 2026-03-25 | PASS |
 | P4-T7 | [P4-T7_Prevent_Enter_from_double-dispatching_focused_calculator_buttons/](P4-T7_Prevent_Enter_from_double-dispatching_focused_calculator_buttons/) | 2026-03-25 | PASS |
 | P4-T5 | [P4-T5_Finalize_readiness_scripts_and_developer_guidance/](P4-T5_Finalize_readiness_scripts_and_developer_guidance/) | 2026-03-25 | PASS |
@@ -36,6 +37,7 @@
 | Folder | Description |
 |--------|-------------|
 | [_Historical/](_Historical/) | Non-task artifacts |
+| [_Historical/REVIEW_fu_t2_phase1_rescope.md](_Historical/REVIEW_fu_t2_phase1_rescope.md) | Post-archive review report for the FU-T2 phase 1 rescope task |
 | [_Historical/REVIEW_fu_t1_namespace_policy.md](_Historical/REVIEW_fu_t1_namespace_policy.md) | Post-archive review report for the FU-T1 namespace policy task |
 | [_Historical/REVIEW_p4_phase4_completion.md](_Historical/REVIEW_p4_phase4_completion.md) | Post-archive review report for the Phase 4 completion task |
 | [_Historical/REVIEW_p4_t5_readiness_guidance.md](_Historical/REVIEW_p4_t5_readiness_guidance.md) | Post-archive review report for the P4-T5 readiness guidance task |
@@ -64,9 +66,11 @@
 
 | Date | Task ID | Action |
 |------|---------|--------|
+| 2026-03-25 | REVIEW_fu_t2_phase1_rescope | Archived REVIEW_fu_t2_phase1_rescope report |
 | 2026-03-25 | REVIEW_fu_t1_namespace_policy | Archived REVIEW_fu_t1_namespace_policy report |
 | 2026-03-25 | FU-T1 | Archived task with validation report (PASS) |
 | Legacy | P1-T1 | Historical duplicate IDs are disambiguated by archive folder slug; use the folder path as the canonical reference |
+| 2026-03-25 | FU-T2 | Archived task with validation report (PASS) |
 | 2026-03-25 | REVIEW_p4_phase4_completion | Archived REVIEW_p4_phase4_completion report |
 | 2026-03-25 | P4-T7 | Archived task with validation report (PASS) |
 | 2026-03-25 | REVIEW_p4_t5_readiness_guidance | Archived REVIEW_p4_t5_readiness_guidance report |
