@@ -1,6 +1,11 @@
 import { randomBytes } from 'node:crypto';
 import { exact, validateCalculation } from './calcu';
-import { type RuntimeAccess, surface, type Transport } from './executor';
+import {
+  type Binding,
+  type RuntimeAccess,
+  surface,
+  type Transport,
+} from './executor';
 
 // Only this returned function is agent-facing. Credentials/control-plane methods
 // remain in trusted server closures, not in tool arguments or tool results.
@@ -9,7 +14,11 @@ export function createLocalBackend(
   transport: Transport,
 ) {
   const credential = access.credential;
-  const binding = { ...access.binding };
+  const binding: Binding = {
+    ...access.binding,
+    subject: { ...access.binding.subject },
+    delegate: { ...access.binding.delegate },
+  };
   return {
     calculationPropose(args: unknown) {
       const input = validateCalculation(args);
@@ -37,7 +46,7 @@ export function createLocalBackend(
       for (const key of Object.keys(
         correlation,
       ) as (keyof typeof correlation)[])
-        if (payload[key] !== correlation[key])
+        if (JSON.stringify(payload[key]) !== JSON.stringify(correlation[key]))
           throw new Error('invalid_response');
       const output = exact(payload.output, [
         'operator',

@@ -12,10 +12,13 @@ the opaque credential out of that body, and validates correlated `action.result`
 before returning numeric output. Model prose does not enter this path.
 
 The executor independently validates the credential, expiry, revocation, current
-session generation, Grant/surface bindings, action/mode, closed input schema,
-request size and a three-invocation budget. Recreating a LocalBackend does not
-reset that app-owned budget. Failed arithmetic consumes an admitted invocation.
+session generation, Grant/surface bindings (`subject.user`, `delegate.runtime`,
+`delegate.agent`, and resource-server `audience`), action/mode, closed input
+schema, request size and a three-invocation budget. Recreating a LocalBackend does
+not reset that app-owned budget. Failed arithmetic consumes an admitted invocation.
 Execution is synchronous and non-persisted; no UI/memory/history state changes.
+The mediator receives a deep copy of the binding, so changing its subject or
+delegate projection cannot mutate the executor's authoritative Grant state.
 
 ## Scope and trust
 
@@ -29,9 +32,11 @@ exactly the same application checks.
 The message shape follows ASP Action Request/Response, but this is **not yet a
 conforming ASP implementation**. The local surface snapshot and grant-state hash
 are not normative manifest/Grant documents or claimed ASP JCS digests. Concrete
-identity-evidence verification, audience/subject/delegate provisioning, normative
-hashing, session establishment, authenticated confidential HTTP, protocol error
-envelopes and the complete Mediated Proposal conformance closure remain pending.
+identity-evidence verification, user consent and durable subject/delegate
+provisioning, normative hashing, session establishment, authenticated confidential
+HTTP, protocol error envelopes and the complete Mediated Proposal conformance
+closure remain pending. The generated identifiers only make the tuple explicit;
+they are not identity evidence.
 There is no receipt or Proof-Bound claim. The opaque credential is development
 bearer-like authority held only by the trusted mediator.
 

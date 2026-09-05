@@ -19,9 +19,23 @@ export type Binding = {
   grant_id: string;
   grant_hash: string;
   surface_hash: string;
+  subject: { user: string };
+  delegate: { runtime: string; agent: string };
+  audience: string;
 };
 export type RuntimeAccess = { credential: string; binding: Binding };
 export type Transport = (credential: string, body: string) => string;
+export type GrantIssueOptions = {
+  user?: string;
+  runtime?: string;
+  agent?: string;
+  audience?: string;
+};
+const cloneBinding = (binding: Binding): Binding => ({
+  ...binding,
+  subject: { ...binding.subject },
+  delegate: { ...binding.delegate },
+});
 
 export function createCalcuExecutor(now = Date.now) {
   const grants = new Map<
@@ -31,16 +45,25 @@ export function createCalcuExecutor(now = Date.now) {
   let engineCalls = 0;
 
   // Trusted application control plane only. Never expose to a model or browser.
-  function issue(): RuntimeAccess {
+  function issue(options: GrantIssueOptions = {}): RuntimeAccess {
     const credential = randomBytes(32).toString('base64url');
     const grant_id = randomUUID();
     const expires = now() + 60_000;
-    const binding: Binding = {
+    const bindingBase = {
       session_id: randomUUID(),
       session_generation: 1,
       grant_id,
-      grant_hash: digest(JSON.stringify({ grant_id, expires, surfaceHash })),
       surface_hash: surfaceHash,
+      subject: { user: options.user ?? 'calcu-user-local' },
+      delegate: {
+        runtime: options.runtime ?? 'calcu-runtime-local',
+        agent: options.agent ?? 'calcu-agent-local',
+      },
+      audience: options.audience ?? 'https://calcu.local/agent-actions',
+    };
+    const binding: Binding = {
+      ...bindingBase,
+      grant_hash: digest(JSON.stringify({ ...bindingBase, expires })),
     };
     grants.set(digest(credential), {
       binding,
@@ -48,7 +71,7 @@ export function createCalcuExecutor(now = Date.now) {
       active: true,
       remaining: 3,
     });
-    return { credential, binding: { ...binding } };
+    return { credential, binding: cloneBinding(binding) };
   }
 
   const invoke: Transport = (credential, body) => {
@@ -81,7 +104,7 @@ export function createCalcuExecutor(now = Date.now) {
       'input',
     ]);
     for (const key of Object.keys(grant.binding) as (keyof Binding)[])
-      if (payload[key] !== grant.binding[key])
+      if (JSON.stringify(payload[key]) !== JSON.stringify(grant.binding[key]))
         throw new Error('binding_mismatch');
     if (payload.action_id !== surface.action_id)
       throw new Error('action_not_allowed');

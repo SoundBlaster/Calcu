@@ -67,6 +67,9 @@ describe('LocalBackend → independent Calcu executor', () => {
     'grant_id',
     'grant_hash',
     'surface_hash',
+    'subject',
+    'delegate',
+    'audience',
     'action_id',
     'trace_id',
     'span_id',
@@ -143,9 +146,34 @@ describe('LocalBackend → independent Calcu executor', () => {
   it('does not share mutable authority with the mediator', () => {
     const state = setup();
     state.access.binding.session_generation = 999;
+    state.access.binding.subject.user = 'substituted-user';
+    state.access.binding.delegate.agent = 'substituted-agent';
     expect(state.backend.calculationPropose(input).result).toBe(36);
     const changed = createLocalBackend(state.access, state.app.invoke);
     expect(() => changed.calculationPropose(input)).toThrow('binding_mismatch');
+  });
+
+  it('binds the request to the configured subject, delegate and audience', () => {
+    let captured = '';
+    const app = createCalcuExecutor(() => 1000);
+    const access = app.issue({
+      user: 'user-42',
+      runtime: 'runtime-7',
+      agent: 'agent-9',
+      audience: 'https://calcu.example/actions',
+    });
+    const backend = createLocalBackend(access, (credential, body) => {
+      captured = body;
+      return app.invoke(credential, body);
+    });
+    expect(backend.calculationPropose(input).result).toBe(36);
+    const request = JSON.parse(captured);
+    expect(request.payload.subject).toEqual({ user: 'user-42' });
+    expect(request.payload.delegate).toEqual({
+      runtime: 'runtime-7',
+      agent: 'agent-9',
+    });
+    expect(request.payload.audience).toBe('https://calcu.example/actions');
   });
 
   it.each([
