@@ -1,55 +1,110 @@
-# Calcu application boundary — P5-T2 first slice
+# Calcu application boundary — P5-T2
 
-`createCalcuExecutor()` owns admission state and invokes the existing Calcu engine.
-Its `issue`, `revoke`, and `rotateSession` methods are trusted application control
-plane operations, **not agent tools**. `issue()` is development provisioning, not
-a user-consent flow or complete ASP Grant issuer.
+This directory contains the first Calcu application-boundary slice for the ASP
+Mediated Proposal flow. It is a development profile named **Compatibility Bearer
+over loopback HTTPS**. It is not a production authorization service and does
+not claim Proof-Bound, DPoP, mTLS, receipt, or human-approval conformance.
 
-`createLocalBackend(access, transport)` returns only `calculationPropose(args)`.
-The function accepts arithmetic operands, never caller-selected Grant/session,
-action, credential, or execution mode. It constructs an `action.request`, keeps
-the opaque credential out of that body, and validates correlated `action.result`
-before returning numeric output. Model prose does not enter this path.
+```text
+LocalBackend
+    │ typed action.request + Authorization header
+    ▼
+HTTPS POST https://127.0.0.1:<port>/agent-actions
+    │ exact host/path/content-type/size checks
+    ▼
+ASP Action Executor
+    │ grant, identity, session, quota and input admission
+    ▼
+evaluateScientificBinaryOperation
+```
 
-The executor independently validates the credential, expiry, revocation, current
-session generation, Grant/surface bindings (`subject.user`, `delegate.runtime`,
-`delegate.agent`, and resource-server `audience`), action/mode, closed input
-schema, request size and a three-invocation budget. Recreating a LocalBackend does
-not reset that app-owned budget. Failed arithmetic consumes an admitted invocation.
-Execution is synchronous and non-persisted; no UI/memory/history state changes.
-The mediator receives a deep copy of the binding, so changing its subject or
-delegate projection cannot mutate the executor's authoritative Grant state.
+## Closed application contract
 
-## Scope and trust
+`createCalcuExecutor({ now, identityVerifier })` owns the authoritative
+control-plane state. The only exported surface is a proposal-only action:
 
-This first slice uses a **trusted in-process serialized transport**, not HTTP.
-Credential custody is an API/code-ownership boundary, not process isolation.
-Do not expose provisioning methods, use this transport across an untrusted network,
-import server modules into the browser, or give Codex access to server credentials.
-Agent internals/subagents are not an admission criterion. Their requests receive
-exactly the same application checks.
+- `surface_mode`: `proposal_only`;
+- action and scope: `calculation.propose`;
+- execution mode: `propose`;
+- `side_effect`: `false`;
+- `credential_release.mode`: `deny`.
 
-The message shape follows ASP Action Request/Response, but this is **not yet a
-conforming ASP implementation**. The local surface snapshot and grant-state hash
-are not normative manifest/Grant documents or claimed ASP JCS digests. Concrete
-identity-evidence verification, user consent and durable subject/delegate
-provisioning, normative hashing, session establishment, authenticated confidential
-HTTP, protocol error envelopes and the complete Mediated Proposal conformance
-closure remain pending. The generated identifiers only make the tuple explicit;
-they are not identity evidence.
-There is no receipt or Proof-Bound claim. The opaque credential is development
-bearer-like authority held only by the trusted mediator.
+The trusted `issue(request)` operation accepts a closed `GrantRequest` only:
+the application supplies a user, runtime, agent, identity evidence, fixed
+audience and short expiry. It never synthesizes default identities and callers
+cannot choose an action, mode, scope or credential. The resulting authoritative
+Grant contains a JCS `grant_hash`, fixed surface hash, subject/delegate tuple,
+identity-evidence projection and compatibility bearer binding. The raw bearer
+is returned only to the trusted local mediator; the executor retains only its
+domain-separated hash.
 
-## Verification and next slice
+Each Grant has one authoritative `SessionRecord` with a generation and state.
+Grant revocation, expiry, or session rotation makes subsequent requests fail
+closed before the calculator engine. Session rotation invalidates the old
+generation and revokes the current development session; a future renewal API is
+deliberately outside this slice.
 
-`npm run check` includes `server/boundary.test.ts`: real arithmetic and negative
-admission tests directly bypass LocalBackend to check executor enforcement.
-These tests use an injected clock, not a model, network service or credentials.
+## Identity evidence
 
-Next: replace development provisioning with the exact ASP Grant/identity/session
-contract and add authenticated transport. Then wire the Codex dynamic tool to the
-LocalBackend facade and build the task panel. This slice opens no endpoint.
+`IdentityEvidenceVerifier` is the application-owned verification interface. The
+test implementation validates the ASP `agent-identity-evidence/v1` envelope,
+the minimal Agent Passport profile, exact artifact digest, Ed25519 signature,
+issuer/subject projection, key binding, freshness and lifecycle status.
 
-References in the local ASP checkout: `drafts/modules/core.md` (Action Request /
-Action Response) and `drafts/modules/authorization.md` (Grant Credentials /
-Subdelegation). In particular, downstream helpers do not inherit Grant authority.
+Tests generate an ephemeral Ed25519 key and Passport in a unique temporary
+directory/memory fixture. No private key or production trust root is committed.
+The fixture can fail closed with `active`, `revoked`, `expired`, `unknown` or
+`unavailable`; unknown verification profiles return
+`identity_evidence_profile_unsupported`. The verifier is test infrastructure,
+not a production identity provider.
+
+Object hashes use the ASP Canonical Object Hash Profile: RFC 8785 JCS over the
+exact `{ "domain": <URI>, "object": <hashing view> }` wrapper, SHA-256 and
+unpadded base64url. The artifact digest uses the ASP Agent Passport artifact
+profile's exact octet and domain-prefix rule.
+
+## Protected transport
+
+`createActionHttpsServer` is server-only and listens on `127.0.0.1`. It accepts
+only `POST /agent-actions` with the exact bound Host, JSON content type, a
+Bearer credential in `Authorization`, and an 8 KiB request limit. Responses are
+closed JSON ASP error envelopes or an 8 KiB action result; all responses use
+`Cache-Control: no-store` and `X-Content-Type-Options: nosniff`.
+
+`createAuthenticatedHttpsTransport` accepts only an `https:` loopback URL with
+the exact path, pins the supplied CA/certificate, sets
+`rejectUnauthorized: true`, never follows redirects, enforces request/response
+limits, and supports timeout plus `AbortSignal`. The credential is never put in
+the action JSON body. There is no CORS trust, arbitrary process launcher, or
+browser import of server modules.
+
+The HTTPS tests generate a one-day test certificate with `openssl` in a unique
+temporary directory and use its certificate as the pinned CA. The key is read
+only during the test and removed afterwards.
+
+## Mediated Proposal mapping
+
+The current executable coverage and its deliberate limits are recorded in
+[`CONFORMANCE.md`](./CONFORMANCE.md). In short:
+
+- Surface Publisher: fixed local snapshot, not a published manifest endpoint;
+- Grant Issuer: exact development Grant/identity/session contract;
+- Action Executor: independent per-request admission and quota;
+- Runtime Mediator: LocalBackend plus authenticated loopback transport;
+- Agent Adapter: typed facade only, no live Codex process;
+- Receipt Producer and human approval: not implemented in P5-T2.
+
+Run the local quality gate with:
+
+```sh
+npm run check
+npm run build
+npm run test:coverage
+git diff --check
+```
+
+The boundary tests include positive HTTPS round trips and negative cases for
+credential, identity, grant/session binding, action/mode/input, host/path/
+method/content-type, TLS, redirect, size, timeout, abort, quota and correlated
+response failures. Rejection paths assert that the current request does not
+reach the engine.

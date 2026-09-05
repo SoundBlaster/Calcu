@@ -1,6 +1,8 @@
 # Calcu + Codex CLI: minimal ASP demo
 
-Status: P5-T2 first application-boundary slice implemented and tested in-process.
+Status: P5-T2 exact development Grant/identity/session contract and loopback HTTPS
+transport implemented and tested. The profile is Compatibility Bearer over
+loopback HTTPS; it is not production certification.
 P5-T1 dynamic calculator round trip is verified with a synthetic provider. Internal
 Codex tools are diagnostic observations, not an ASP admission blocker. No real-agent
 integration or conformance claim is implemented yet. See the
@@ -113,18 +115,20 @@ ASP-over-MCP binding conformance.
 - Define typed I/O and the full ASP requirement/identity/transport mapping.
 - Exit: bounded tool smoke test, exact tested versions and documented boundaries.
 
-### P5-T2 — Calculator facade and ASP execution (in progress)
+### P5-T2 — Calculator facade and ASP execution (implemented development slice)
 
-Implemented: [server boundary](../server/README.md), a pure facade, app-owned
-opaque credential state, expiry/revocation/session/surface/action checks, bounded
-admission and response correlation. Direct-executor negative tests are included.
-This is a serialized in-process slice, not complete ASP Grant/identity/HTTP support.
+Implemented: [server boundary](../server/README.md), exact closed Grant/identity/
+session state, RFC 8785/JCS hashes, ephemeral test Passport verification,
+server-only loopback HTTPS, bounded admission, response correlation and direct
+negative tests. This remains a Compatibility Bearer development profile, not
+complete production ASP support.
 
 - Reuse the existing math function through strict, pure validation.
 - Add independent app-side Grant/session/manifest checks and runtime mediation.
-- Bound request size, concurrency, action count and runtime duration. Protect
-  loopback endpoints against cross-origin requests and unexpected hosts; loopback
-  is not authentication. Never expose an arbitrary process launcher.
+- Bound request/response size, quota, timeout and action scope. Protect the
+  loopback endpoint with HTTPS, pinned test CA, exact Host/path/method/content
+  checks and no redirect following; loopback is not authentication. Never
+  expose an arbitrary process launcher.
 - Exit: valid calculation succeeds; malformed input, expired/revoked authority and
   mismatched identity/session/surface are rejected before engine execution.
 
@@ -163,6 +167,6 @@ If the smallest bundle requires substantial unrelated infrastructure, record an
 ASP adoption finding and ask for a scope decision. Do not invent a private
 read-no-grant profile or build a framework to conceal the cost.
 
-Next implementation task: finish **P5-T2** identity/Grant provisioning and
-authenticated transport, then connect the Codex tool and task UI. No normative
-ASP changes are planned.
+Next implementation task: connect the Codex tool and task UI in **P5-T3** while
+keeping Grant issuance and HTTPS transport server-only. No normative ASP changes
+are planned.

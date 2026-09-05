@@ -20,22 +20,32 @@ export function createLocalBackend(
     delegate: { ...access.binding.delegate },
   };
   return {
-    calculationPropose(args: unknown) {
+    async calculationPropose(args: unknown, signal?: AbortSignal) {
       const input = validateCalculation(args);
       const correlation = {
         ...binding,
-        action_id: surface.action_id,
+        action_id: surface.action.id,
         trace_id: randomBytes(16).toString('hex'),
         span_id: randomBytes(8).toString('hex'),
       };
       const request = JSON.stringify({
         type: 'action.request',
-        payload: { ...correlation, execution: { mode: 'propose' }, input },
+        payload: {
+          ...correlation,
+          execution: { mode: surface.action.execution.mode },
+          input,
+        },
       });
-      const response = transport(credential, request);
+      const response = await transport(credential, request, signal);
       if (Buffer.byteLength(response) > 8192)
         throw new Error('invalid_response');
-      const envelope = exact(JSON.parse(response), ['type', 'payload']);
+      let decoded: unknown;
+      try {
+        decoded = JSON.parse(response);
+      } catch {
+        throw new Error('invalid_response');
+      }
+      const envelope = exact(decoded, ['type', 'payload']);
       if (envelope.type !== 'action.result')
         throw new Error('invalid_response');
       const payload = exact(envelope.payload, [

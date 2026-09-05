@@ -5,18 +5,18 @@
 The [integration plan](ASP_DEMO_PLAN.md) defines a new opt-in task panel, separate
 from the completed calculator baseline. P5-T1 has an offline diagnostic and
 deterministic fixture tests and a synthetic dynamic-tool round trip. Internal agent
-tools are not an ASP blocker. P5-T2 now has a tested in-process application boundary;
-complete Grant/identity/transport work remains. See [boundary status](../server/README.md).
+tools are not an ASP blocker. P5-T2 now has an exact development Grant/identity/
+session contract and tested loopback HTTPS boundary. See [boundary status](../server/README.md).
 
 | Task | Deliverable | Depends on |
 | --- | --- | --- |
 | P5-T1 | Partial: offline preflight; live model run pending | none |
-| P5-T2 | In progress: tested facade/admission boundary; identity and HTTP pending | P5-T1 |
+| P5-T2 | Implemented development slice: exact Grant/identity/session and loopback HTTPS | P5-T1 |
 | P5-T3 | Task UI and real Codex tool round trip | P5-T2 |
 | P5-T4 | Regression/conformance evidence and adoption report | P5-T3 |
 
-Next selectable task: **P5-T2**. This section does not mark the runtime feature
-implemented or change the existing keypad requirements.
+Next selectable task: **P5-T3**. This section does not mark a production ASP
+deployment or change the existing keypad requirements.
 
 ## 1. Overview
 

@@ -1,36 +1,63 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest';
-import { createCalcuExecutor, type Transport } from './executor';
+import { createCalcuExecutor, surface, type Transport } from './executor';
+import {
+  createTestIdentityFixture,
+  createTestIdentityVerifier,
+} from './identity';
 import { createLocalBackend } from './localBackend';
 
-const input = { operator: 'multiply', left: 240, right: 0.15 };
+const START = Date.parse('2026-09-05T00:00:00Z');
+const input = { operator: 'multiply', left: 240, right: 0.15 } as const;
+
 function setup() {
-  let time = 1000;
-  const app = createCalcuExecutor(() => time);
-  const access = app.issue();
-  let captured = '';
-  const backend = createLocalBackend(access, (credential, body) => {
-    captured = body;
-    return app.invoke(credential, body);
+  let time = START;
+  const identity = createTestIdentityFixture(START);
+  const app = createCalcuExecutor({
+    now: () => time,
+    identityVerifier: createTestIdentityVerifier(identity),
   });
+  const access = app.issue({
+    subject: { user: 'calcu-user-local' },
+    delegate: {
+      runtime: 'calcu-runtime-local',
+      agent: identity.evidence.subject,
+    },
+    identity: {
+      evidence: identity.evidence,
+      artifactBytes: identity.artifactBytes,
+    },
+    audience: surface.credential_audience,
+    expires_at: START + 60_000,
+  });
+  let captured = '';
+  const backend = createLocalBackend(
+    access,
+    async (credential, body, signal) => {
+      captured = body;
+      if (signal?.aborted) throw new Error('aborted');
+      return app.invoke(credential, body, signal);
+    },
+  );
   return {
     app,
     access,
+    identity,
     backend,
-    capture() {
-      backend.calculationPropose(input);
+    capture: async () => {
+      await backend.calculationPropose(input);
       return JSON.parse(captured);
     },
-    advance() {
-      time += 60_000;
+    advance: (milliseconds: number) => {
+      time += milliseconds;
     },
   };
 }
 
-describe('LocalBackend → independent Calcu executor', () => {
-  it('returns actual Calcu output without exposing authority', () => {
+describe('LocalBackend → ASP Grant/session-bound Calcu executor', () => {
+  it('returns actual Calcu output without exposing authority', async () => {
     const { app, backend, access } = setup();
-    const output = backend.calculationPropose(input);
+    const output = await backend.calculationPropose(input);
     expect(output).toEqual({ ...input, result: 36 });
     expect(app.engineCalls).toBe(1);
     expect(Object.keys(backend)).toEqual(['calculationPropose']);
@@ -45,19 +72,32 @@ describe('LocalBackend → independent Calcu executor', () => {
     'revoked',
     'expired',
     'session',
-  ])('rejects %s authority before the engine', (kind) => {
+  ])('rejects %s authority before the engine', async (kind) => {
     const state = setup();
-    const request = state.capture();
+    const request = await state.capture();
     let credential = state.access.credential;
     if (kind === 'missing') credential = '';
     if (kind === 'identifier') credential = state.access.binding.grant_id;
-    if (kind === 'other-grant') credential = state.app.issue().credential;
+    if (kind === 'other-grant')
+      credential = state.app.issue({
+        subject: { user: 'calcu-user-local' },
+        delegate: {
+          runtime: 'calcu-runtime-local',
+          agent: state.identity.evidence.subject,
+        },
+        identity: {
+          evidence: state.identity.evidence,
+          artifactBytes: state.identity.artifactBytes,
+        },
+        audience: surface.credential_audience,
+        expires_at: Date.parse('2026-09-05T00:00:59Z'),
+      }).credential;
     if (kind === 'revoked') state.app.revoke(credential);
-    if (kind === 'expired') state.advance();
+    if (kind === 'expired') state.advance(60_001);
     if (kind === 'session') state.app.rotateSession(credential);
-    expect(() =>
+    await expect(
       state.app.invoke(credential, JSON.stringify(request)),
-    ).toThrow();
+    ).rejects.toThrow();
     expect(state.app.engineCalls).toBe(1);
   });
 
@@ -70,16 +110,17 @@ describe('LocalBackend → independent Calcu executor', () => {
     'subject',
     'delegate',
     'audience',
+    'identity_evidence_hash',
     'action_id',
     'trace_id',
     'span_id',
-  ])('rejects altered %s even when bypassing LocalBackend', (key) => {
+  ])('rejects altered %s even when bypassing LocalBackend', async (key) => {
     const state = setup();
-    const request = state.capture();
+    const request = await state.capture();
     request.payload[key] = 'substituted';
-    expect(() =>
+    await expect(
       state.app.invoke(state.access.credential, JSON.stringify(request)),
-    ).toThrow();
+    ).rejects.toThrow();
     expect(state.app.engineCalls).toBe(1);
   });
 
@@ -91,37 +132,37 @@ describe('LocalBackend → independent Calcu executor', () => {
     { ...input, operator: 'eval' },
     { ...input, left: '240' },
     { ...input, right: null },
-  ])('rejects invalid application input independently: %j', (bad) => {
+  ])('rejects invalid application input independently: %j', async (bad) => {
     const state = setup();
-    const request = state.capture();
+    const request = await state.capture();
     request.payload.input = bad;
-    expect(() =>
+    await expect(
       state.app.invoke(state.access.credential, JSON.stringify(request)),
-    ).toThrow();
+    ).rejects.toThrow();
     expect(state.app.engineCalls).toBe(1);
   });
 
-  it('rejects non-finite tool arguments and result overflow', () => {
+  it('rejects non-finite tool arguments and result overflow', async () => {
     const { backend, app } = setup();
-    expect(() =>
+    await expect(
       backend.calculationPropose({ ...input, left: Infinity }),
-    ).toThrow();
+    ).rejects.toThrow();
     expect(app.engineCalls).toBe(0);
-    expect(() =>
+    await expect(
       backend.calculationPropose({
         ...input,
         left: Number.MAX_VALUE,
         right: 2,
       }),
-    ).toThrow('invalid_result');
-    expect(() =>
+    ).rejects.toThrow('invalid_result');
+    await expect(
       backend.calculationPropose({ operator: 'divide', left: 1, right: 0 }),
-    ).toThrow('invalid_result');
+    ).rejects.toThrow('invalid_result');
   });
 
-  it('rejects changed mode, extra envelope fields, malformed/oversized JSON', () => {
+  it('rejects changed mode, extra envelope fields, malformed/oversized JSON', async () => {
     const state = setup();
-    const request = state.capture();
+    const request = await state.capture();
     for (const body of [
       '{',
       ' '.repeat(8193),
@@ -131,49 +172,137 @@ describe('LocalBackend → independent Calcu executor', () => {
         payload: { ...request.payload, execution: { mode: 'commit' } },
       }),
     ])
-      expect(() => state.app.invoke(state.access.credential, body)).toThrow();
+      await expect(
+        state.app.invoke(state.access.credential, body),
+      ).rejects.toThrow();
     expect(state.app.engineCalls).toBe(1);
   });
 
-  it('bounds calls in app-owned state across multiple backend instances', () => {
+  it('bounds calls in app-owned state across multiple backend instances', async () => {
     const state = setup();
-    for (let i = 0; i < 3; i++) state.backend.calculationPropose(input);
+    for (let i = 0; i < 3; i++) await state.backend.calculationPropose(input);
     const second = createLocalBackend(state.access, state.app.invoke);
-    expect(() => second.calculationPropose(input)).toThrow('quota_exceeded');
+    await expect(second.calculationPropose(input)).rejects.toThrow(
+      'quota_exceeded',
+    );
     expect(state.app.engineCalls).toBe(3);
   });
 
-  it('does not share mutable authority with the mediator', () => {
+  it('does not share mutable authority with the mediator', async () => {
     const state = setup();
     state.access.binding.session_generation = 999;
     state.access.binding.subject.user = 'substituted-user';
     state.access.binding.delegate.agent = 'substituted-agent';
-    expect(state.backend.calculationPropose(input).result).toBe(36);
+    expect((await state.backend.calculationPropose(input)).result).toBe(36);
     const changed = createLocalBackend(state.access, state.app.invoke);
-    expect(() => changed.calculationPropose(input)).toThrow('binding_mismatch');
+    await expect(changed.calculationPropose(input)).rejects.toThrow(
+      'binding_mismatch',
+    );
   });
 
-  it('binds the request to the configured subject, delegate and audience', () => {
-    let captured = '';
-    const app = createCalcuExecutor(() => 1000);
-    const access = app.issue({
-      user: 'user-42',
-      runtime: 'runtime-7',
-      agent: 'agent-9',
-      audience: 'https://calcu.example/actions',
+  it('snapshots identity evidence and artifact bytes at issuance', async () => {
+    const state = setup();
+    const requestIdentity: { evidence: unknown; artifactBytes: Uint8Array } = {
+      evidence: structuredClone(state.identity.evidence),
+      artifactBytes: new Uint8Array(state.identity.artifactBytes),
+    };
+    const access = state.app.issue({
+      subject: { user: 'snapshot-user' },
+      delegate: {
+        runtime: 'snapshot-runtime',
+        agent: state.identity.evidence.subject,
+      },
+      identity: requestIdentity,
+      audience: surface.credential_audience,
+      expires_at: START + 60_000,
     });
-    const backend = createLocalBackend(access, (credential, body) => {
-      captured = body;
-      return app.invoke(credential, body);
+    requestIdentity.evidence = { profile: 'substituted' };
+    requestIdentity.artifactBytes[0] ^= 0xff;
+    await expect(
+      state.app.invoke(access.credential, JSON.stringify({})),
+    ).rejects.toThrow('schema_invalid');
+    const backend = createLocalBackend(access, (credential, body, signal) =>
+      state.app.invoke(credential, body, signal),
+    );
+    await expect(backend.calculationPropose(input)).resolves.toEqual({
+      ...input,
+      result: 36,
     });
-    expect(backend.calculationPropose(input).result).toBe(36);
-    const request = JSON.parse(captured);
-    expect(request.payload.subject).toEqual({ user: 'user-42' });
+  });
+
+  it('binds the request to configured subject, delegate and audience', async () => {
+    const state = setup();
+    const request = await state.capture();
+    expect(request.payload.subject).toEqual({ user: 'calcu-user-local' });
     expect(request.payload.delegate).toEqual({
-      runtime: 'runtime-7',
-      agent: 'agent-9',
+      runtime: 'calcu-runtime-local',
+      agent: state.identity.evidence.subject,
     });
-    expect(request.payload.audience).toBe('https://calcu.example/actions');
+    expect(request.payload.audience).toBe(surface.credential_audience);
+    expect(request.payload.identity_evidence_hash).toMatch(/^sha-256:/);
+    expect(request.payload.grant_hash).toMatch(/^sha-256:/);
+    expect(request.payload.surface_hash).toMatch(/^sha-256:/);
+  });
+
+  it.each([
+    'revoked',
+    'expired',
+    'unknown',
+    'unavailable',
+  ])('fails closed when identity status is %s', async (status) => {
+    const state = setup();
+    state.identity.setStatus(status as never, START + 300_000);
+    await expect(state.backend.calculationPropose(input)).rejects.toThrow(
+      `identity_evidence_${status}`,
+    );
+    expect(state.app.engineCalls).toBe(0);
+  });
+
+  it('rejects unsupported identity profile before issuing a Grant', () => {
+    const state = setup();
+    const identity = {
+      evidence: {
+        ...state.identity.evidence,
+        verification_profile: 'https://calcu.local/profiles/unknown/v1',
+      },
+      artifactBytes: state.identity.artifactBytes,
+    };
+    expect(() =>
+      state.app.issue({
+        subject: { user: 'calcu-user-local' },
+        delegate: {
+          runtime: 'calcu-runtime-local',
+          agent: state.identity.evidence.subject,
+        },
+        identity,
+        audience: surface.credential_audience,
+        expires_at: START + 60_000,
+      }),
+    ).toThrow('identity_evidence_profile_unsupported');
+  });
+
+  it('does not accept a caller-selected audience or credential in the body', async () => {
+    const state = setup();
+    expect(() =>
+      state.app.issue({
+        subject: { user: 'user' },
+        delegate: {
+          runtime: 'runtime',
+          agent: state.identity.evidence.subject,
+        },
+        identity: {
+          evidence: state.identity.evidence,
+          artifactBytes: state.identity.artifactBytes,
+        },
+        audience: 'https://attacker.invalid/actions',
+        expires_at: START + 60_000,
+      }),
+    ).toThrow('audience_mismatch');
+    const request = await state.capture();
+    request.payload.credential = state.access.credential;
+    await expect(
+      state.app.invoke(state.access.credential, JSON.stringify(request)),
+    ).rejects.toThrow('schema_invalid');
   });
 
   it.each([
@@ -183,11 +312,11 @@ describe('LocalBackend → independent Calcu executor', () => {
     'type',
     'malformed',
     'late',
-  ])('does not accept %s response as current app result', (kind) => {
+  ])('does not accept %s response as current app result', async (kind) => {
     const state = setup();
     let previous = '';
-    const transport: Transport = (credential, body) => {
-      const raw = state.app.invoke(credential, body);
+    const transport: Transport = async (credential, body) => {
+      const raw = await state.app.invoke(credential, body);
       const result = JSON.parse(raw);
       if (kind === 'correlation') result.payload.session_generation++;
       if (kind === 'output') result.payload.output.left = 18;
@@ -202,7 +331,7 @@ describe('LocalBackend → independent Calcu executor', () => {
       return JSON.stringify(result);
     };
     const backend = createLocalBackend(state.access, transport);
-    if (kind === 'late') backend.calculationPropose(input);
-    expect(() => backend.calculationPropose(input)).toThrow();
+    if (kind === 'late') await backend.calculationPropose(input);
+    await expect(backend.calculationPropose(input)).rejects.toThrow();
   });
 });
