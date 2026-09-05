@@ -13,10 +13,10 @@ session contract and tested loopback HTTPS boundary. See [boundary status](../se
 | P5-T1 | Implemented: offline preflight; live model verified in P5-T3 | none |
 | P5-T2 | Implemented development slice: exact Grant/identity/session and loopback HTTPS | P5-T1 |
 | P5-T3 | Implemented: ephemeral Codex adapter, local task host and task UI | P5-T2 |
-| **P5-T4 (INPROGRESS)** | Regression/conformance evidence and adoption report | P5-T3 |
+| P5-T4 | Implemented: regression/conformance evidence and adoption report | P5-T3 |
 
-Active task: **P5-T4**. This section does not mark a production ASP deployment
-or change the existing keypad requirements.
+The P5 demo is complete through **P5-T4**. This section does not mark a
+production ASP deployment or change the existing keypad requirements.
 
 ## 1. Overview
 

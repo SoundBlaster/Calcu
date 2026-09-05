@@ -1,11 +1,12 @@
 # Tasks Archive
 
-**Last Updated:** 2026-03-25
+**Last Updated:** 2026-09-05
 
 ## Archived Tasks
 
 | Task ID | Folder | Archived | Verdict |
 |---------|--------|----------|---------|
+| P5-T4 | [P5-T4_Verify_ASP_demo_readiness_and_document_adoption/](P5-T4_Verify_ASP_demo_readiness_and_document_adoption/) | 2026-09-05 | PASS |
 | P4-T8 | [P4-T8_Establish_repository_quality_gates_and_CI_reporting/](P4-T8_Establish_repository_quality_gates_and_CI_reporting/) | 2026-03-25 | PASS |
 | FU-T2 | [FU-T2_Re-scope_remaining_Phase_1_setup_tasks_after_scaffold_delivery/](FU-T2_Re-scope_remaining_Phase_1_setup_tasks_after_scaffold_delivery/) | 2026-03-25 | PASS |
 | FU-T1 | [FU-T1_Normalize_calculator_task_IDs_against_existing_archive_history/](FU-T1_Normalize_calculator_task_IDs_against_existing_archive_history/) | 2026-03-25 | PASS |
@@ -68,6 +69,7 @@
 
 | Date | Task ID | Action |
 |------|---------|--------|
+| 2026-09-05 | P5-T4 | Archived task with validation report (PASS) |
 | 2026-03-25 | REVIEW_p4_t8_quality_gates_ci | Archived REVIEW_p4_t8_quality_gates_ci report |
 | 2026-03-25 | P4-T8 | Archived task with validation report (PASS) |
 | 2026-03-25 | REVIEW_fu_t2_phase1_rescope | Archived REVIEW_fu_t2_phase1_rescope report |
