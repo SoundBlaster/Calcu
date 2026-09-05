@@ -1,4 +1,4 @@
-# Calcu application boundary and Codex task adapter — P5-T3
+# Calcu application boundary and Codex task adapter — P5-T4
 
 This directory contains the Calcu application-boundary and task-adapter slices for the ASP
 Mediated Proposal flow. It is a development profile named **Compatibility Bearer
@@ -131,7 +131,8 @@ The current executable coverage and its deliberate limits are recorded in
 - Runtime Mediator: LocalBackend plus authenticated loopback transport;
 - Agent Adapter: ephemeral Codex app-server with one dynamic tool, backed only by
   LocalBackend;
-- Receipt Producer and human approval: not implemented in P5-T3.
+- Receipt Producer and human approval: not implemented; deliberately outside
+  this proposal-only development slice.
 
 Run the local quality gate with:
 
@@ -142,6 +143,10 @@ npm run test:coverage
 git diff --check
 ```
 
+`npm run build` also scans the generated browser assets for known server-only
+Grant, identity, session, bearer-header, and private-key markers. CI runs this
+production build without Codex credentials or model inference.
+
 The tests include fake app-server lifecycle/protocol cases, a fake Codex → real
 HTTPS executor integration, task-host security/error cases, UI stream/cancel/
 retry cases, and positive HTTPS round trips plus negative cases for
@@ -149,3 +154,7 @@ credential, identity, grant/session binding, action/mode/input, host/path/
 method/content-type, TLS, redirect, size, timeout, abort, quota and correlated
 response failures. Rejection paths assert that the current request does not
 reach the engine.
+
+For setup instructions, measured responsive-layout evidence, implementation
+cost, and the adoption conclusion, see the
+[Calcu ASP adoption report](../docs/ASP_ADOPTION_REPORT.md).

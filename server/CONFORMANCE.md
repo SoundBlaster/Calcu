@@ -1,4 +1,4 @@
-# P5-T3 boundary/conformance report
+# P5-T4 boundary/conformance report
 
 This report maps the local executable slice to the ASP Mediated Proposal roles.
 It is a diagnostic report for Calcu development and is not an ASP certification
@@ -45,3 +45,15 @@ The slice does not provide production identity trust, durable user consent,
 Proof-Bound DPoP/mTLS, portable receipts, recovery, replay protection beyond
 the local correlation contract, remote networking, CORS integration, or a
 general-purpose ASP SDK. The ASP repository and normative text remain unchanged.
+
+## Adoption verification
+
+P5-T4 adds a post-build browser-bundle check for known server-only Grant,
+identity, session, bearer-header, and private-key markers. CI now runs the real
+production build and this check before the deterministic test suite. This guard
+supports, but does not replace, the server/client architecture and negative
+boundary tests.
+
+Reproduction steps, implementation cost, limitations, rendered layout evidence,
+and the recommended SDK extraction path are recorded in the
+[Calcu ASP adoption report](../docs/ASP_ADOPTION_REPORT.md).

@@ -1,6 +1,7 @@
 # Calcu + Codex CLI: minimal ASP demo
 
-Status: P5-T3 Codex adapter, local task host and opt-in task UI implemented over
+Status: P5-T4 verification and adoption reporting completed over the
+P5-T3 Codex adapter, local task host and opt-in task UI, which are implemented over
 the P5-T2 Grant/identity/session and loopback HTTPS boundary. The profile is
 Compatibility Bearer over loopback HTTPS; it is not production certification.
 P5-T1 dynamic calculator round trip is verified with a synthetic provider. Internal
@@ -158,7 +159,7 @@ Manual smoke on 2026-09-05 with authenticated Codex CLI `0.145.0` completed the
 Luna `low` dynamic-tool path and returned the executor-verified result
 `240 × 0.15 = 36`. This is local evidence, not an automated interop claim.
 
-### P5-T4 — Verification and adoption report (pending)
+### P5-T4 — Verification and adoption report (implemented)
 
 - Run `npm run check`, `npm run build`, new deterministic adapter/UI tests,
   negative authority cases and applicable conformance checks.
@@ -171,6 +172,13 @@ Luna `low` dynamic-tool path and returned the executor-verified result
 - Exit: one documented demo command after prerequisites; incomplete conformance
   reported honestly rather than silently expanding scope.
 
+Implemented with a deterministic post-build scan for known server-only material,
+CI production-build coverage, public setup and adoption documentation, a compact
+760 × 1000 and wide 1440 × 900 screenshot/DOM audit, and a Flow validation
+report. The report concludes that the boundary is technically successful but
+too large to duplicate per application; reusable TypeScript ASP components are
+the highest-leverage follow-up.
+
 ## Non-goals and stop conditions
 
 No SpecSpace dependency, persistence/recovery workflow, human approval ceremony,
@@ -182,7 +190,7 @@ If the smallest bundle requires substantial unrelated infrastructure, record an
 ASP adoption finding and ask for a scope decision. Do not invent a private
 read-no-grant profile or build a framework to conceal the cost.
 
-Next implementation task: complete **P5-T4** with rendered layout evidence, a
-documented live-smoke result and an adoption report. Human approval, receipts and
-Proof-Bound transport remain separate follow-ups. No normative ASP changes are
-planned.
+The planned P5 demo is complete through **P5-T4**. The recommended next slice is
+to extract reusable TypeScript ASP core/server components and validate them in a
+second small application. Human approval, receipts and Proof-Bound transport
+remain separate follow-ups. No normative ASP changes are planned.
