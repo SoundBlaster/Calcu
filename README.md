@@ -50,6 +50,9 @@ npm run check
 
 ## Notes
 
+- Planned opt-in agent demo: [Calcu + Codex CLI via ASP](./SPECS/ASP_DEMO_PLAN.md).
+  This is a plan, not an available runtime feature.
+
 - `npm run check` runs formatting, linting, type checking, and the Vitest suite in one pass.
 - `npm run test:coverage` produces the coverage report used by Flow and CI.
 - `npm run dev` is the primary local workflow for UI development.

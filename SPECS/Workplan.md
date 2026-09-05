@@ -1,5 +1,20 @@
 # Calcu Workplan
 
+## Planned addition: Codex CLI / ASP demo
+
+The [integration plan](ASP_DEMO_PLAN.md) defines a new opt-in task panel, separate
+from the completed calculator baseline. All implementation tasks are pending:
+
+| Task | Deliverable | Depends on |
+| --- | --- | --- |
+| P5-T1 | Contract, conformance mapping and isolated CLI preflight | none |
+| P5-T2 | Pure calculator facade and authenticated ASP execution | P5-T1 |
+| P5-T3 | Task UI and real Codex tool round trip | P5-T2 |
+| P5-T4 | Regression/conformance evidence and adoption report | P5-T3 |
+
+Next selectable task: **P5-T1**. This section does not mark the runtime feature
+implemented or change the existing keypad requirements.
+
 ## 1. Overview
 
 This workplan converts the calculator PRD into an implementation-ready task graph for a responsive web application that reproduces the portrait and landscape calculator layouts shown in the root screenshots.
