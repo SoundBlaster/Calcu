@@ -2,6 +2,11 @@
 
 Status: planned; no agent integration or conformance claim is implemented yet.
 
+User-selected demo agent: **GPT-5.6 Luna** (`gpt-5.6-luna`) through Codex CLI,
+with reasoning effort **low**. Set these explicitly for the demo process without
+changing global Codex configuration. P5-T1 must verify availability in the installed
+CLI/account; do not silently substitute another model or reasoning level.
+
 ## Outcome
 
 Add an opt-in task panel alongside the existing calculator:
