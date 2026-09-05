@@ -1,6 +1,8 @@
 # Calcu + Codex CLI: minimal ASP demo
 
-Status: planned; no agent integration or conformance claim is implemented yet.
+Status: P5-T1 partially implemented; tool isolation gate failed. No real-agent
+integration or conformance claim is implemented yet. See the
+[preflight findings and reproduction](../scripts/agent-preflight/README.md).
 
 User-selected demo agent: **GPT-5.6 Luna** (`gpt-5.6-luna`) through Codex CLI,
 with reasoning effort **low**. Set these explicitly for the demo process without
@@ -97,7 +99,7 @@ ASP-over-MCP binding conformance.
 
 ## Delivery slices
 
-### P5-T1 — Contract and CLI preflight (pending)
+### P5-T1 — Contract and CLI preflight (partial: isolation blocker)
 
 - Confirm installed CLI version and isolated non-interactive MCP invocation.
   Local `codex exec --help` exposes stdin, JSONL, ephemeral runs, sandbox selection

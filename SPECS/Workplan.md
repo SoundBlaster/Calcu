@@ -3,11 +3,13 @@
 ## Planned addition: Codex CLI / ASP demo
 
 The [integration plan](ASP_DEMO_PLAN.md) defines a new opt-in task panel, separate
-from the completed calculator baseline. All implementation tasks are pending:
+from the completed calculator baseline. P5-T1 has an offline diagnostic and
+deterministic fixture tests, but is blocked on CLI tool isolation; later tasks
+remain pending. See [preflight evidence](../scripts/agent-preflight/README.md).
 
 | Task | Deliverable | Depends on |
 | --- | --- | --- |
-| P5-T1 | Contract, conformance mapping and isolated CLI preflight | none |
+| P5-T1 | Partial: offline preflight; isolation gate failed | none |
 | P5-T2 | Pure calculator facade and authenticated ASP execution | P5-T1 |
 | P5-T3 | Task UI and real Codex tool round trip | P5-T2 |
 | P5-T4 | Regression/conformance evidence and adoption report | P5-T3 |
