@@ -1,12 +1,14 @@
 import { createHash } from 'node:crypto';
+import { CanonicalObjectHash, JsonDocument } from '@0al/agent-surface';
 import canonicalize from 'canonicalize';
 
+// Callers supply internally constructed/validated JSON values, not raw wire
+// text. Retain the existing JCS value serializer (including non-finite rejection)
+// while the SDK owns the ASP wrapper, domain separation and digest encoding.
 export function canonicalHash(domain: string, value: unknown) {
-  const serialized = canonicalize({ domain, object: value });
+  const serialized = canonicalize(value);
   if (!serialized) throw new Error('schema_invalid');
-  return `sha-256:${createHash('sha256')
-    .update(serialized, 'utf8')
-    .digest('base64url')}`;
+  return new CanonicalObjectHash(domain).digest(new JsonDocument(serialized));
 }
 
 export function byteHash(domain: string, bytes: Uint8Array) {

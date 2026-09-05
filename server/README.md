@@ -5,6 +5,16 @@ Mediated Proposal flow. It is a development profile named **Compatibility Bearer
 over loopback HTTPS**. It is not a production authorization service and does
 not claim Proof-Bound, DPoP, mTLS, receipt, or human-approval conformance.
 
+Canonical object hashing now delegates the ASP wrapper, domain separation and
+digest encoding to the pinned [TypeScript SDK package](../vendor/README.md).
+`server/hash.ts` retains the existing JCS serializer for internally constructed,
+validated values; it is not a raw-wire JSON validator. This avoids converting
+non-finite values to `null` with `JSON.stringify`. Valid JSON hash vectors remain
+unchanged; lone Unicode surrogates remain rejected. Credential byte
+hashes and exact Agent Passport artifact hashing remain local and unchanged.
+The SDK is imported only by the server path, not the browser. Grant/session,
+identity verification, transport and application behavior are still Calcu code.
+
 ```text
 LocalBackend
     │ typed action.request + Authorization header
