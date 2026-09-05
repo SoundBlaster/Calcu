@@ -50,6 +50,33 @@ npm run check
 
 ## Notes
 
+### Experimental Codex + ASP demo
+
+An opt-in local demo connects a natural-language task panel to exact Codex CLI
+`0.145.0` with `gpt-5.6-luna` at `low` effort. Codex can call one typed
+`calculation_propose` tool; Calcu independently admits it through a development
+ASP Grant/session and loopback HTTPS boundary. The ordinary calculator still
+works without Codex or the local host.
+
+The task panel preserves the submitted natural-language request separately from
+the exact application action. ASP verifies admission and execution of that
+action; it does not establish that the action fully represents the user's
+natural-language intent.
+
+After authenticating the exact CLI version, run:
+
+```sh
+npm run agent:demo
+```
+
+Task text is sent to the configured model provider. ASP authority remains in the
+local server process. This Compatibility Bearer experiment is not production
+certification. See the [adoption report](./docs/ASP_ADOPTION_REPORT.md),
+[boundary documentation](./server/README.md), and
+[staged implementation plan](./SPECS/ASP_DEMO_PLAN.md).
+
+### Repository notes
+
 - `npm run check` runs formatting, linting, type checking, and the Vitest suite in one pass.
 - `npm run test:coverage` produces the coverage report used by Flow and CI.
 - `npm run dev` is the primary local workflow for UI development.

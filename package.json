@@ -5,29 +5,38 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && npm run verify:agent-bundle",
     "preview": "vite preview",
     "lint": "biome check . --vcs-use-ignore-file=true",
     "format": "biome format --write . --vcs-use-ignore-file=true",
     "format:check": "biome format . --vcs-use-ignore-file=true",
     "check": "npm run format:check && npm run lint && npm run typecheck && npm run test:run",
     "test": "vitest",
-    "test:run": "vitest run",
+    "test:run": "vitest run && npm run test:agent-preflight && npm run test:agent-bundle",
+    "test:agent-preflight": "node --test scripts/agent-preflight/preflight.test.mjs",
+    "test:agent-bundle": "node --test scripts/agent-demo/verify-client-bundle.test.mjs",
+    "verify:agent-bundle": "node scripts/agent-demo/verify-client-bundle.mjs dist",
+    "agent:preflight": "node scripts/agent-preflight/probe.mjs",
+    "agent:preflight:dynamic": "node scripts/agent-preflight/probe.mjs --dynamic",
+    "agent:demo": "npm run build && tsx server/demo.ts",
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit"
   },
   "dependencies": {
+    "canonicalize": "^4.0.0",
     "react": "^19.2.4",
-    "react-dom": "^19.2.4"
+    "react-dom": "^19.2.4",
+    "yaml": "^2.9.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.8",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
-    "@vitest/coverage-v8": "^4.1.1",
     "@vitejs/plugin-react": "^6.0.1",
+    "@vitest/coverage-v8": "^4.1.1",
     "jsdom": "^27.2.0",
+    "tsx": "^4.23.13",
     "typescript": "5.9.3",
     "vite": "^8.0.2",
     "vitest": "^4.1.1"

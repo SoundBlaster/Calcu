@@ -4,6 +4,7 @@ No active task currently selected.
 
 ## Recently Archived
 
+- P5-T4 — Verify ASP demo readiness and document adoption (PASS)
 - P4-T8 — Establish repository quality gates and CI reporting (PASS)
 - FU-T1 — Normalize calculator task IDs against existing archive history (PASS)
 - FU-T2 — Re-scope remaining Phase 1 setup tasks after scaffold delivery (PASS)

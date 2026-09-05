@@ -1,5 +1,23 @@
 # Calcu Workplan
 
+## Planned addition: Codex CLI / ASP demo
+
+The [integration plan](ASP_DEMO_PLAN.md) defines a new opt-in task panel, separate
+from the completed calculator baseline. P5-T1 has an offline diagnostic and
+deterministic fixture tests and a synthetic dynamic-tool round trip. Internal agent
+tools are not an ASP blocker. P5-T2 now has an exact development Grant/identity/
+session contract and tested loopback HTTPS boundary. See [boundary status](../server/README.md).
+
+| Task | Deliverable | Depends on |
+| --- | --- | --- |
+| P5-T1 | Implemented: offline preflight; live model verified in P5-T3 | none |
+| P5-T2 | Implemented development slice: exact Grant/identity/session and loopback HTTPS | P5-T1 |
+| P5-T3 | Implemented: ephemeral Codex adapter, local task host and task UI | P5-T2 |
+| P5-T4 | Implemented: regression/conformance evidence and adoption report | P5-T3 |
+
+The P5 demo is complete through **P5-T4**. This section does not mark a
+production ASP deployment or change the existing keypad requirements.
+
 ## 1. Overview
 
 This workplan converts the calculator PRD into an implementation-ready task graph for a responsive web application that reproduces the portrait and landscape calculator layouts shown in the root screenshots.
@@ -48,6 +66,12 @@ Build the React components, portrait and landscape key layouts, stable button sy
 ### Phase 4 — Verification and Polish
 
 Add keyboard support, test coverage, visual QA, and final readiness checks. This phase ensures the build is dependable, visually stable, and ready for continued task-driven implementation.
+
+### Phase 5 — Codex CLI and ASP Demo
+
+Add an opt-in natural-language task path through an ephemeral Codex adapter and
+an independently enforced local ASP application boundary, then document the
+resulting adoption evidence and limitations.
 
 ## 3. Tasks
 
@@ -366,6 +390,66 @@ Boundary note: P1-T1 delivers the runnable app shell only; the remaining Phase 1
   - [ ] Coverage metrics are generated and surfaced through badges or workflow artifacts
   - [ ] README communicates the repo's quality status with visible badges and consistent commands
 
+## Phase 5 — Codex CLI and ASP Demo
+
+#### ✅ P5-T1: Validate the Codex CLI and ASP integration contract
+- **Description:** Establish the exact Codex CLI/model configuration, typed calculator tool contract, synthetic dynamic-tool round trip, and ASP role/conformance mapping before adding application authority.
+- **Priority:** P0
+- **Dependencies:** P4-T8
+- **Parallelizable:** no
+- **Outputs/Artifacts:**
+  - `scripts/agent-preflight/`
+  - `SPECS/ASP_DEMO_PLAN.md`
+  - deterministic synthetic-provider fixtures and tests
+- **Acceptance Criteria:**
+  - [ ] The supported Codex CLI version, model, effort, sandbox, and fallback policy are explicit
+  - [ ] A bounded synthetic round trip exercises the typed calculator tool
+  - [ ] Diagnostic agent capabilities are not confused with ASP application authority
+
+#### ✅ P5-T2: Implement the ASP Grant and execution boundary
+- **Description:** Add the closed development Grant, identity evidence, session lifecycle, JCS hashes, Runtime Mediator, and independently enforced loopback HTTPS Action Executor around the existing Calcu math engine.
+- **Priority:** P0
+- **Dependencies:** P5-T1
+- **Parallelizable:** no
+- **Outputs/Artifacts:**
+  - server-side ASP boundary modules under `server/`
+  - positive and negative boundary/transport tests
+  - `server/README.md`
+- **Acceptance Criteria:**
+  - [ ] Valid authority reaches the existing math engine through loopback HTTPS
+  - [ ] Invalid or stale authority is rejected before any engine call
+  - [ ] Browser and model receive no Grant, credential, identity artifact, or raw ASP request
+
+#### ✅ P5-T3: Add the Codex adapter and task UI
+- **Description:** Connect an opt-in task panel to one ephemeral Codex app-server process per task, expose only the closed `calculation_propose` tool, and route every admitted calculation through LocalBackend and the ASP executor.
+- **Priority:** P0
+- **Dependencies:** P5-T2
+- **Parallelizable:** no
+- **Outputs/Artifacts:**
+  - `server/codexAdapter.ts`
+  - `server/taskHost.ts`
+  - `src/features/agent-task/`
+  - deterministic fake app-server and UI regression tests
+- **Acceptance Criteria:**
+  - [ ] One correlated calculator action can complete a task through the ASP boundary
+  - [ ] Cancellation terminates the task process and late events cannot restore stale UI state
+  - [ ] Requested task, exact application action, and untrusted model prose are presented separately
+
+#### ✅ P5-T4: Verify and report ASP adoption readiness
+- **Description:** Run the complete local quality gates, verify browser/server artifact isolation and responsive layouts, record manual live evidence, and publish an honest conformance and adoption report.
+- **Priority:** P1
+- **Dependencies:** P5-T3
+- **Parallelizable:** no
+- **Outputs/Artifacts:**
+  - `docs/ASP_ADOPTION_REPORT.md`
+  - `server/CONFORMANCE.md`
+  - production browser-bundle isolation checks
+  - CI and rendered-layout evidence
+- **Acceptance Criteria:**
+  - [ ] Deterministic tests and production-build isolation checks pass in CI
+  - [ ] Manual live evidence is distinguished from mock and CI evidence
+  - [ ] Development-profile limitations and the reusable SDK follow-up are explicit
+
 ## 4. Traceability
 
 | PRD Area | Covered By |
@@ -381,6 +465,7 @@ Boundary note: P1-T1 delivers the runnable app shell only; the remaining Phase 1
 | Keyboard support | P4-T1 |
 | Accessibility and focus states | P3-T2, P4-T4 |
 | Repository quality gates, coverage, and CI | P1-T2, P1-T3, P4-T5, P4-T8 |
+| Codex CLI and ASP application boundary | P5-T1, P5-T2, P5-T3, P5-T4 |
 
 ## 5. Dependency Notes
 
@@ -388,6 +473,8 @@ Boundary note: P1-T1 delivers the runnable app shell only; the remaining Phase 1
 - The engine tasks form a directed acyclic graph: standard behavior first, then percent/memory, then scientific behavior, then parentheses and formatting.
 - UI tasks split cleanly between key metadata, visual primitives, portrait layout, and landscape layout before final composition.
 - Verification tasks run in parallel where possible after the composed calculator exists.
+- Phase 5 proceeds serially from CLI contract to authority boundary, adapter/UI,
+  and adoption verification.
 
 ## 6. Follow-up Tasks
 

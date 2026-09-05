@@ -7,8 +7,9 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html', 'lcov'],
-      include: ['src/**/*.{ts,tsx}'],
+      include: ['src/**/*.{ts,tsx}', 'server/**/*.ts'],
       exclude: [
+        'server/**/*.test.ts',
         'src/**/*.test.ts',
         'src/**/*.test.tsx',
         'src/test/**',
@@ -23,7 +24,7 @@ export default defineConfig({
     },
     environment: 'jsdom',
     globals: true,
-    include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
+    include: ['src/**/*.test.ts', 'src/**/*.test.tsx', 'server/**/*.test.ts'],
     setupFiles: ['./src/test/setup.ts'],
   },
 });

@@ -1,11 +1,12 @@
 # Tasks Archive
 
-**Last Updated:** 2026-03-25
+**Last Updated:** 2026-09-05
 
 ## Archived Tasks
 
 | Task ID | Folder | Archived | Verdict |
 |---------|--------|----------|---------|
+| P5-T4 | [P5-T4_Verify_ASP_demo_readiness_and_document_adoption/](P5-T4_Verify_ASP_demo_readiness_and_document_adoption/) | 2026-09-05 | PASS |
 | P4-T8 | [P4-T8_Establish_repository_quality_gates_and_CI_reporting/](P4-T8_Establish_repository_quality_gates_and_CI_reporting/) | 2026-03-25 | PASS |
 | FU-T2 | [FU-T2_Re-scope_remaining_Phase_1_setup_tasks_after_scaffold_delivery/](FU-T2_Re-scope_remaining_Phase_1_setup_tasks_after_scaffold_delivery/) | 2026-03-25 | PASS |
 | FU-T1 | [FU-T1_Normalize_calculator_task_IDs_against_existing_archive_history/](FU-T1_Normalize_calculator_task_IDs_against_existing_archive_history/) | 2026-03-25 | PASS |
@@ -38,6 +39,7 @@
 | Folder | Description |
 |--------|-------------|
 | [_Historical/](_Historical/) | Non-task artifacts |
+| [_Historical/REVIEW_p5_t4_asp_adoption_readiness.md](_Historical/REVIEW_p5_t4_asp_adoption_readiness.md) | Post-archive review report for P5-T4 ASP demo adoption readiness |
 | [_Historical/REVIEW_p4_t8_quality_gates_ci.md](_Historical/REVIEW_p4_t8_quality_gates_ci.md) | Post-archive review report for the P4-T8 quality gates and CI reporting task |
 | [_Historical/REVIEW_fu_t2_phase1_rescope.md](_Historical/REVIEW_fu_t2_phase1_rescope.md) | Post-archive review report for the FU-T2 phase 1 rescope task |
 | [_Historical/REVIEW_fu_t1_namespace_policy.md](_Historical/REVIEW_fu_t1_namespace_policy.md) | Post-archive review report for the FU-T1 namespace policy task |
@@ -68,6 +70,8 @@
 
 | Date | Task ID | Action |
 |------|---------|--------|
+| 2026-09-05 | REVIEW_p5_t4_asp_adoption_readiness | Archived REVIEW_p5_t4_asp_adoption_readiness report |
+| 2026-09-05 | P5-T4 | Archived task with validation report (PASS) |
 | 2026-03-25 | REVIEW_p4_t8_quality_gates_ci | Archived REVIEW_p4_t8_quality_gates_ci report |
 | 2026-03-25 | P4-T8 | Archived task with validation report (PASS) |
 | 2026-03-25 | REVIEW_fu_t2_phase1_rescope | Archived REVIEW_fu_t2_phase1_rescope report |
