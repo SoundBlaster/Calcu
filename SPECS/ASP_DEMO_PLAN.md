@@ -1,8 +1,8 @@
 # Calcu + Codex CLI: minimal ASP demo
 
-Status: P5-T1 partially implemented; dynamic calculator round trip verified with
-a synthetic provider, but unexpected runtime bindings still fail the isolation
-gate. No real-agent
+Status: P5-T2 first application-boundary slice implemented and tested in-process.
+P5-T1 dynamic calculator round trip is verified with a synthetic provider. Internal
+Codex tools are diagnostic observations, not an ASP admission blocker. No real-agent
 integration or conformance claim is implemented yet. See the
 [preflight findings and reproduction](../scripts/agent-preflight/README.md).
 
@@ -101,20 +101,24 @@ ASP-over-MCP binding conformance.
 
 ## Delivery slices
 
-### P5-T1 — Contract and CLI preflight (partial: isolation blocker)
+### P5-T1 — Contract and CLI preflight (partial: live run pending)
 
 - Confirm installed CLI version and isolated non-interactive MCP invocation.
   Local `codex exec --help` exposes stdin, JSONL, ephemeral runs, sandbox selection
   and user-config isolation; verify behavior before relying on these options.
   Do not alter global user configuration.
-- Prove only the intended tool path is available: no unrelated inherited MCP
-  servers/hooks, repository access or shell-based calculator bypass. A read-only
-  sandbox alone is not tool isolation. Report unavailable enforcement rather than
-  relying on prompt instructions.
+- Keep app credentials outside agent contexts and expose no application bypass.
+  Agent-internal tools and subagents are not an ASP rejection criterion. Diagnostic
+  tool inventory is a deployment observation, not the application's authority gate.
 - Define typed I/O and the full ASP requirement/identity/transport mapping.
 - Exit: bounded tool smoke test, exact tested versions and documented boundaries.
 
-### P5-T2 — Calculator facade and ASP execution (pending)
+### P5-T2 — Calculator facade and ASP execution (in progress)
+
+Implemented: [server boundary](../server/README.md), a pure facade, app-owned
+opaque credential state, expiry/revocation/session/surface/action checks, bounded
+admission and response correlation. Direct-executor negative tests are included.
+This is a serialized in-process slice, not complete ASP Grant/identity/HTTP support.
 
 - Reuse the existing math function through strict, pure validation.
 - Add independent app-side Grant/session/manifest checks and runtime mediation.
@@ -159,4 +163,6 @@ If the smallest bundle requires substantial unrelated infrastructure, record an
 ASP adoption finding and ask for a scope decision. Do not invent a private
 read-no-grant profile or build a framework to conceal the cost.
 
-Next implementation task: **P5-T1**. No normative ASP changes are planned.
+Next implementation task: finish **P5-T2** identity/Grant provisioning and
+authenticated transport, then connect the Codex tool and task UI. No normative
+ASP changes are planned.

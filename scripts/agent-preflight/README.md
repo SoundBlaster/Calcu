@@ -105,20 +105,15 @@ runtime evidence rather than unconditional rejection or unconditional acceptance
 
 ## P5-T1 status and next decision
 
-**Partial / blocked on tool isolation.** Do not proceed to a browser-accessible
-task service using this CLI configuration. Additional file tools being exposed
-does not demonstrate an exploitable write, but it fails our intended tool-only
-boundary. Do not weaken the claim to make this test pass.
+**Partial; tool-only isolation is no longer an ASP acceptance requirement.**
+The inventory diagnostic retains its strict failure result; we do not relabel
+the observed configuration as isolated. However, ASP permits internal helpers
+and subagents without transferring application authority to them. Their existence
+does not block P5-T2. The actual gate is independent application admission and
+credential custody; see [the server boundary](../../server/README.md).
 
-Next: find a supported way to disable the unadvertised multi-agent handlers or
-use external isolation. Empty-argument validation errors do not establish disabled
-dispatch and must never count as denial evidence. Review skills/plan helpers before
-claiming the intended boundary. Retain Luna low and CLI-managed authentication.
-Do not bypass the gate by adding unknown bindings to the allow-list. If this
-cannot meet the boundary, choose an
-externally isolated CLI environment with explicit filesystem/network restrictions.
-Either path needs a fresh inventory and a real tool round-trip test before P5-T2.
-No complete isolation path or real-model execution is established by this probe.
+Real Luna execution, transport protection and complete identity/Grant provisioning
+remain pending. The probe is diagnostic only, not a prerequisite for those tasks.
 
 ## Planned ASP contract (still unimplemented)
 
