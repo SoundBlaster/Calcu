@@ -24,9 +24,11 @@ Add an opt-in task panel alongside the existing calculator:
 3. Calcu calculates `240 * 0.15` using its existing math implementation.
 4. The panel displays `36` and the actual operation, arguments, and result.
 
-A model-generated answer without a verified application result is not a successful
-demo. No deterministic phrase matcher will impersonate the agent. Ordinary
-calculator use remains available without Codex or a running backend.
+A model-generated answer without an admitted and executor-confirmed application
+action is not a successful demo. The UI preserves the submitted task separately
+from that exact action and does not claim that their meanings are equivalent. No
+deterministic phrase matcher will impersonate the agent. Ordinary calculator use
+remains available without Codex or a running backend.
 
 ## Inspected baseline
 
@@ -156,8 +158,10 @@ tests are deterministic CI evidence; `npm run agent:demo` is the authenticated
 manual smoke command.
 
 Manual smoke on 2026-09-05 with authenticated Codex CLI `0.145.0` completed the
-Luna `low` dynamic-tool path and returned the executor-verified result
-`240 × 0.15 = 36`. This is local evidence, not an automated interop claim.
+Luna `low` dynamic-tool path and returned the executor-confirmed action result
+`240 × 0.15 = 36`. This is local wiring evidence, not a claim that Calcu can
+independently verify Codex's interpretation of a natural-language task, nor an
+automated interop claim.
 
 ### P5-T4 — Verification and adoption report (implemented)
 

@@ -99,8 +99,20 @@
 
 .resultBlock {
   display: grid;
-  gap: 10px;
+  gap: 16px;
   padding-top: 4px;
+}
+
+.resultSection {
+  display: grid;
+  gap: 6px;
+}
+
+.requestedTask {
+  margin: 0;
+  color: var(--calc-text-primary);
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
 }
 
 .result {
@@ -114,6 +126,24 @@
   margin: 0;
   color: var(--calc-text-muted);
   white-space: pre-wrap;
+}
+
+.scopeNote {
+  display: grid;
+  gap: 6px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 159, 10, 0.22);
+  border-radius: 14px;
+  background: rgba(255, 159, 10, 0.08);
+}
+
+.scopeNote p {
+  margin: 0;
+}
+
+.scopeNote p:last-child {
+  color: var(--calc-text-muted);
+  font-size: 0.82rem;
 }
 
 .trace summary {

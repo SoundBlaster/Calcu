@@ -30,6 +30,9 @@ calls, untrusted fabricated prose, nonzero exit, timeout, cancellation, exact
 Host/Origin/cookie checks, oversized/extra task input, concurrency and closed
 error projection. The UI requires a correlated tool-result event before rendering
 terminal success and ignores events from cancelled/replaced client generations.
+It also keeps the immutable submitted task separate from the exact admitted
+action and labels model prose as unverified. This provenance presentation does
+not establish semantic equivalence between the request and the action.
 
 ## Manual live evidence
 
@@ -44,7 +47,9 @@ CI evidence, independent interoperability, or production conformance.
 The slice does not provide production identity trust, durable user consent,
 Proof-Bound DPoP/mTLS, portable receipts, recovery, replay protection beyond
 the local correlation contract, remote networking, CORS integration, or a
-general-purpose ASP SDK. The ASP repository and normative text remain unchanged.
+general-purpose ASP SDK. It does not parse natural-language intent or prove that
+an admitted action fully represents a user's task. The ASP repository and
+normative text remain unchanged.
 
 ## Adoption verification
 

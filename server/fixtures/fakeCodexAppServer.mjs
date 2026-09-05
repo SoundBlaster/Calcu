@@ -31,7 +31,9 @@ input.on('line', (line) => {
       JSON.stringify(params.selectedCapabilityRoots) !== '[]' ||
       params.dynamicTools?.length !== 1 ||
       tool?.name !== 'calculation_propose' ||
-      tool?.inputSchema?.additionalProperties !== false
+      tool?.inputSchema?.additionalProperties !== false ||
+      JSON.stringify(tool?.inputSchema?.properties?.operator?.enum) !==
+        JSON.stringify(['add', 'subtract', 'multiply', 'divide'])
     )
       process.exit(3);
     send({ id: 1, result: { thread: { id: threadId } } });
@@ -97,6 +99,10 @@ input.on('line', (line) => {
       });
       return;
     }
+    const argumentsValue =
+      scenario === 'semantic_subset'
+        ? { operator: 'multiply', left: 111, right: 2 }
+        : { operator: 'multiply', left: 240, right: 0.15 };
     send({
       id: 0,
       method: 'item/tool/call',
@@ -106,7 +112,7 @@ input.on('line', (line) => {
         callId: scenario === 'invalid_call' ? '' : 'call-calcu-1',
         namespace: null,
         tool: scenario === 'wrong_tool' ? 'other_tool' : 'calculation_propose',
-        arguments: { operator: 'multiply', left: 240, right: 0.15 },
+        arguments: argumentsValue,
       },
     });
     return;
@@ -136,7 +142,7 @@ input.on('line', (line) => {
         delta:
           scenario === 'fabricated_prose'
             ? 'I calculated 999.'
-            : 'The verified Calcu result is 36.',
+            : 'Calcu returned 36.',
       },
     });
     send({

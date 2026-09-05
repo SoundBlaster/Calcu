@@ -25,6 +25,7 @@ export function AgentTaskPanel() {
   const [task, setTask] = useState(EXAMPLE);
   const [state, setState] = useState<PanelState>('idle');
   const [phase, setPhase] = useState('');
+  const [submittedTask, setSubmittedTask] = useState('');
   const [result, setResult] = useState<CalculationResult>();
   const [trace, setTrace] = useState<SafeTaskTrace>();
   const [agentMessage, setAgentMessage] = useState('');
@@ -41,11 +42,13 @@ export function AgentTaskPanel() {
   };
 
   const submit = async () => {
+    const taskSnapshot = task.trim();
     const currentGeneration = ++generation.current;
     activeController.current?.abort();
     const controller = new AbortController();
     activeController.current = controller;
     clearOutput();
+    setSubmittedTask(taskSnapshot);
     setState('running');
     let streamTaskId: string | undefined;
     let toolSeen = false;
@@ -108,7 +111,7 @@ export function AgentTaskPanel() {
         method: 'POST',
         credentials: 'same-origin',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ task: task.trim() }),
+        body: JSON.stringify({ task: taskSnapshot }),
         signal: controller.signal,
       });
       await consumeTaskStream(response, controller.signal, applyEvent);
@@ -183,38 +186,73 @@ export function AgentTaskPanel() {
         {state === 'running' ? `Running${phase ? ` · ${phase}` : '…'}` : null}
         {state === 'cancelled' ? 'Task cancelled.' : null}
         {state === 'error' ? `Task failed: ${error}` : null}
-        {state === 'success' && result && trace ? (
-          <div className={styles.resultBlock}>
-            <p className={styles.verifiedLabel}>Verified Calcu result</p>
-            <output className={styles.result}>
+        {state === 'success' ? 'Application action completed.' : null}
+      </div>
+      {state === 'success' && result && trace && submittedTask ? (
+        <div className={styles.resultBlock}>
+          <section
+            className={styles.resultSection}
+            aria-labelledby="requested-task-label"
+          >
+            <p className={styles.verifiedLabel} id="requested-task-label">
+              Requested task
+            </p>
+            <p className={styles.requestedTask}>{submittedTask}</p>
+          </section>
+          <section
+            className={styles.resultSection}
+            aria-labelledby="verified-action-label"
+          >
+            <p className={styles.verifiedLabel} id="verified-action-label">
+              Verified application action
+            </p>
+            <output
+              className={styles.result}
+              aria-label="Verified application action result"
+            >
               {result.left} {OPERATOR_LABELS[result.operator]} {result.right} ={' '}
               {result.result}
             </output>
-            {agentMessage ? (
-              <p className={styles.agentMessage}>{agentMessage}</p>
-            ) : null}
-            <details className={styles.trace}>
-              <summary>Safe trace</summary>
-              <dl>
-                <dt>Model</dt>
-                <dd>{trace.model}</dd>
-                <dt>Effort</dt>
-                <dd>{trace.effort}</dd>
-                <dt>Tool</dt>
-                <dd>{trace.tool_name}</dd>
-                <dt>Call</dt>
-                <dd>{trace.call_id}</dd>
-                <dt>Operands</dt>
-                <dd>
-                  {trace.operands.left}{' '}
-                  {OPERATOR_LABELS[trace.operands.operator]}{' '}
-                  {trace.operands.right}
-                </dd>
-              </dl>
-            </details>
+          </section>
+          <div className={styles.scopeNote} role="note">
+            <p className={styles.verifiedLabel}>Scope of verification</p>
+            <p>
+              Calcu verified that this displayed operation was admitted and
+              executed through the ASP boundary. It does not verify that the
+              operation fully represents the natural-language task.
+            </p>
           </div>
-        ) : null}
-      </div>
+          {agentMessage ? (
+            <section
+              className={styles.resultSection}
+              aria-labelledby="agent-message-label"
+            >
+              <p className={styles.verifiedLabel} id="agent-message-label">
+                Agent message (unverified)
+              </p>
+              <p className={styles.agentMessage}>{agentMessage}</p>
+            </section>
+          ) : null}
+          <details className={styles.trace}>
+            <summary>Safe trace</summary>
+            <dl>
+              <dt>Model</dt>
+              <dd>{trace.model}</dd>
+              <dt>Effort</dt>
+              <dd>{trace.effort}</dd>
+              <dt>Tool</dt>
+              <dd>{trace.tool_name}</dd>
+              <dt>Call</dt>
+              <dd>{trace.call_id}</dd>
+              <dt>Operands</dt>
+              <dd>
+                {trace.operands.left} {OPERATOR_LABELS[trace.operands.operator]}{' '}
+                {trace.operands.right}
+              </dd>
+            </dl>
+          </details>
+        </div>
+      ) : null}
     </section>
   );
 }

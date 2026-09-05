@@ -5,8 +5,8 @@
 Calcu demonstrates one useful ASP path end to end: a user gives Codex CLI a
 natural-language arithmetic task, Codex selects a single typed application
 action, and Calcu independently admits and evaluates that action behind a local
-HTTPS boundary. The verified application result is displayed separately from
-untrusted model prose.
+HTTPS boundary. The immutable submitted task, exact admitted application action,
+and untrusted model prose are displayed as three separate facts.
 
 The experiment proves that the ASP authority boundary can separate an agent
 from application business logic. It also shows that implementing the boundary
@@ -60,8 +60,10 @@ Open the printed `http://127.0.0.1:<port>/` URL and submit:
 Сколько будет 15% от 240?
 ```
 
-The success view must show the executor-verified result
-`240 × 0.15 = 36`. Model prose is optional and is never the source of success.
+The success view must show the original request under `Requested task`, the exact
+`Verified application action` `240 × 0.15 = 36`, and a scope note stating that
+Calcu has not established semantic equivalence between those two values. Model
+prose is optional, labelled unverified, and is never the source of success.
 Stop the host with `Ctrl-C`; it cancels the active task, closes both loopback
 servers, and removes temporary TLS material.
 
@@ -80,14 +82,33 @@ protocol diagnostics; diagnostics intentionally exclude ASP authority.
 | Agent protocol isolation | `server/codexAdapter.test.ts` | Exact CLI/model/effort, one closed tool, correlated IDs, bounded JSONL, no/multiple tool rejection, timeout and cancellation |
 | Full deterministic path | `server/codexAdapter.test.ts` | Fake app-server → LocalBackend → real loopback HTTPS executor → Calcu returns `36` |
 | Browser task boundary | `server/taskHost.test.ts` | Same-origin cookie gate, one active task, bounded NDJSON, disconnect cancellation, and safe event projection |
-| UI verification | `src/features/agent-task/*.test.ts*` | Verified result is required, fabricated/mismatched completion fails, retry works, late cancelled events are ignored |
+| UI provenance | `src/features/agent-task/*.test.ts*` | Executor-confirmed action evidence is required, the immutable requested task is shown separately, no semantic-equivalence claim is made, fabricated/mismatched completion fails, retry replaces the snapshot, and late cancelled events are ignored |
 | Client artifact isolation | `scripts/agent-demo/verify-client-bundle.*` | Generated browser files contain none of the known server-only protocol markers |
 
 The Codex fixture is a deterministic **mock process**, not a real agent or
 independent implementation. Default CI uses no Codex authentication and performs
 no paid model inference. On 2026-09-05, a separate manual smoke using the real
 authenticated CLI `0.145.0`, `gpt-5.6-luna`, and effort `low` made one
-`calculation_propose` call and returned the verified result `36`.
+`calculation_propose` call and returned the application action result `36`.
+
+## Natural-language intent boundary
+
+ASP admission is deliberately narrower than natural-language understanding. For
+example, a user may submit:
+
+```text
+Сколько будет корень из 111 умноженный на 2?
+```
+
+If Codex calls the allowed action `multiply(111, 2)`, the application can safely
+admit and execute that exact call. The UI therefore reports both the immutable
+request and `111 × 2 = 222`, while explaining that only the displayed operation
+was verified through the ASP boundary. This application-level success does not
+assert that Codex computed a square root or correctly solved the user's task.
+
+This distinction is evidence that the narrow four-operation surface constrains
+application authority. It is not evidence of a semantic parser, task-intent
+binding, or automatic detection of an incomplete interpretation.
 
 ## Rendered layout evidence
 
@@ -144,6 +165,8 @@ shrink to its surface declaration, one action handler, and UI composition.
 
 The demo also does not provide durable consent, recovery, remote multi-user
 deployment, general expression parsing, a reusable ASP SDK, or a WebMCP bridge.
+It also does not verify semantic equivalence between natural-language requests
+and admitted actions.
 Its bearer is short-lived, stored only in the trusted server process, bound to a
 fresh Grant/session for one task, and revoked in a `finally` block, but it remains
 a development credential profile.

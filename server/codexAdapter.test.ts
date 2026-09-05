@@ -85,6 +85,32 @@ describe('CodexTaskAdapter', () => {
     expect(events.some((event) => event.type === 'tool_result')).toBe(true);
   });
 
+  it('admits a schema-valid action without claiming semantic task equivalence', async () => {
+    const semanticInput = {
+      operator: 'multiply',
+      left: 111,
+      right: 2,
+    } as const;
+    const semanticResult = { ...semanticInput, result: 222 };
+    const localBackend = {
+      calculationPropose: vi.fn(async (value: unknown) => {
+        expect(value).toEqual(semanticInput);
+        return semanticResult;
+      }),
+    };
+
+    const output = await adapter('semantic_subset').run(
+      'Сколько будет корень из 111 умноженный на 2?',
+      localBackend,
+      new AbortController().signal,
+      () => {},
+    );
+
+    expect(localBackend.calculationPropose).toHaveBeenCalledTimes(1);
+    expect(output.application_result).toEqual(semanticResult);
+    expect(output.trace.operands).toEqual(semanticInput);
+  });
+
   it.each([
     ['malformed', 'agent_protocol_error'],
     ['truncated', 'agent_protocol_error'],

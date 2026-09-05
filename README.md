@@ -58,6 +58,11 @@ An opt-in local demo connects a natural-language task panel to exact Codex CLI
 ASP Grant/session and loopback HTTPS boundary. The ordinary calculator still
 works without Codex or the local host.
 
+The task panel preserves the submitted natural-language request separately from
+the exact application action. ASP verifies admission and execution of that
+action; it does not establish that the action fully represents the user's
+natural-language intent.
+
 After authenticating the exact CLI version, run:
 
 ```sh
