@@ -1,6 +1,19 @@
 # Next Task Queue
 
-No active task currently selected.
+## Active Task
+
+- **ID:** P5-T4
+- **Title:** Verify ASP demo readiness and document adoption
+- **Priority:** P1
+- **Depends on:** P5-T3
+- **Branch:** `codex/calcu-asp-demo-plan`
+- **Pull request:** [#2](https://github.com/SoundBlaster/Calcu/pull/2)
+- **Status:** INPROGRESS
+
+P5-T4 completes the existing P5 demo branch with deterministic verification,
+responsive layout evidence, reproducible setup instructions, and an honest
+adoption report. The existing branch is intentionally reused because P5-T4 is
+the concluding verification slice for the already-open focused demo PR.
 
 ## Recently Archived
 
