@@ -203,6 +203,16 @@ test('Code Mode advertisement is recognized but never proves runtime safety', ()
 
 test('dynamic gate requires matching runtime inventory, result, nonce and denied capabilities', () => {
   assert.equal(judgeDynamicProbe(probeCase()).capabilityProbePassed, true);
+  assert.equal(
+    judgeDynamicProbe({ ...probeCase(), requestCount: 3 })
+      .capabilityProbePassed,
+    false,
+  );
+  assert.equal(
+    judgeDynamicProbe({ ...probeCase(), requestCount: 1 })
+      .capabilityProbePassed,
+    false,
+  );
   for (const overrides of [
     { inventory: [...permittedRuntimeTools, 'multi_agent_v1__spawn_agent'] },
     { inventory: [...permittedRuntimeTools, 'exec_command'] },
@@ -212,6 +222,7 @@ test('dynamic gate requires matching runtime inventory, result, nonce and denied
     { globals: { process: 'object' } },
     { nonce: 'stale' },
     { result: '36' },
+    { result: { operator: 'add', left: 18, right: 18, result: 36 } },
     { result: '{invalid json' },
     { result: { operator: 'multiply', left: 240, right: 0.15, result: 37 } },
   ])

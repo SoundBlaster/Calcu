@@ -78,7 +78,8 @@ The gate now separates advertisement from execution evidence:
    not invoked). The parent separately records its calculator handler invocation.
 4. `capabilityProbePassed` requires the exact reviewed runtime inventory, denied
    host operations, a matching nonce/call ID, the parent invocation and matching
-   result in the next request. Missing/duplicate evidence or changed models fail.
+   result in the next request. Exactly two provider requests are required;
+   missing/duplicate evidence, extra requests or changed models fail.
 
 `initialRequestGatePassed` remains the legacy **direct-tool-only** shape check;
 the dynamic command's exit status uses `capabilityProbePassed`, not that field.

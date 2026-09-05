@@ -15,122 +15,126 @@ if (process.platform === 'win32') {
 }
 
 const dir = await prepareFixture();
-const dynamic = process.argv.includes('--dynamic');
-const nonce = randomUUID();
-const { tool, calculate } = await import(
-  pathToFileURL(join(dir, 'calculator.mjs'))
-);
-const calls = [];
-let rejectedCalls = 0;
-const cwd = join(dir, 'work');
-const home = join(dir, 'home');
-await mkdir(cwd);
-await mkdir(home);
-
-let captured;
-let followingRequest;
-let requestCount = 0;
-const server = createServer((request, response) => {
-  let body = '';
-  request.on('data', (chunk) => {
-    body += chunk;
-    if (Buffer.byteLength(body) > 2_000_000) request.destroy();
-  });
-  request.on('end', () => {
-    try {
-      const parsed = JSON.parse(body);
-      if (Array.isArray(parsed.input)) {
-        if (!captured) captured = parsed;
-        else followingRequest = parsed;
-      }
-    } catch {
-      /* Only a Responses request is evidence. */
-    }
-    let candidate = false;
-    try {
-      candidate = captured && inspectRequest(captured).wrapperCandidate;
-    } catch {
-      /* Fail closed below. */
-    }
-    if (++requestCount === 1 && dynamic && candidate) {
-      response.writeHead(200, { 'Content-Type': 'text/event-stream' });
-      response.end(syntheticResponse(nonce));
-      return;
-    }
-    response.writeHead(400, { 'Content-Type': 'application/json' });
-    response.end(
-      JSON.stringify({
-        error: {
-          message: 'Offline capture complete',
-          type: 'invalid_request_error',
-        },
-      }),
-    );
-  });
-});
-await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
-const settings = {
-  model_provider: 'capture',
-  'model_providers.capture.name': 'Offline capture',
-  'model_providers.capture.base_url': `http://127.0.0.1:${server.address().port}/v1`,
-  'model_providers.capture.wire_api': 'responses',
-  'model_providers.capture.requires_openai_auth': false,
-  'model_providers.capture.request_max_retries': 0,
-  'model_providers.capture.stream_max_retries': 0,
-  model_reasoning_effort: 'low',
-  web_search: 'disabled',
-  ...(!dynamic
-    ? {
-        'mcp_servers.calcu.command': process.execPath,
-        'mcp_servers.calcu.args': [join(dir, 'server.mjs')],
-        'mcp_servers.calcu.required': true,
-        'mcp_servers.calcu.enabled_tools': ['calculation_propose'],
-      }
-    : {}),
-};
-const args = [
-  '-a',
-  'never',
-  'exec',
-  '--ignore-user-config',
-  '--ignore-rules',
-  '--ephemeral',
-  '--skip-git-repo-check',
-  '--sandbox',
-  'read-only',
-  '--json',
-  '-m',
-  'gpt-5.6-luna',
-  '-C',
-  cwd,
-];
-// Disable known optional capability paths; the captured tool list is the gate.
-for (const feature of [
-  'shell_tool',
-  'unified_exec',
-  'apps',
-  'plugins',
-  'hooks',
-  'multi_agent',
-  'browser_use',
-  'computer_use',
-  'image_generation',
-  'code_mode',
-  'code_mode_host',
-  'workspace_dependencies',
-  'skill_search',
-  'memories',
-  'enable_request_compression',
-]) {
-  args.push('--disable', feature);
-}
-for (const [key, value] of Object.entries(settings))
-  args.push('-c', `${key}=${JSON.stringify(value)}`);
-args.push('-');
 let child;
 let timer;
-const appServer = dynamic || process.argv.includes('--app-server');
+let server;
 try {
+  const dynamic = process.argv.includes('--dynamic');
+  const nonce = randomUUID();
+  const { tool, calculate } = await import(
+    pathToFileURL(join(dir, 'calculator.mjs'))
+  );
+  const calls = [];
+  let rejectedCalls = 0;
+  const cwd = join(dir, 'work');
+  const home = join(dir, 'home');
+  await mkdir(cwd);
+  await mkdir(home);
+
+  let captured;
+  let followingRequest;
+  let requestCount = 0;
+  server = createServer((request, response) => {
+    let body = '';
+    request.on('data', (chunk) => {
+      body += chunk;
+      if (Buffer.byteLength(body) > 2_000_000) request.destroy();
+    });
+    request.on('end', () => {
+      try {
+        const parsed = JSON.parse(body);
+        if (Array.isArray(parsed.input)) {
+          if (!captured) captured = parsed;
+          else if (!followingRequest) followingRequest = parsed;
+        }
+      } catch {
+        /* Only a Responses request is evidence. */
+      }
+      let candidate = false;
+      try {
+        candidate = captured && inspectRequest(captured).wrapperCandidate;
+      } catch {
+        /* Fail closed below. */
+      }
+      if (++requestCount === 1 && dynamic && candidate) {
+        response.writeHead(200, { 'Content-Type': 'text/event-stream' });
+        response.end(syntheticResponse(nonce));
+        return;
+      }
+      response.writeHead(400, { 'Content-Type': 'application/json' });
+      response.end(
+        JSON.stringify({
+          error: {
+            message: 'Offline capture complete',
+            type: 'invalid_request_error',
+          },
+        }),
+      );
+    });
+  });
+  await new Promise((resolve, reject) => {
+    server.once('error', reject);
+    server.listen(0, '127.0.0.1', resolve);
+  });
+  const settings = {
+    model_provider: 'capture',
+    'model_providers.capture.name': 'Offline capture',
+    'model_providers.capture.base_url': `http://127.0.0.1:${server.address().port}/v1`,
+    'model_providers.capture.wire_api': 'responses',
+    'model_providers.capture.requires_openai_auth': false,
+    'model_providers.capture.request_max_retries': 0,
+    'model_providers.capture.stream_max_retries': 0,
+    model_reasoning_effort: 'low',
+    web_search: 'disabled',
+    ...(!dynamic
+      ? {
+          'mcp_servers.calcu.command': process.execPath,
+          'mcp_servers.calcu.args': [join(dir, 'server.mjs')],
+          'mcp_servers.calcu.required': true,
+          'mcp_servers.calcu.enabled_tools': ['calculation_propose'],
+        }
+      : {}),
+  };
+  const args = [
+    '-a',
+    'never',
+    'exec',
+    '--ignore-user-config',
+    '--ignore-rules',
+    '--ephemeral',
+    '--skip-git-repo-check',
+    '--sandbox',
+    'read-only',
+    '--json',
+    '-m',
+    'gpt-5.6-luna',
+    '-C',
+    cwd,
+  ];
+  // Disable known optional capability paths; the captured tool list is the gate.
+  for (const feature of [
+    'shell_tool',
+    'unified_exec',
+    'apps',
+    'plugins',
+    'hooks',
+    'multi_agent',
+    'browser_use',
+    'computer_use',
+    'image_generation',
+    'code_mode',
+    'code_mode_host',
+    'workspace_dependencies',
+    'skill_search',
+    'memories',
+    'enable_request_compression',
+  ]) {
+    args.push('--disable', feature);
+  }
+  for (const [key, value] of Object.entries(settings))
+    args.push('-c', `${key}=${JSON.stringify(value)}`);
+  args.push('-');
+  const appServer = dynamic || process.argv.includes('--app-server');
   const launchArgs = appServer
     ? ['app-server', '--stdio', ...args.slice(args.indexOf('--disable'), -1)]
     : args;
@@ -284,6 +288,7 @@ try {
         nonce,
         calls,
         rejectedCalls,
+        requestCount,
       })
     : null;
   console.log(
@@ -322,7 +327,7 @@ try {
       /* Already exited. */
     }
   }
-  server.closeAllConnections();
-  await new Promise((resolve) => server.close(resolve));
+  server?.closeAllConnections();
+  if (server?.listening) await new Promise((resolve) => server.close(resolve));
   await rm(dir, { recursive: true, force: true });
 }

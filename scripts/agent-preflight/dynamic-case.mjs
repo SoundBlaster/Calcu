@@ -69,6 +69,7 @@ export function judgeDynamicProbe({
   nonce,
   calls,
   rejectedCalls = 0,
+  requestCount = 2,
 }) {
   const outputs =
     followingRequest?.input?.filter(
@@ -127,7 +128,8 @@ export function judgeDynamicProbe({
     forbiddenUnavailable &&
     hostGlobalsUnavailable &&
     mediatedResultVerified &&
-    rejectedCalls === 0;
+    rejectedCalls === 0 &&
+    requestCount === 2;
   return {
     capabilityProbePassed: Boolean(capabilityProbePassed),
     runtimeInventoryMatches,
