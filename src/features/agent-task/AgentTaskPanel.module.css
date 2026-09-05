@@ -1,0 +1,142 @@
+.panel {
+  width: min(100%, 520px);
+  padding: clamp(20px, 3vw, 30px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 28px;
+  background: rgba(26, 26, 28, 0.86);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+  backdrop-filter: blur(24px);
+}
+
+.header h1 {
+  margin: 4px 0 10px;
+  font-size: clamp(1.8rem, 3vw, 2.65rem);
+  line-height: 1.05;
+  letter-spacing: -0.045em;
+}
+
+.eyebrow,
+.verifiedLabel {
+  margin: 0;
+  color: var(--calc-accent-soft);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.disclosure {
+  margin: 0 0 22px;
+  color: var(--calc-text-muted);
+  font-size: 0.9rem;
+}
+
+.label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--calc-text-primary);
+  font-size: 0.86rem;
+  font-weight: 650;
+}
+
+.input {
+  width: 100%;
+  resize: vertical;
+  min-height: 108px;
+  padding: 14px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 16px;
+  outline: none;
+  color: var(--calc-text-primary);
+  background: rgba(0, 0, 0, 0.34);
+}
+
+.input:focus-visible {
+  border-color: var(--calc-surface-operator);
+  box-shadow: 0 0 0 3px rgba(255, 159, 10, 0.2);
+}
+
+.input:disabled {
+  opacity: 0.62;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.primary,
+.secondary {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.primary {
+  color: #111;
+  background: var(--calc-surface-operator);
+}
+
+.secondary {
+  color: var(--calc-text-primary);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.primary:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.status {
+  min-height: 24px;
+  margin-top: 20px;
+  color: var(--calc-text-muted);
+}
+
+.resultBlock {
+  display: grid;
+  gap: 10px;
+  padding-top: 4px;
+}
+
+.result {
+  color: var(--calc-text-primary);
+  font-size: clamp(1.7rem, 3.4vw, 2.5rem);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+}
+
+.agentMessage {
+  margin: 0;
+  color: var(--calc-text-muted);
+  white-space: pre-wrap;
+}
+
+.trace summary {
+  cursor: pointer;
+  color: var(--calc-text-primary);
+  font-weight: 650;
+}
+
+.trace dl {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 4px 12px;
+  margin-bottom: 0;
+  font-size: 0.78rem;
+}
+
+.trace dt {
+  color: var(--calc-text-muted);
+}
+
+.trace dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--calc-text-primary);
+}

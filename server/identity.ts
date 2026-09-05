@@ -326,3 +326,18 @@ export function createTestIdentityVerifier(
     },
   };
 }
+
+// The local demo uses the same ephemeral trust mechanism as conformance tests,
+// but these aliases make its development-only role explicit. Neither function
+// represents production identity infrastructure or Codex binary attestation.
+export function createEphemeralDevelopmentIdentity(now = Date.now()) {
+  const fixture = createTestIdentityFixture(now);
+  fixture.setStatus('active', now + 24 * 60 * 60 * 1_000);
+  return fixture;
+}
+
+export function createDevelopmentIdentityVerifier(
+  fixture: ReturnType<typeof createEphemeralDevelopmentIdentity>,
+) {
+  return createTestIdentityVerifier(fixture);
+}

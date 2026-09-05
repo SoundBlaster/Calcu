@@ -1,17 +1,18 @@
 # Calcu + Codex CLI: minimal ASP demo
 
-Status: P5-T2 exact development Grant/identity/session contract and loopback HTTPS
-transport implemented and tested. The profile is Compatibility Bearer over
-loopback HTTPS; it is not production certification.
+Status: P5-T3 Codex adapter, local task host and opt-in task UI implemented over
+the P5-T2 Grant/identity/session and loopback HTTPS boundary. The profile is
+Compatibility Bearer over loopback HTTPS; it is not production certification.
 P5-T1 dynamic calculator round trip is verified with a synthetic provider. Internal
-Codex tools are diagnostic observations, not an ASP admission blocker. No real-agent
-integration or conformance claim is implemented yet. See the
+Codex tools are diagnostic observations, not an ASP admission blocker. The live
+authenticated smoke remains an explicit manual check, not a CI conformance claim. See the
 [preflight findings and reproduction](../scripts/agent-preflight/README.md).
 
 User-selected demo agent: **GPT-5.6 Luna** (`gpt-5.6-luna`) through Codex CLI,
 with reasoning effort **low**. Set these explicitly for the demo process without
-changing global Codex configuration. P5-T1 must verify availability in the installed
-CLI/account; do not silently substitute another model or reasoning level.
+changing global Codex configuration. The implementation must verify availability
+in the installed CLI/account; P5-T3's live smoke supplied that evidence. Do not silently
+substitute another model or reasoning level.
 
 ## Outcome
 
@@ -53,9 +54,9 @@ Task panel → local task service → Codex CLI
                               existing math function
 ```
 
-Use a small local Node/TypeScript service and MCP stdio adapter as the initial
-implementation direction. Task text is stdin data, never shell syntax. The MCP
-tool is an adapter, not an authorization bypass. The application independently
+Use a small local Node/TypeScript service and the Codex app-server dynamic tool
+protocol. Task text is protocol data, never shell syntax. The tool is an adapter,
+not an authorization bypass. The application independently
 verifies the current Grant and session before calling the engine. Components may
 share a service package, but runtime-held credentials and application verification
 remain separate responsibilities.
@@ -103,7 +104,7 @@ ASP-over-MCP binding conformance.
 
 ## Delivery slices
 
-### P5-T1 — Contract and CLI preflight (partial: live run pending)
+### P5-T1 — Contract and CLI preflight (implemented; live evidence supplied by P5-T3)
 
 - Confirm installed CLI version and isolated non-interactive MCP invocation.
   Local `codex exec --help` exposes stdin, JSONL, ephemeral runs, sandbox selection
@@ -132,7 +133,7 @@ complete production ASP support.
 - Exit: valid calculation succeeds; malformed input, expired/revoked authority and
   mismatched identity/session/surface are rejected before engine execution.
 
-### P5-T3 — Task UI and real Codex round trip (pending)
+### P5-T3 — Task UI and Codex round trip (implemented; live smoke is manual)
 
 - Add input, submit, pending/success/error/cancelled states and actual call trace.
 - Correlate application results with the current task; ignore late results after
@@ -142,6 +143,20 @@ complete production ASP support.
 - Preserve keyboard behavior, responsive layouts and ordinary offline use.
 - Exit: the percent example returns verified 36; missing CLI/authentication,
   timeout and unsupported input have useful errors.
+
+Implemented as one ephemeral `codex app-server --stdio` process group per task,
+pinned to Codex CLI `0.145.0`, `gpt-5.6-luna`, effort `low`, no fallback,
+`approvalPolicy: never`, read-only sandbox, empty environments/capability roots,
+and one closed dynamic tool. A same-origin loopback host streams bounded NDJSON
+events while keeping the Grant, identity evidence, bearer and raw ASP envelope
+out of the browser and model. Each task receives a fresh Grant/session that is
+revoked in a `finally` block. Fake app-server, HTTPS integration, host API and UI
+tests are deterministic CI evidence; `npm run agent:demo` is the authenticated
+manual smoke command.
+
+Manual smoke on 2026-09-05 with authenticated Codex CLI `0.145.0` completed the
+Luna `low` dynamic-tool path and returned the executor-verified result
+`240 × 0.15 = 36`. This is local evidence, not an automated interop claim.
 
 ### P5-T4 — Verification and adoption report (pending)
 
@@ -167,6 +182,7 @@ If the smallest bundle requires substantial unrelated infrastructure, record an
 ASP adoption finding and ask for a scope decision. Do not invent a private
 read-no-grant profile or build a framework to conceal the cost.
 
-Next implementation task: connect the Codex tool and task UI in **P5-T3** while
-keeping Grant issuance and HTTPS transport server-only. No normative ASP changes
-are planned.
+Next implementation task: complete **P5-T4** with rendered layout evidence, a
+documented live-smoke result and an adoption report. Human approval, receipts and
+Proof-Bound transport remain separate follow-ups. No normative ASP changes are
+planned.

@@ -1,5 +1,5 @@
 import { randomBytes } from 'node:crypto';
-import { exact, validateCalculation } from './calcu';
+import { type CalculationResult, exact, validateCalculation } from './calcu';
 import {
   type Binding,
   type RuntimeAccess,
@@ -73,7 +73,7 @@ export function createLocalBackend(
         !Number.isFinite(output.result)
       )
         throw new Error('invalid_response');
-      return { ...output };
+      return { ...output } as CalculationResult;
     },
   };
 }

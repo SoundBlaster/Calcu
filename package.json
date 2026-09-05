@@ -16,6 +16,7 @@
     "test:agent-preflight": "node --test scripts/agent-preflight/preflight.test.mjs",
     "agent:preflight": "node scripts/agent-preflight/probe.mjs",
     "agent:preflight:dynamic": "node scripts/agent-preflight/probe.mjs --dynamic",
+    "agent:demo": "npm run build && tsx server/demo.ts",
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit"
   },
@@ -33,6 +34,7 @@
     "@vitejs/plugin-react": "^6.0.1",
     "@vitest/coverage-v8": "^4.1.1",
     "jsdom": "^27.2.0",
+    "tsx": "^4.23.13",
     "typescript": "5.9.3",
     "vite": "^8.0.2",
     "vitest": "^4.1.1"

@@ -6,6 +6,8 @@ export type Calculation = {
   right: number;
 };
 
+export type CalculationResult = Calculation & { result: number };
+
 export function object(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value))
     throw new Error('schema_invalid');
@@ -34,7 +36,7 @@ export function validateCalculation(value: unknown): Calculation {
   return input as Calculation;
 }
 
-export function calculate(input: Calculation) {
+export function calculate(input: Calculation): CalculationResult {
   const result = evaluateScientificBinaryOperation(
     input.left,
     input.operator,

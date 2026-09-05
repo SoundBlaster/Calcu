@@ -1,6 +1,6 @@
-# Calcu application boundary — P5-T2
+# Calcu application boundary and Codex task adapter — P5-T3
 
-This directory contains the first Calcu application-boundary slice for the ASP
+This directory contains the Calcu application-boundary and task-adapter slices for the ASP
 Mediated Proposal flow. It is a development profile named **Compatibility Bearer
 over loopback HTTPS**. It is not a production authorization service and does
 not claim Proof-Bound, DPoP, mTLS, receipt, or human-approval conformance.
@@ -17,6 +17,29 @@ ASP Action Executor
     ▼
 evaluateScientificBinaryOperation
 ```
+
+The opt-in demo adds a separate server-only path without changing that trust
+boundary:
+
+```text
+AgentTaskPanel
+    │ same-origin POST /api/tasks/run + bounded NDJSON
+    ▼
+local task host
+    │ one ephemeral process group per task
+    ▼
+codex app-server --stdio (CLI 0.145.0, Luna low)
+    │ dynamic tool: calculation_propose
+    ▼
+LocalBackend → pinned loopback HTTPS → Action Executor → Calcu engine
+```
+
+The adapter accepts exactly one successful calculator tool call. It validates
+the app-server thread, turn, call, tool name and closed arguments before calling
+`LocalBackend`. Model prose is retained only as bounded untrusted presentation;
+success and the safe trace are derived from the application result. Cancellation,
+disconnect, timeout or protocol failure sends the process group `SIGTERM` and
+then `SIGKILL` after one second.
 
 ## Closed application contract
 
@@ -47,7 +70,7 @@ deliberately outside this slice.
 ## Identity evidence
 
 `IdentityEvidenceVerifier` is the application-owned verification interface. The
-test implementation validates the ASP `agent-identity-evidence/v1` envelope,
+development/test implementation validates the ASP `agent-identity-evidence/v1` envelope,
 the minimal Agent Passport profile, exact artifact digest, Ed25519 signature,
 issuer/subject projection, key binding, freshness and lifecycle status.
 
@@ -55,8 +78,23 @@ Tests generate an ephemeral Ed25519 key and Passport in a unique temporary
 directory/memory fixture. No private key or production trust root is committed.
 The fixture can fail closed with `active`, `revoked`, `expired`, `unknown` or
 `unavailable`; unknown verification profiles return
-`identity_evidence_profile_unsupported`. The verifier is test infrastructure,
-not a production identity provider.
+`identity_evidence_profile_unsupported`. The verifier is development/test
+infrastructure, not a production identity provider. The demo identity identifies
+the Calcu adapter, not the Codex executable. Its key material is ephemeral and
+never sent to the browser or model.
+
+## Local task host
+
+`npm run agent:demo` builds the UI, starts both loopback servers on random ports,
+and prints the browser URL. The static host sets an HttpOnly `SameSite=Strict`
+process-session cookie. `POST /api/tasks/run` requires the exact loopback Host,
+same Origin, cookie and a closed task body, permits one active task, disables
+CORS/caching and returns only a bounded NDJSON projection. The browser never
+receives a Grant, bearer credential, Passport, identity digest or raw ASP request.
+
+The command requires the already authenticated `codex` CLI version `0.145.0`.
+Authentication remains CLI-managed; Calcu only passes allow-listed path, proxy
+and TLS environment variables and never reads or copies CLI credentials.
 
 Object hashes use the ASP Canonical Object Hash Profile: RFC 8785 JCS over the
 exact `{ "domain": <URI>, "object": <hashing view> }` wrapper, SHA-256 and
@@ -91,8 +129,9 @@ The current executable coverage and its deliberate limits are recorded in
 - Grant Issuer: exact development Grant/identity/session contract;
 - Action Executor: independent per-request admission and quota;
 - Runtime Mediator: LocalBackend plus authenticated loopback transport;
-- Agent Adapter: typed facade only, no live Codex process;
-- Receipt Producer and human approval: not implemented in P5-T2.
+- Agent Adapter: ephemeral Codex app-server with one dynamic tool, backed only by
+  LocalBackend;
+- Receipt Producer and human approval: not implemented in P5-T3.
 
 Run the local quality gate with:
 
@@ -103,7 +142,9 @@ npm run test:coverage
 git diff --check
 ```
 
-The boundary tests include positive HTTPS round trips and negative cases for
+The tests include fake app-server lifecycle/protocol cases, a fake Codex → real
+HTTPS executor integration, task-host security/error cases, UI stream/cancel/
+retry cases, and positive HTTPS round trips plus negative cases for
 credential, identity, grant/session binding, action/mode/input, host/path/
 method/content-type, TLS, redirect, size, timeout, abort, quota and correlated
 response failures. Rejection paths assert that the current request does not
