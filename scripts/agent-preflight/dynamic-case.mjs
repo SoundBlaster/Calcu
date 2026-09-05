@@ -6,10 +6,29 @@ export const permittedRuntimeTools = [
   'update_plan',
 ];
 export const forbiddenTools = ['exec_command', 'view_image', 'apply_patch'];
+export const unadvertisedBindings = [
+  'multi_agent_v1__close_agent',
+  'multi_agent_v1__resume_agent',
+  'multi_agent_v1__send_input',
+  'multi_agent_v1__spawn_agent',
+  'multi_agent_v1__wait_agent',
+];
 
 export function syntheticResponse(nonce) {
   const script = `
 const inventory = Object.keys(tools).sort();
+const dispatchDiagnostics = {};
+// Empty arguments supply neither a spawn task nor an existing agent target.
+// A validation error is diagnostic only: it does NOT prove a tool is disabled.
+for (const name of ${JSON.stringify(unadvertisedBindings)}) {
+  if (typeof tools[name] === "undefined") { dispatchDiagnostics[name] = {status:"absent"}; continue; }
+  try {
+    const value = await tools[name]({});
+    dispatchDiagnostics[name] = {status:"returned",detail:String(value).slice(0,512)};
+  } catch (error) {
+    dispatchDiagnostics[name] = {status:"threw",detail:String(error).slice(0,512)};
+  }
+}
 const denied = {};
 for (const name of ${JSON.stringify(forbiddenTools)}) {
   if (typeof tools[name] !== "undefined") { denied[name] = "exposed"; continue; }
@@ -17,7 +36,7 @@ for (const name of ${JSON.stringify(forbiddenTools)}) {
   catch (error) { denied[name] = error instanceof TypeError ? "unavailable" : "unexpected_error"; }
 }
 const result = await tools.calculation_propose({operator:"multiply",left:240,right:0.15});
-text({nonce:${JSON.stringify(nonce)},inventory,denied,result,
+text({nonce:${JSON.stringify(nonce)},inventory,dispatchDiagnostics,denied,result,
   globals:{process:typeof process,require:typeof require,fetch:typeof fetch}});
 `;
   const item = {

@@ -9,6 +9,7 @@ import {
   judgeDynamicProbe,
   permittedRuntimeTools,
   syntheticResponse,
+  unadvertisedBindings,
 } from './dynamic-case.mjs';
 import { inspectRequest, prepareFixture } from './fixture.mjs';
 
@@ -291,6 +292,40 @@ test('synthetic provider program exercises calculator and rejects missing host t
       reports[0],
     );
     assert.equal(judgeDynamicProbe(fixture).capabilityProbePassed, true);
+    for (const name of unadvertisedBindings) {
+      assert.equal(reports[0].dispatchDiagnostics[name].status, 'absent');
+    }
+
+    // Argument rejection cannot turn an unexpected callable into an allowed one.
+    // Exercise both thrown validation errors and returned values (including errors).
+    for (const returnsValue of [false, true]) {
+      const attempts = [];
+      for (const name of unadvertisedBindings) {
+        tools[name] = (args) => {
+          assert.equal(JSON.stringify(args), '{}');
+          attempts.push(name);
+          if (returnsValue) return 'validation error';
+          throw new Error('missing field');
+        };
+      }
+      reports.length = 0;
+      await runInNewContext(
+        `(async () => { ${item.input} })()`,
+        { tools, text: (report) => reports.push(report) },
+        { timeout: 1000 },
+      );
+      assert.deepEqual(attempts, unadvertisedBindings);
+      for (const name of unadvertisedBindings) {
+        assert.equal(
+          reports[0].dispatchDiagnostics[name].status,
+          returnsValue ? 'returned' : 'threw',
+        );
+      }
+      fixture.followingRequest.input.at(-1).output[0].text = JSON.stringify(
+        reports[0],
+      );
+      assert.equal(judgeDynamicProbe(fixture).capabilityProbePassed, false);
+    }
   } finally {
     await rm(dir, { recursive: true, force: true });
   }

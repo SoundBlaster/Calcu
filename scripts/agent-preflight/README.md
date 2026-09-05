@@ -63,8 +63,12 @@ no MCP server, and the same temporary empty home. In this configuration:
   with TypeError. Host globals `process`, `require` and `fetch` are undefined.
 - Runtime enumeration also finds five **unadvertised** `multi_agent_v1__*` keys
   (`spawn_agent`, `close_agent`, `resume_agent`, `send_input`, `wait_agent`) despite
-  disabled multi-agent. They are not invoked and are not added to the allow-list.
-  Their presence is a review blocker, not proof that their handlers can execute.
+  disabled multi-agent. Diagnostic calls with empty arguments reach argument
+  validation: close/send report missing `target`, resume reports missing `id`,
+  spawn reports `Provide one of: message or items`, and wait reports
+  `agent ids must be non-empty`. These are not explicit disabled-tool rejections.
+  No valid spawn task or agent target is supplied; actual agent creation and
+  cross-agent operations remain untested. The bindings stay outside the allow-list.
 - Therefore the current real CLI probe still exits 1: `mediatedResultVerified`
   and `forbiddenUnavailable` are true, but `runtimeInventoryMatches` is false.
 
@@ -106,8 +110,9 @@ task service using this CLI configuration. Additional file tools being exposed
 does not demonstrate an exploitable write, but it fails our intended tool-only
 boundary. Do not weaken the claim to make this test pass.
 
-Next: establish whether the unadvertised multi-agent bindings can be disabled or
-are rejected by their handlers; review the remaining skills/plan helpers before
+Next: find a supported way to disable the unadvertised multi-agent handlers or
+use external isolation. Empty-argument validation errors do not establish disabled
+dispatch and must never count as denial evidence. Review skills/plan helpers before
 claiming the intended boundary. Retain Luna low and CLI-managed authentication.
 Do not bypass the gate by adding unknown bindings to the allow-list. If this
 cannot meet the boundary, choose an
