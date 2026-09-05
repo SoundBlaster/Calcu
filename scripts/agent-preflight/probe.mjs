@@ -1,8 +1,11 @@
 // Offline provider capture: sends no requests to OpenAI and reads no credentials.
 import { spawn } from 'node:child_process';
+import { randomUUID } from 'node:crypto';
 import { mkdir, readFile, rm } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { judgeDynamicProbe, syntheticResponse } from './dynamic-case.mjs';
 import { inspectRequest, prepareFixture } from './fixture.mjs';
 
 if (process.platform === 'win32') {
@@ -12,12 +15,21 @@ if (process.platform === 'win32') {
 }
 
 const dir = await prepareFixture();
+const dynamic = process.argv.includes('--dynamic');
+const nonce = randomUUID();
+const { tool, calculate } = await import(
+  pathToFileURL(join(dir, 'calculator.mjs'))
+);
+const calls = [];
+let rejectedCalls = 0;
 const cwd = join(dir, 'work');
 const home = join(dir, 'home');
 await mkdir(cwd);
 await mkdir(home);
 
 let captured;
+let followingRequest;
+let requestCount = 0;
 const server = createServer((request, response) => {
   let body = '';
   request.on('data', (chunk) => {
@@ -27,9 +39,23 @@ const server = createServer((request, response) => {
   request.on('end', () => {
     try {
       const parsed = JSON.parse(body);
-      if (Array.isArray(parsed.input)) captured = parsed;
+      if (Array.isArray(parsed.input)) {
+        if (!captured) captured = parsed;
+        else followingRequest = parsed;
+      }
     } catch {
       /* Only a Responses request is evidence. */
+    }
+    let candidate = false;
+    try {
+      candidate = captured && inspectRequest(captured).wrapperCandidate;
+    } catch {
+      /* Fail closed below. */
+    }
+    if (++requestCount === 1 && dynamic && candidate) {
+      response.writeHead(200, { 'Content-Type': 'text/event-stream' });
+      response.end(syntheticResponse(nonce));
+      return;
     }
     response.writeHead(400, { 'Content-Type': 'application/json' });
     response.end(
@@ -53,10 +79,14 @@ const settings = {
   'model_providers.capture.stream_max_retries': 0,
   model_reasoning_effort: 'low',
   web_search: 'disabled',
-  'mcp_servers.calcu.command': process.execPath,
-  'mcp_servers.calcu.args': [join(dir, 'server.mjs')],
-  'mcp_servers.calcu.required': true,
-  'mcp_servers.calcu.enabled_tools': ['calculation_propose'],
+  ...(!dynamic
+    ? {
+        'mcp_servers.calcu.command': process.execPath,
+        'mcp_servers.calcu.args': [join(dir, 'server.mjs')],
+        'mcp_servers.calcu.required': true,
+        'mcp_servers.calcu.enabled_tools': ['calculation_propose'],
+      }
+    : {}),
 };
 const args = [
   '-a',
@@ -99,7 +129,7 @@ for (const [key, value] of Object.entries(settings))
 args.push('-');
 let child;
 let timer;
-const appServer = process.argv.includes('--app-server');
+const appServer = dynamic || process.argv.includes('--app-server');
 try {
   const launchArgs = appServer
     ? ['app-server', '--stdio', ...args.slice(args.indexOf('--disable'), -1)]
@@ -135,6 +165,37 @@ try {
         child.kill('SIGKILL');
         return;
       }
+      if (message.method === 'item/tool/call') {
+        try {
+          if (
+            !dynamic ||
+            calls.length !== 0 ||
+            message.params.tool !== 'calculation_propose'
+          )
+            throw new Error('denied');
+          const result = calculate(message.params.arguments);
+          calls.push(result);
+          send({
+            id: message.id,
+            result: {
+              success: true,
+              contentItems: [
+                { type: 'inputText', text: JSON.stringify(result) },
+              ],
+            },
+          });
+        } catch {
+          rejectedCalls += 1;
+          send({
+            id: message.id,
+            result: {
+              success: false,
+              contentItems: [{ type: 'inputText', text: 'Request rejected' }],
+            },
+          });
+        }
+        continue;
+      }
       if (message.id === 0) {
         send({ method: 'initialized', params: {} });
         send({
@@ -148,6 +209,14 @@ try {
             approvalPolicy: 'never',
             sandbox: 'read-only',
             environments: [],
+            ...(dynamic
+              ? {
+                  dynamicTools: [
+                    { type: 'function', ...tool, deferLoading: false },
+                  ],
+                  selectedCapabilityRoots: [],
+                }
+              : {}),
             allowProviderModelFallback: false,
           },
         });
@@ -205,11 +274,28 @@ try {
       `No provider request captured (exit ${code}): ${diagnostics}`,
     );
   const assessment = inspectRequest(captured);
+  const dynamicAssessment = dynamic
+    ? judgeDynamicProbe({
+        assessment,
+        followingAssessment: followingRequest
+          ? inspectRequest(followingRequest)
+          : null,
+        followingRequest,
+        nonce,
+        calls,
+        rejectedCalls,
+      })
+    : null;
   console.log(
     JSON.stringify(
       {
-        mode: appServer ? 'offline_app_server_capture' : 'offline_capture',
+        mode: dynamic
+          ? 'offline_dynamic_roundtrip'
+          : appServer
+            ? 'offline_app_server_capture'
+            : 'offline_capture',
         ...assessment,
+        ...(dynamicAssessment ?? {}),
         liveModelTested: false,
         aspConformance: false,
         mcpEvents: await readFile(join(dir, 'mcp-events.jsonl'), 'utf8').catch(
@@ -220,7 +306,13 @@ try {
       2,
     ),
   );
-  process.exitCode = assessment.initialRequestGatePassed ? 0 : 1;
+  process.exitCode = (
+    dynamic
+      ? dynamicAssessment.capabilityProbePassed
+      : assessment.initialRequestGatePassed
+  )
+    ? 0
+    : 1;
 } finally {
   clearTimeout(timer);
   if (child?.pid && process.platform !== 'win32') {

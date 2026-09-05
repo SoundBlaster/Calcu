@@ -1,6 +1,8 @@
 # Calcu + Codex CLI: minimal ASP demo
 
-Status: P5-T1 partially implemented; tool isolation gate failed. No real-agent
+Status: P5-T1 partially implemented; dynamic calculator round trip verified with
+a synthetic provider, but unexpected runtime bindings still fail the isolation
+gate. No real-agent
 integration or conformance claim is implemented yet. See the
 [preflight findings and reproduction](../scripts/agent-preflight/README.md).
 

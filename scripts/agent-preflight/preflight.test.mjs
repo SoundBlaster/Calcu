@@ -4,6 +4,12 @@ import { rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { test } from 'node:test';
 import { pathToFileURL } from 'node:url';
+import { runInNewContext } from 'node:vm';
+import {
+  judgeDynamicProbe,
+  permittedRuntimeTools,
+  syntheticResponse,
+} from './dynamic-case.mjs';
 import { inspectRequest, prepareFixture } from './fixture.mjs';
 
 test('calculator fixture uses Calcu engine and rejects invalid requests', async () => {
@@ -126,4 +132,155 @@ test('capture gate fails closed for extra tools, missing tool and wrong model', 
   assert.equal(extra.initialRequestGatePassed, false);
   assert.deepEqual(extra.nestedToolHeadings, ['apply_patch']);
   assert.throws(() => inspectRequest({}));
+});
+
+function wrappedRequest() {
+  return {
+    model: 'gpt-5.6-luna',
+    reasoning: { effort: 'low' },
+    input: [
+      {
+        type: 'additional_tools',
+        tools: [
+          {
+            name: 'exec',
+            type: 'custom',
+            description: permittedRuntimeTools
+              .map((name) => `### \`${name}\``)
+              .join('\n'),
+          },
+          { name: 'wait', type: 'function' },
+          { name: 'request_user_input', type: 'function' },
+        ],
+      },
+    ],
+  };
+}
+
+function probeCase(overrides = {}) {
+  const result = { operator: 'multiply', left: 240, right: 0.15, result: 36 };
+  const evidence = {
+    nonce: 'case',
+    inventory: [...permittedRuntimeTools],
+    denied: {
+      exec_command: 'unavailable',
+      view_image: 'unavailable',
+      apply_patch: 'unavailable',
+    },
+    globals: { process: 'undefined', require: 'undefined', fetch: 'undefined' },
+    result: JSON.stringify(result),
+    ...overrides,
+  };
+  const request = wrappedRequest();
+  request.input.push({
+    type: 'custom_tool_call_output',
+    call_id: 'case',
+    output: [{ type: 'input_text', text: JSON.stringify(evidence) }],
+  });
+  return {
+    nonce: 'case',
+    assessment: inspectRequest(wrappedRequest()),
+    followingAssessment: inspectRequest(request),
+    followingRequest: request,
+    calls: [result],
+  };
+}
+
+test('Code Mode advertisement is recognized but never proves runtime safety', () => {
+  const request = wrappedRequest();
+  const result = inspectRequest(request);
+  assert.equal(result.calculatorToolPresent, true);
+  assert.equal(result.wrapperCandidate, true);
+  assert.equal(result.initialRequestGatePassed, false);
+  assert.equal(
+    judgeDynamicProbe({ assessment: result, nonce: 'case', calls: [] })
+      .capabilityProbePassed,
+    false,
+  );
+  request.input[0].tools[0].description += '\n### `exec_command`';
+  assert.equal(inspectRequest(request).wrapperCandidate, false);
+});
+
+test('dynamic gate requires matching runtime inventory, result, nonce and denied capabilities', () => {
+  assert.equal(judgeDynamicProbe(probeCase()).capabilityProbePassed, true);
+  for (const overrides of [
+    { inventory: [...permittedRuntimeTools, 'multi_agent_v1__spawn_agent'] },
+    { inventory: [...permittedRuntimeTools, 'exec_command'] },
+    { inventory: [] },
+    { inventory: [...permittedRuntimeTools, 'calculation_propose'] },
+    { denied: { exec_command: 'exposed' } },
+    { globals: { process: 'object' } },
+    { nonce: 'stale' },
+    { result: '36' },
+    { result: '{invalid json' },
+    { result: { operator: 'multiply', left: 240, right: 0.15, result: 37 } },
+  ])
+    assert.equal(
+      judgeDynamicProbe(probeCase(overrides)).capabilityProbePassed,
+      false,
+    );
+  assert.equal(
+    judgeDynamicProbe({ ...probeCase(), calls: [] }).capabilityProbePassed,
+    false,
+  );
+  assert.equal(
+    judgeDynamicProbe({ ...probeCase(), rejectedCalls: 1 })
+      .capabilityProbePassed,
+    false,
+  );
+  const changed = probeCase();
+  changed.followingAssessment = inspectRequest({
+    ...wrappedRequest(),
+    model: 'other',
+  });
+  assert.equal(judgeDynamicProbe(changed).capabilityProbePassed, false);
+  const duplicate = probeCase();
+  duplicate.followingRequest.input.push(
+    duplicate.followingRequest.input.at(-1),
+  );
+  assert.equal(judgeDynamicProbe(duplicate).capabilityProbePassed, false);
+});
+
+test('synthetic provider program exercises calculator and rejects missing host tools', async () => {
+  const dir = await prepareFixture();
+  try {
+    const { calculate } = await import(
+      pathToFileURL(join(dir, 'calculator.mjs'))
+    );
+    const reports = [];
+    const calls = [];
+    const tools = Object.fromEntries(
+      permittedRuntimeTools.map((name) => [name, () => {}]),
+    );
+    tools.calculation_propose = (input) => {
+      const result = calculate(input);
+      calls.push(result);
+      return JSON.stringify(result);
+    };
+    const events = syntheticResponse('case')
+      .split('\n')
+      .filter((line) => line.startsWith('data: '))
+      .map((line) => JSON.parse(line.slice(6)));
+    const item = events.find(
+      (event) => event.type === 'response.output_item.done',
+    ).item;
+    assert.equal(item.call_id, 'case');
+    await runInNewContext(
+      `(async () => { ${item.input} })()`,
+      { tools, text: (report) => reports.push(report) },
+      { timeout: 1000 },
+    );
+    assert.equal(calls.length, 1);
+    assert.equal(calls[0].result, 36);
+    assert.equal(reports[0].denied.exec_command, 'unavailable');
+    assert.equal(reports[0].denied.apply_patch, 'unavailable');
+    assert.equal(reports[0].globals.process, 'undefined');
+    const fixture = probeCase();
+    fixture.followingRequest.input.at(-1).output[0].text = JSON.stringify(
+      reports[0],
+    );
+    assert.equal(judgeDynamicProbe(fixture).capabilityProbePassed, true);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
 });

@@ -15,6 +15,7 @@
     "test:run": "vitest run && npm run test:agent-preflight",
     "test:agent-preflight": "node --test scripts/agent-preflight/preflight.test.mjs",
     "agent:preflight": "node scripts/agent-preflight/probe.mjs",
+    "agent:preflight:dynamic": "node scripts/agent-preflight/probe.mjs --dynamic",
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit"
   },

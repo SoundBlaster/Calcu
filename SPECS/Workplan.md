@@ -4,7 +4,8 @@
 
 The [integration plan](ASP_DEMO_PLAN.md) defines a new opt-in task panel, separate
 from the completed calculator baseline. P5-T1 has an offline diagnostic and
-deterministic fixture tests, but is blocked on CLI tool isolation; later tasks
+deterministic fixture tests and a synthetic dynamic-tool round trip, but is blocked
+on unexpected runtime bindings (not the Code Mode wrapper itself); later tasks
 remain pending. See [preflight evidence](../scripts/agent-preflight/README.md).
 
 | Task | Deliverable | Depends on |

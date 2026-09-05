@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
+import { permittedRuntimeTools } from './dynamic-case.mjs';
 
 export async function prepareFixture() {
   const root = fileURLToPath(new URL('../../', import.meta.url));
@@ -49,11 +50,17 @@ export function inspectRequest(request) {
       (match) => match[1],
     ),
   );
-  const unexpected = tools.filter(
-    (name) => name !== 'mcp__calcu__calculation_propose',
+  const codeMode = tools.includes('exec');
+  const unexpected = tools.filter((name) =>
+    codeMode
+      ? !['exec', 'wait', 'request_user_input'].includes(name)
+      : name !== 'mcp__calcu__calculation_propose',
   );
-  const calculatorToolPresent = tools.includes(
-    'mcp__calcu__calculation_propose',
+  const calculatorToolPresent =
+    tools.includes('mcp__calcu__calculation_propose') ||
+    nestedToolHeadings.includes('calculation_propose');
+  const unexpectedNested = nestedToolHeadings.filter(
+    (name) => !permittedRuntimeTools.includes(name),
   );
   const requestedModelMatches =
     request.model === 'gpt-5.6-luna' && request.reasoning?.effort === 'low';
@@ -63,8 +70,20 @@ export function inspectRequest(request) {
     tools,
     nestedToolHeadings,
     unexpected,
+    unexpectedNested,
+    codeMode,
     calculatorToolPresent,
     requestedModelMatches,
+    // Descriptions only identify a candidate; runtime evidence is mandatory.
+    wrapperCandidate:
+      requestedModelMatches &&
+      codeMode &&
+      calculatorToolPresent &&
+      unexpected.length === 0 &&
+      unexpectedNested.length === 0 &&
+      tools.length === 3 &&
+      new Set(tools).size === 3 &&
+      definitions.find((tool) => tool.name === 'exec')?.type === 'custom',
     initialRequestGatePassed:
       requestedModelMatches &&
       calculatorToolPresent &&
