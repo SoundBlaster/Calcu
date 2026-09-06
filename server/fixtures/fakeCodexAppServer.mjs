@@ -47,6 +47,25 @@ input.on('line', (line) => {
     )
       process.exit(4);
     send({ id: 2, result: { turn: { id: turnId } } });
+    const marker = message.params.input[0].text;
+    if (scenario === 'diagnostic_error') {
+      send({ id: marker, error: { message: marker } });
+      return;
+    }
+    if (scenario === 'diagnostic_method') {
+      send({ id: marker, method: marker, params: {} });
+      return;
+    }
+    if (scenario === 'diagnostic_turn') {
+      send({
+        method: 'turn/completed',
+        params: {
+          threadId,
+          turn: { id: turnId, status: marker, error: { message: marker } },
+        },
+      });
+      return;
+    }
     if (scenario === 'timeout') return;
     if (scenario === 'malformed') {
       process.stdout.write('{broken json\n');
