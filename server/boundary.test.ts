@@ -1,6 +1,7 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import { createCalcuExecutor, surface, type Transport } from './executor';
+import { canonicalHash } from './hash';
 import {
   createTestIdentityFixture,
   createTestIdentityVerifier,
@@ -55,6 +56,83 @@ function setup() {
 }
 
 describe('LocalBackend → ASP Grant/session-bound Calcu executor', () => {
+  it('rejects a legacy-domain verifier result before engine execution', async () => {
+    const identity = createTestIdentityFixture(START);
+    const verifier = createTestIdentityVerifier(identity);
+    let checks = 0;
+    const app = createCalcuExecutor({
+      now: () => START,
+      identityVerifier: {
+        verify(value, now) {
+          const verified = verifier.verify(value, now);
+          checks += 1;
+          return checks === 1
+            ? verified
+            : {
+                ...verified,
+                identity_evidence_hash: canonicalHash(
+                  'https://github.com/0al-spec/agent-surface/hash/identity-evidence/v1',
+                  verified.evidence,
+                ),
+              };
+        },
+      },
+    });
+    const access = app.issue({
+      subject: { user: 'calcu-user-local' },
+      delegate: {
+        runtime: 'calcu-runtime-local',
+        agent: identity.evidence.subject,
+      },
+      identity: {
+        evidence: identity.evidence,
+        artifactBytes: identity.artifactBytes,
+      },
+      audience: surface.credential_audience,
+      expires_at: START + 60_000,
+    });
+    expect(access.binding.session_generation).toBe(1);
+    expect(access.binding.identity_evidence_hash).toBe(
+      canonicalHash(
+        'https://github.com/0al-spec/agent-surface/hash/agent-identity-evidence/v1',
+        identity.evidence,
+      ),
+    );
+    const backend = createLocalBackend(access, (credential, body, signal) =>
+      app.invoke(credential, body, signal),
+    );
+    await expect(backend.calculationPropose(input)).rejects.toThrow(
+      'identity_evidence_invalid',
+    );
+    expect(checks).toBe(2);
+    expect(app.engineCalls).toBe(0);
+  });
+
+  it('requires fresh issuance after executor restart', async () => {
+    const first = setup();
+    const fresh = setup();
+    const backend = createLocalBackend(
+      first.access,
+      (credential, body, signal) => fresh.app.invoke(credential, body, signal),
+    );
+    await expect(backend.calculationPropose(input)).rejects.toThrow(
+      'unauthorized',
+    );
+    expect(fresh.app.engineCalls).toBe(0);
+    expect(fresh.access.binding.grant_id).not.toBe(
+      first.access.binding.grant_id,
+    );
+    expect(fresh.access.binding.session_id).not.toBe(
+      first.access.binding.session_id,
+    );
+    expect(first.access.binding.session_generation).toBe(1);
+    expect(fresh.access.binding.session_generation).toBe(1);
+    expect(await fresh.backend.calculationPropose(input)).toEqual({
+      ...input,
+      result: 36,
+    });
+  });
+
   it('returns actual Calcu output without exposing authority', async () => {
     const { app, backend, access } = setup();
     const output = await backend.calculationPropose(input);

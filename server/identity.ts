@@ -25,7 +25,7 @@ export const TEST_STATUS_PROFILE =
   'https://calcu.local/profiles/agent-status-test/v1';
 
 const IDENTITY_HASH_DOMAIN =
-  'https://github.com/0al-spec/agent-surface/hash/identity-evidence/v1';
+  'https://github.com/0al-spec/agent-surface/hash/agent-identity-evidence/v1';
 
 export type IdentityEvidence = {
   profile: string;

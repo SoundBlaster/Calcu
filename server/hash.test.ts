@@ -8,6 +8,49 @@ import { surface } from './executor';
 import { artifactHash, byteHash, canonicalHash } from './hash';
 
 describe('ASP hash profiles', () => {
+  it('matches an independent identity-evidence domain vector', () => {
+    // Synthetic hashing vector, not valid identity authority or an artifact.
+    const evidence = {
+      artifact_digest: {
+        profile:
+          'https://github.com/0al-spec/agent-surface/hash/agent-passport-artifact/v1',
+        value: 'sha-256:FIXED',
+      },
+      artifact_ref: 'memory://calcu-test-agent-passport',
+      format_profile:
+        'https://github.com/0al-spec/agent-surface/profiles/agent-passport-minimal/v1',
+      issuer: 'https://calcu.test/issuer',
+      key_binding: {
+        profile: 'https://calcu.local/profiles/ed25519-spki-sha256-test/v1',
+        value: 'sha-256:FIXED',
+      },
+      lifecycle: {
+        freshness_profile:
+          'https://calcu.local/profiles/status-max-age-test/v1',
+        status_profile: 'https://calcu.local/profiles/agent-status-test/v1',
+        status_ref: 'calcu-test-agent-status',
+      },
+      profile:
+        'https://github.com/0al-spec/agent-surface/profiles/agent-identity-evidence/v1',
+      subject: 'calcu-agent-uid',
+      verification_profile:
+        'https://calcu.local/profiles/agent-passport-ed25519-test/v1',
+    };
+    const digest = canonicalHash(
+      'https://github.com/0al-spec/agent-surface/hash/agent-identity-evidence/v1',
+      evidence,
+    );
+    expect(digest).toBe('sha-256:aRqGoyRPnUKqvZxtxtT_ejhyRr3tFYfGKRXevNV_B_M');
+    const oldDomainDigest = canonicalHash(
+      'https://github.com/0al-spec/agent-surface/hash/identity-evidence/v1',
+      evidence,
+    );
+    expect(oldDomainDigest).toBe(
+      'sha-256:3SMiYi5Dc3AL3JL6wezq2F7e0gWK2DnR3zpK6eYJJDM',
+    );
+    expect(digest).not.toBe(oldDomainDigest);
+  });
+
   it('uses the RFC 8785 wrapper and preserves the ASP domain', () => {
     expect(
       canonicalHash('https://github.com/0al-spec/agent-surface/hash/grant/v1', {
@@ -26,7 +69,7 @@ describe('ASP hash profiles', () => {
   it.each([
     'manifest',
     'grant',
-    'identity-evidence',
+    'agent-identity-evidence',
   ])('preserves the previous %s wrapper for supported JSON values', (profile) => {
     const domain = `https://github.com/0al-spec/agent-surface/hash/${profile}/v1`;
     for (const value of [

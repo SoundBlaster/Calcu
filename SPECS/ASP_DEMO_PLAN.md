@@ -1,5 +1,22 @@
 # Calcu + Codex CLI: minimal ASP demo
 
+## Current follow-up: ADP-01
+
+Correct the identity evidence hash domain to the RFC
+`hash/agent-identity-evidence/v1`. This is a focused correction stacked on SDK
+consumer PR #3, not full manifest/Grant/session conformance or SDK extraction.
+There is no legacy-domain alias. Restart the development host and issue fresh
+Grants/sessions; do not rewrite existing bindings or carry credentials between
+executor instances. Existing state is process-local and is not migrated.
+
+The cross-repository ADP-01…09 delivery backlog is proposed in the ASP
+`codex/calcu-adoption-delivery` branch, `review/adoption-delivery-backlog.md`.
+Full migration remains gated on safety-state cost review and an explicit
+data-handling/provider decision. Existing P5 completion below describes only
+the development demonstration, not a conforming production implementation.
+
+## Existing demonstration status
+
 Status: P5-T4 verification and adoption reporting completed over the
 P5-T3 Codex adapter, local task host and opt-in task UI, which are implemented over
 the P5-T2 Grant/identity/session and loopback HTTPS boundary. The profile is
