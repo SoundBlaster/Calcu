@@ -383,16 +383,14 @@ export class CodexTaskAdapter implements CodexTaskRunner {
           const message = object(value);
           this.#onDiagnostic?.({
             stage: 'protocol_event',
-            message: `id=${String(message.id ?? '')} method=${String(message.method ?? '')}`,
           });
           if ('error' in message) {
             const error = object(message.error);
             this.#onDiagnostic?.({
               stage: 'protocol_error',
-              message:
-                typeof error.message === 'string'
-                  ? error.message.slice(0, 512)
-                  : undefined,
+              message: classifyCodexFailure(
+                typeof error.message === 'string' ? error.message : undefined,
+              ),
             });
             throw new Error(
               classifyCodexFailure(
@@ -531,12 +529,12 @@ export class CodexTaskAdapter implements CodexTaskRunner {
               const turnError = turn.error ? object(turn.error) : {};
               this.#onDiagnostic?.({
                 stage: 'turn_failed',
-                status:
-                  typeof turn.status === 'string' ? turn.status : undefined,
-                message:
+                status: 'failed',
+                message: classifyCodexFailure(
                   typeof turnError.message === 'string'
-                    ? turnError.message.slice(0, 512)
+                    ? turnError.message
                     : undefined,
+                ),
               });
               throw new Error(
                 classifyCodexFailure(
