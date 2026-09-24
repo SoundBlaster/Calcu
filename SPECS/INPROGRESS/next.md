@@ -1,6 +1,16 @@
 # Next Task Queue
 
-No active task currently selected.
+## Active
+
+- **P5-T5 — Adopt ASP SDK manifest, semantic request, and selected Grant values**
+  - Branch: `feature/P5-T5-sdk-selected-grant`
+  - Goal: use the merged SDK offline value validators for Calcu's published
+    proposal manifest and issuer-created request/Grant representations, while
+    retaining application-owned identity verification, Grant issuance,
+    session/revocation state, per-call admission, and loopback HTTPS.
+  - Non-goals: human consent/approval, credential/session issuance by the SDK,
+    replacing executor checks, changing action surface, or claiming ASP
+    certification.
 
 ## Recently Archived
 
