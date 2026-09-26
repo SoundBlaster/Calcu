@@ -6,7 +6,7 @@ import {
   createTestIdentityFixture,
   createTestIdentityVerifier,
 } from './identity';
-import { createLocalBackend } from './localBackend';
+import { createLocalBackend, localReceiptHistory } from './localBackend';
 
 const START = Date.parse('2026-09-05T00:00:00Z');
 const input = { operator: 'multiply', left: 240, right: 0.15 } as const;
@@ -39,6 +39,7 @@ function setup() {
       if (signal?.aborted) throw new Error('aborted');
       return app.invoke(credential, body, signal);
     },
+    () => time,
   );
   return {
     app,
@@ -52,6 +53,7 @@ function setup() {
     advance: (milliseconds: number) => {
       time += milliseconds;
     },
+    now: () => time,
   };
 }
 
@@ -143,6 +145,37 @@ describe('LocalBackend → ASP Grant/session-bound Calcu executor', () => {
     expect(JSON.stringify(output)).not.toContain(access.binding.grant_id);
   });
 
+  it('records a linked local Runtime Receipt and App Receipt server-side', async () => {
+    const { backend } = setup();
+    await backend.calculationPropose(input);
+    const [runtimeReceipt, appReceipt] = localReceiptHistory(backend);
+    expect(runtimeReceipt.receipt_type).toBe('runtime');
+    expect(appReceipt.receipt_type).toBe('app');
+    expect(appReceipt.parent_receipt_hash).toBe(runtimeReceipt.receipt_hash);
+    expect(appReceipt.trace_id).toBe(runtimeReceipt.trace_id);
+    expect(appReceipt.span_id).not.toBe(runtimeReceipt.span_id);
+    expect(appReceipt.policy_decision_hash).not.toBe(
+      runtimeReceipt.policy_decision_hash,
+    );
+    expect(runtimeReceipt.result).toBe('authorized_for_forwarding');
+    expect(appReceipt.result).toBe('success');
+    expect(runtimeReceipt.policy_decision.safe_to_show).toContain(
+      'application admission is separate',
+    );
+  });
+
+  it('keeps only the Runtime Receipt when application admission rejects', async () => {
+    const state = setup();
+    state.app.revoke(state.access.credential);
+    await expect(state.backend.calculationPropose(input)).rejects.toThrow(
+      'unauthorized',
+    );
+    expect(state.app.engineCalls).toBe(0);
+    expect(
+      localReceiptHistory(state.backend).map((r) => r.receipt_type),
+    ).toEqual(['runtime']);
+  });
+
   it.each([
     'missing',
     'identifier',
@@ -203,12 +236,60 @@ describe('LocalBackend → ASP Grant/session-bound Calcu executor', () => {
   });
 
   it.each([
+    'receipt_hash',
+    'grant_hash',
+    'trace_id',
+    'input_hash',
+    'execution_hash',
+  ])('rejects tampered Runtime Receipt %s before another engine call', async (key) => {
+    const state = setup();
+    const request = await state.capture();
+    const callsBefore = state.app.engineCalls;
+    request.payload.runtime_receipt[key] =
+      'sha-256:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+    await expect(
+      state.app.invoke(state.access.credential, JSON.stringify(request)),
+    ).rejects.toThrow();
+    expect(state.app.engineCalls).toBe(callsBefore);
+  });
+
+  it('requires the full Runtime Receipt and matching parent hash', async () => {
+    const state = setup();
+    const request = await state.capture();
+    const callsBefore = state.app.engineCalls;
+    const missing = structuredClone(request);
+    delete missing.payload.runtime_receipt;
+    await expect(
+      state.app.invoke(state.access.credential, JSON.stringify(missing)),
+    ).rejects.toThrow('schema_invalid');
+    const mismatched = structuredClone(request);
+    mismatched.payload.parent_receipt_hash =
+      'sha-256:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+    await expect(
+      state.app.invoke(state.access.credential, JSON.stringify(mismatched)),
+    ).rejects.toThrow('integrity_mismatch');
+    expect(state.app.engineCalls).toBe(callsBefore);
+  });
+
+  it('recomputes the Runtime Receipt policy-decision hash before execution', async () => {
+    const state = setup();
+    const request = await state.capture();
+    const callsBefore = state.app.engineCalls;
+    request.payload.runtime_receipt.policy_decision.policy.version = 'forged';
+    await expect(
+      state.app.invoke(state.access.credential, JSON.stringify(request)),
+    ).rejects.toThrow('invalid_receipt');
+    expect(state.app.engineCalls).toBe(callsBefore);
+  });
+
+  it.each([
     null,
     {},
     [],
     { ...input, credential: 'agent-supplied' },
     { ...input, operator: 'eval' },
     { ...input, left: '240' },
+    { ...input, left: -0 },
     { ...input, right: null },
   ])('rejects invalid application input independently: %j', async (bad) => {
     const state = setup();
@@ -241,9 +322,16 @@ describe('LocalBackend → ASP Grant/session-bound Calcu executor', () => {
   it('rejects changed mode, extra envelope fields, malformed/oversized JSON', async () => {
     const state = setup();
     const request = await state.capture();
+    const serializedRequest = JSON.stringify(request);
     for (const body of [
       '{',
       ' '.repeat(8193),
+      serializedRequest.replace(
+        '"type":"action.request"',
+        '"type":"action.request","type":"action.request"',
+      ),
+      serializedRequest.replace('"left":240', '"left":240,"left":1'),
+      serializedRequest.replace('"left":240', '"left":-0'),
       JSON.stringify({ ...request, credential: 'extra' }),
       JSON.stringify({
         ...request,
@@ -259,7 +347,11 @@ describe('LocalBackend → ASP Grant/session-bound Calcu executor', () => {
   it('bounds calls in app-owned state across multiple backend instances', async () => {
     const state = setup();
     for (let i = 0; i < 3; i++) await state.backend.calculationPropose(input);
-    const second = createLocalBackend(state.access, state.app.invoke);
+    const second = createLocalBackend(
+      state.access,
+      state.app.invoke,
+      state.now,
+    );
     await expect(second.calculationPropose(input)).rejects.toThrow(
       'quota_exceeded',
     );
@@ -272,7 +364,11 @@ describe('LocalBackend → ASP Grant/session-bound Calcu executor', () => {
     state.access.binding.subject.user = 'substituted-user';
     state.access.binding.delegate.agent = 'substituted-agent';
     expect((await state.backend.calculationPropose(input)).result).toBe(36);
-    const changed = createLocalBackend(state.access, state.app.invoke);
+    const changed = createLocalBackend(
+      state.access,
+      state.app.invoke,
+      state.now,
+    );
     await expect(changed.calculationPropose(input)).rejects.toThrow(
       'binding_mismatch',
     );
@@ -299,8 +395,10 @@ describe('LocalBackend → ASP Grant/session-bound Calcu executor', () => {
     await expect(
       state.app.invoke(access.credential, JSON.stringify({})),
     ).rejects.toThrow('schema_invalid');
-    const backend = createLocalBackend(access, (credential, body, signal) =>
-      state.app.invoke(credential, body, signal),
+    const backend = createLocalBackend(
+      access,
+      (credential, body, signal) => state.app.invoke(credential, body, signal),
+      state.now,
     );
     await expect(backend.calculationPropose(input)).resolves.toEqual({
       ...input,
@@ -388,6 +486,10 @@ describe('LocalBackend → ASP Grant/session-bound Calcu executor', () => {
     'output',
     'extra',
     'type',
+    'receipt-hash',
+    'policy-decision',
+    'output-hash',
+    'duplicate',
     'malformed',
     'late',
   ])('does not accept %s response as current app result', async (kind) => {
@@ -400,6 +502,18 @@ describe('LocalBackend → ASP Grant/session-bound Calcu executor', () => {
       if (kind === 'output') result.payload.output.left = 18;
       if (kind === 'extra') result.payload.output.credential = credential;
       if (kind === 'type') result.type = 'model.answer';
+      if (kind === 'receipt-hash')
+        result.payload.receipt.receipt_hash = 'substituted';
+      if (kind === 'policy-decision')
+        result.payload.receipt.policy_decision.policy.version = 'forged';
+      if (kind === 'output-hash')
+        result.payload.receipt.output_hash =
+          'sha-256:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+      if (kind === 'duplicate')
+        return raw.replace(
+          '"type":"action.result"',
+          '"type":"action.result","type":"action.result"',
+        );
       if (kind === 'malformed') return '{';
       if (kind === 'late') {
         const response = previous || raw;

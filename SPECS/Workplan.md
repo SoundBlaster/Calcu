@@ -29,12 +29,15 @@ production ASP deployment or change the existing keypad requirements.
   projections only. Calcu remains the authority for identity verification,
   issuance, credentials, session lifecycle, revocation, freshness, per-action
   admission and HTTPS transport.
-- **Outputs:** Provenance-pinned SDK package snapshot; executor migration;
-  regression tests and updated adoption/conformance documentation.
+- **Outputs:** Provenance-pinned SDK package snapshot; SDK-validated manifest,
+  semantic request and selected Grant; server-only unsigned Runtime/App Receipt
+  flow for successful proposal actions; regression tests and updated
+  adoption/conformance documentation.
 - **Acceptance:** Unsupported or mismatched manifest/request/Grant values fail
   before issuance; selected Grant hash and exposure are SDK-derived; current
-  executor checks still reject stale/revoked/expired authority before engine
-  calls; browser bundle and HTTPS boundary remain unchanged.
+  executor checks still reject stale/revoked/expired authority and invalid
+  Runtime Receipts before engine calls; LocalBackend verifies App Receipts
+  before returning results; browser task API remains unchanged.
 
 ## 1. Overview
 

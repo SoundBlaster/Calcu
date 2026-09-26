@@ -30,7 +30,9 @@ export function validateCalculation(value: unknown): Calculation {
     typeof input.left !== 'number' ||
     typeof input.right !== 'number' ||
     !Number.isFinite(input.left) ||
-    !Number.isFinite(input.right)
+    !Number.isFinite(input.right) ||
+    Object.is(input.left, -0) ||
+    Object.is(input.right, -0)
   )
     throw new Error('schema_invalid');
   return input as Calculation;

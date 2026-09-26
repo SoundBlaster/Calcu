@@ -1,4 +1,11 @@
 import { randomBytes, randomUUID } from 'node:crypto';
+import {
+  JsonDocument,
+  OfflineSelectedGrant,
+  OfflineSemanticGrantRequest,
+  type PreparedOfflineSelectedGrant,
+  type PreparedOfflineSemanticGrantRequest,
+} from '@0al/agent-surface';
 import { calculate, exact, validateCalculation } from './calcu';
 import { byteHash, canonicalHash } from './hash';
 import type {
@@ -8,48 +15,19 @@ import type {
   VerifiedIdentity,
 } from './identity';
 
-export type SurfaceSnapshot = {
-  surface_url: string;
-  surface_version: string;
-  surface_mode: 'proposal_only';
-  actions: readonly ['calculation.propose'];
-  scopes: readonly ['calculation.propose'];
-  credential_audience: string;
-  credential_release: { mode: 'deny' };
-  action: {
-    id: 'calculation.propose';
-    execution: { mode: 'propose' };
-    side_effect: false;
-  };
-  surface_hash: string;
-};
-
-const surfaceDefinition = {
-  surface_url: 'https://calcu.local/agent-actions',
-  surface_version: '0.1.0',
-  surface_mode: 'proposal_only' as const,
-  actions: Object.freeze(['calculation.propose']) as readonly [
-    'calculation.propose',
-  ],
-  scopes: Object.freeze(['calculation.propose']) as readonly [
-    'calculation.propose',
-  ],
-  credential_audience: 'https://calcu.local/agent-actions',
-  credential_release: Object.freeze({ mode: 'deny' as const }),
-  action: Object.freeze({
-    id: 'calculation.propose' as const,
-    execution: Object.freeze({ mode: 'propose' as const }),
-    side_effect: false as const,
-  }),
-};
-const SURFACE_HASH_DOMAIN =
-  'https://github.com/0al-spec/agent-surface/hash/manifest/v1';
 const GRANT_HASH_DOMAIN =
   'https://github.com/0al-spec/agent-surface/hash/grant/v1';
-export const surface: SurfaceSnapshot = Object.freeze({
-  ...surfaceDefinition,
-  surface_hash: canonicalHash(SURFACE_HASH_DOMAIN, surfaceDefinition),
-});
+const SEMANTIC_REQUEST_HASH_DOMAIN =
+  'https://github.com/0al-spec/agent-surface/hash/grant-request/v1';
+
+import { prepareCalcuSurface } from './manifest';
+import {
+  createApplicationReceipt,
+  type ReceiptContext,
+  verifyRuntimeReceipt,
+} from './receipts';
+
+export { surface } from './manifest';
 
 export type GrantRequest = {
   subject: { user: string };
@@ -73,7 +51,6 @@ export type GrantObject = {
     issuer: string;
     surface_version: string;
     surface_hash: string;
-    credential_audience: string;
   };
   locations: readonly [string];
   actions: readonly ['calculation.propose'];
@@ -87,8 +64,10 @@ export type GrantObject = {
     method: 'bearer';
     runtime_id: string;
     agent_id: string;
-    identity_evidence_hash: string;
+    identity_evidence: IdentityEvidence;
   };
+  data_exposure: unknown[];
+  audit: { local_receipt: 'required'; app_receipt: 'required' };
 };
 
 export type SessionRecord = {
@@ -107,6 +86,8 @@ export type Binding = {
   session_generation: number;
   grant_id: string;
   grant_hash: string;
+  app_id: string;
+  surface_version: string;
   surface_hash: string;
   subject: { user: string };
   delegate: { runtime: string; agent: string };
@@ -136,6 +117,9 @@ type GrantRecord = {
   session: SessionRecord;
   binding: Binding;
   expiresAt: number;
+  semanticRequest: PreparedOfflineSemanticGrantRequest;
+  semanticRequestHash: string;
+  selectedGrant: PreparedOfflineSelectedGrant;
   active: boolean;
   remaining: number;
 };
@@ -209,6 +193,11 @@ export function createCalcuExecutor({
 }: ExecutorOptions) {
   const configuredAppId = requiredIdentifier(app_id);
   const configuredIssuer = requiredIdentifier(issuer);
+  const preparedSurface = prepareCalcuSurface(
+    configuredAppId,
+    configuredIssuer,
+  );
+  const appSurface = preparedSurface.surface;
   if (!identityVerifier || typeof identityVerifier.verify !== 'function')
     throw new Error('identity_evidence_unavailable');
   const grants = new Map<string, GrantRecord>();
@@ -224,7 +213,7 @@ export function createCalcuExecutor({
     const runtime = requiredIdentifier(trustedRequest.delegate.runtime);
     const agent = requiredIdentifier(trustedRequest.delegate.agent);
     const audience = requiredIdentifier(trustedRequest.audience);
-    if (audience !== surface.credential_audience)
+    if (audience !== appSurface.credential_audience)
       throw new Error('audience_mismatch');
     if (
       !Number.isFinite(trustedRequest.expires_at) ||
@@ -246,9 +235,10 @@ export function createCalcuExecutor({
     } catch {
       throw new Error('identity_evidence_invalid');
     }
-    const grantHashInput: Omit<GrantObject, 'grant_hash'> = {
-      grant_id: randomUUID(),
-      subject,
+    const expiresAt = new Date(trustedRequest.expires_at).toISOString();
+    const semanticRequestValue = {
+      locations: [appSurface.surface_url],
+      actions: [...appSurface.actions],
       delegate: {
         runtime,
         agent,
@@ -257,29 +247,71 @@ export function createCalcuExecutor({
       resource_server: {
         app_id: configuredAppId,
         issuer: configuredIssuer,
-        surface_version: surface.surface_version,
-        surface_hash: surface.surface_hash,
-        credential_audience: audience,
+        surface_version: appSurface.surface_version,
+        surface_hash: appSurface.surface_hash,
       },
-      locations: [surface.surface_url],
-      actions: [...surface.actions],
-      scopes: [...surface.scopes],
+      scopes: [...appSurface.scopes],
       constraints: {
-        expires_at: new Date(trustedRequest.expires_at).toISOString(),
+        expires_at: expiresAt,
         credential_release: { mode: 'deny' },
       },
       credential_profile: 'compatibility_bearer',
+      audit: { local_receipt: 'required', app_receipt: 'required' },
+    } as const;
+    const semanticRequest = new OfflineSemanticGrantRequest(
+      new JsonDocument(JSON.stringify(semanticRequestValue)),
+      preparedSurface.manifest,
+      {
+        runtimeId: runtime,
+        agentId: agent,
+        identityEvidence: new JsonDocument(JSON.stringify(verifiedEvidence)),
+      },
+    ).prepare();
+    const semanticRequestHash = semanticRequest.hash();
+    const dataExposure = semanticRequest.dataExposure().parse() as unknown[];
+    const grantHashInput: Omit<GrantObject, 'grant_hash'> = {
+      grant_id: randomUUID(),
+      subject,
+      delegate: structuredClone(semanticRequestValue.delegate),
+      resource_server: structuredClone(semanticRequestValue.resource_server),
+      locations: [...semanticRequestValue.locations] as [string],
+      actions: [...semanticRequestValue.actions] as ['calculation.propose'],
+      scopes: [...semanticRequestValue.scopes] as ['calculation.propose'],
+      constraints: structuredClone(semanticRequestValue.constraints),
+      credential_profile: semanticRequestValue.credential_profile,
       credential_binding: {
         method: 'bearer',
         runtime_id: runtime,
         agent_id: agent,
-        identity_evidence_hash: verifiedIdentity.identity_evidence_hash,
+        identity_evidence: structuredClone(verifiedEvidence),
       },
+      data_exposure: dataExposure,
+      audit: structuredClone(semanticRequestValue.audit),
     };
     const grant: GrantObject = {
       ...grantHashInput,
       grant_hash: grantHash(grantHashInput),
     };
+    const selectedGrant = new OfflineSelectedGrant(
+      new JsonDocument(JSON.stringify(grant)),
+      preparedSurface.manifest,
+      {
+        subjectUser: subject.user,
+        runtimeId: runtime,
+        agentId: agent,
+        credentialAudience: audience,
+        identityEvidence: new JsonDocument(JSON.stringify(verifiedEvidence)),
+      },
+    ).prepare();
+    selectedGrant.validate();
+    semanticRequest.validate();
+    if (
+      selectedGrant.hash() !== grant.grant_hash ||
+      semanticRequest.hash() !== semanticRequestHash ||
+      canonicalHash(SEMANTIC_REQUEST_HASH_DOMAIN, semanticRequestValue) !==
+        semanticRequestHash
+    )
+      throw new Error('integrity_mismatch');
     const session: SessionRecord = {
       session_id: randomUUID(),
       session_generation: 1,
@@ -288,14 +320,16 @@ export function createCalcuExecutor({
       subject: { ...subject },
       runtime_id: runtime,
       agent_id: agent,
-      surface_hash: surface.surface_hash,
+      surface_hash: appSurface.surface_hash,
     };
     const binding: Binding = {
       session_id: session.session_id,
       session_generation: session.session_generation,
       grant_id: grant.grant_id,
       grant_hash: grant.grant_hash,
-      surface_hash: surface.surface_hash,
+      app_id: configuredAppId,
+      surface_version: appSurface.surface_version,
+      surface_hash: appSurface.surface_hash,
       subject: { ...subject },
       delegate: { runtime, agent },
       audience,
@@ -311,6 +345,9 @@ export function createCalcuExecutor({
       session,
       binding,
       expiresAt: trustedRequest.expires_at,
+      semanticRequest,
+      semanticRequestHash,
+      selectedGrant,
       active: true,
       remaining: 3,
     };
@@ -340,7 +377,7 @@ export function createCalcuExecutor({
       throw new Error('schema_invalid');
     let decoded: unknown;
     try {
-      decoded = JSON.parse(body);
+      decoded = new JsonDocument(body).parse(8192);
     } catch {
       throw new Error('schema_invalid');
     }
@@ -351,7 +388,12 @@ export function createCalcuExecutor({
       'action_id',
       'trace_id',
       'span_id',
+      'idempotency_key',
+      'parent_receipt_hash',
+      'runtime_receipt',
+      'input_hash',
       'execution',
+      'execution_hash',
       'input',
     ]);
     const currentIdentity = identityVerifier.verify(
@@ -367,6 +409,17 @@ export function createCalcuExecutor({
       throw new Error('identity_evidence_expired');
     if (grantHash(record.grantHashInput) !== record.grant.grant_hash)
       throw new Error('integrity_mismatch');
+    try {
+      record.semanticRequest.validate();
+      record.selectedGrant.validate();
+    } catch {
+      throw new Error('integrity_mismatch');
+    }
+    if (
+      record.semanticRequest.hash() !== record.semanticRequestHash ||
+      record.selectedGrant.hash() !== record.grant.grant_hash
+    )
+      throw new Error('integrity_mismatch');
     const expectedBinding: Binding = {
       ...record.binding,
       session_generation: record.session.session_generation,
@@ -377,11 +430,17 @@ export function createCalcuExecutor({
     if (
       record.grant.credential_profile !== 'compatibility_bearer' ||
       record.grant.constraints.credential_release.mode !== 'deny' ||
-      payload.action_id !== 'calculation.propose'
+      payload.action_id !== appSurface.action.id
     )
       throw new Error('action_not_allowed');
-    const execution = exact(payload.execution, ['mode']);
-    if (execution.mode !== 'propose') throw new Error('action_not_allowed');
+    const execution = exact(payload.execution, ['mode', 'execution_id']);
+    if (
+      execution.mode !== appSurface.action.execution.mode ||
+      typeof execution.execution_id !== 'string' ||
+      execution.execution_id.length === 0 ||
+      execution.execution_id.length > 128
+    )
+      throw new Error('action_not_allowed');
     if (
       typeof payload.trace_id !== 'string' ||
       !/^[a-f0-9]{32}$/.test(payload.trace_id) ||
@@ -391,11 +450,116 @@ export function createCalcuExecutor({
       /^0+$/.test(payload.span_id)
     )
       throw new Error('schema_invalid');
+    if (
+      typeof payload.idempotency_key !== 'string' ||
+      payload.idempotency_key.length === 0 ||
+      payload.idempotency_key.length > 128 ||
+      typeof payload.parent_receipt_hash !== 'string' ||
+      !/^sha-256:[A-Za-z0-9_-]{43}$/.test(payload.parent_receipt_hash)
+    )
+      throw new Error('schema_invalid');
+    let inputHash: string;
+    try {
+      preparedSurface.manifest.validateInput(
+        appSurface.action.id,
+        new JsonDocument(JSON.stringify(payload.input)),
+      );
+      inputHash = canonicalHash(
+        'https://github.com/0al-spec/agent-surface/hash/action-input/v1',
+        payload.input,
+      );
+    } catch {
+      throw new Error('schema_invalid');
+    }
+    if (payload.input_hash !== inputHash) throw new Error('integrity_mismatch');
+    let executionHash: string;
+    try {
+      executionHash = canonicalHash(
+        'https://github.com/0al-spec/agent-surface/hash/action-execution/v1',
+        execution,
+      );
+    } catch {
+      throw new Error('schema_invalid');
+    }
+    if (payload.execution_hash !== executionHash)
+      throw new Error('integrity_mismatch');
     const input = validateCalculation(payload.input);
+    const runtimeReceiptContext: ReceiptContext = {
+      grant_id: record.grant.grant_id,
+      grant_hash: record.grant.grant_hash,
+      session_id: record.session.session_id,
+      session_generation: record.session.session_generation,
+      trace_id: payload.trace_id as string,
+      span_id: payload.span_id as string,
+      action_id: appSurface.action.id,
+      app_id: configuredAppId,
+      surface_version: appSurface.surface_version,
+      surface_hash: appSurface.surface_hash,
+      runtime_id: record.binding.delegate.runtime,
+      agent_id: record.binding.delegate.agent,
+      identity_evidence_hash: record.binding.identity_evidence_hash,
+      user: record.binding.subject.user,
+      idempotency_key: payload.idempotency_key as string,
+      input_hash: inputHash,
+      execution: {
+        mode: 'propose',
+        execution_id: execution.execution_id as string,
+      },
+      execution_hash: executionHash,
+    };
+    const runtimeReceipt = verifyRuntimeReceipt(
+      payload.runtime_receipt,
+      runtimeReceiptContext,
+    );
+    if (payload.parent_receipt_hash !== runtimeReceipt.receipt_hash)
+      throw new Error('integrity_mismatch');
     if (record.remaining <= 0) throw new Error('quota_exceeded');
     record.remaining--;
     engineCalls++;
     const output = calculate(input);
+    try {
+      preparedSurface.manifest.validateOutput(
+        appSurface.action.id,
+        new JsonDocument(JSON.stringify(output)),
+      );
+    } catch {
+      throw new Error('invalid_result');
+    }
+    const appSpanId = randomBytes(8).toString('hex');
+    const timestamp = new Date(currentTime).toISOString();
+    const receiptContext: ReceiptContext & { issuerId: string; now: string } = {
+      grant_id: record.grant.grant_id,
+      grant_hash: record.grant.grant_hash,
+      session_id: record.session.session_id,
+      session_generation: record.session.session_generation,
+      trace_id: payload.trace_id as string,
+      span_id: appSpanId,
+      action_id: appSurface.action.id,
+      app_id: configuredAppId,
+      surface_version: appSurface.surface_version,
+      surface_hash: appSurface.surface_hash,
+      runtime_id: record.binding.delegate.runtime,
+      agent_id: record.binding.delegate.agent,
+      identity_evidence_hash: record.binding.identity_evidence_hash,
+      user: record.binding.subject.user,
+      idempotency_key: payload.idempotency_key as string,
+      input_hash: inputHash,
+      execution: {
+        mode: 'propose',
+        execution_id: execution.execution_id as string,
+      },
+      execution_hash: executionHash,
+      issuerId: configuredAppId,
+      now: timestamp,
+    };
+    const appReceipt = createApplicationReceipt(
+      receiptContext,
+      runtimeReceipt.receipt_hash,
+      canonicalHash(
+        'https://github.com/0al-spec/agent-surface/hash/action-output/v1',
+        output,
+      ),
+    );
     return JSON.stringify({
       type: 'action.result',
       payload: {
@@ -403,8 +567,14 @@ export function createCalcuExecutor({
         action_id: 'calculation.propose',
         trace_id: payload.trace_id,
         span_id: payload.span_id,
+        idempotency_key: payload.idempotency_key,
+        parent_receipt_hash: payload.parent_receipt_hash,
+        input_hash: inputHash,
+        execution,
+        execution_hash: executionHash,
         result: 'success',
         output,
+        receipt: appReceipt,
       },
     });
   };

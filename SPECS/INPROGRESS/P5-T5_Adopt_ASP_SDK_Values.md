@@ -21,6 +21,16 @@ boundary to the SDK.
 - Construct the selected Grant from that projection; validate its closed
   shape, exact tuple, identity-evidence projection, Grant hash and exposure via
   `OfflineSelectedGrant` before storing or returning runtime access.
+- Produce a local Runtime Receipt before HTTPS dispatch and an App Receipt for
+  each successful admitted action. Hash the exact policy decision, action input,
+  output and receipt views. Bind both receipts to the same Grant/session/action
+  tuple; keep receipt objects inside the server boundary.
+- Carry the complete Runtime Receipt through the explicitly documented,
+  Calcu-local `runtime_receipt` HTTPS extension plus `parent_receipt_hash`.
+  Recompute its receipt and policy-decision hashes and validate its exact tuple
+  before execution; require the App Receipt to link to its hash. This verifies
+  internal consistency, not producer authentication; receipts are unsigned and
+  do not authorize execution.
 - Keep existing application-owned checks: current identity status and expiry,
   bearer secret custody, active/revoked/expired session state, audience,
   generation, correlation, action/mode/input, quotas, and HTTPS transport.
@@ -35,9 +45,14 @@ boundary to the SDK.
 2. Issuance rejects SDK-invalid semantic request/selected Grant values before
    the Grant becomes active; accepted Grant hash and data exposure equal the
    SDK-prepared values.
-3. Existing lifecycle, identity revalidation, credential, HTTPS and negative
+3. Runtime Receipt and policy-decision hashes recompute before engine dispatch;
+   a missing or tampered Runtime Receipt causes zero engine calls. App Receipt
+   and policy-decision hashes recompute; tampered, mismatched, missing or
+   oversized App Receipts fail closed before LocalBackend returns a result.
+4. Existing lifecycle, identity revalidation, credential, HTTPS and negative
    admission tests continue to prove `engineCalls === 0` for rejected calls.
-4. Browser build stays free of Grant, identity, session and private-key code.
+5. Browser build stays free of Grant, identity, session, receipt and private-key
+   code.
 
 ## Work phases
 
@@ -63,6 +78,6 @@ explicit instruction.
 
 Update `server/README.md`, `server/CONFORMANCE.md`,
 `docs/ASP_ADOPTION_REPORT.md`, and `vendor/README.md`. Do not alter the normative
-ASP repository or the HTTP wire shape except where the SDK's selected Grant
-representation is internal to the server; HTTPS action request/response and
-browser API remain unchanged.
+ASP repository. The protected HTTPS action envelope may gain only the minimal
+receipt/hash fields needed for this proposal flow; the browser API and task
+event schema remain unchanged.

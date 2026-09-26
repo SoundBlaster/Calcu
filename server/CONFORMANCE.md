@@ -11,7 +11,7 @@ claim.
 | Action Executor | `executor.invoke()` | Independent grant/session/identity/action/schema/quota admission and `engineCalls === 0` rejection assertions | Implemented for one proposal action |
 | Runtime Mediator | `createLocalBackend()` and `transport.ts` | Typed request construction, no body credential, exact response correlation and HTTPS integration tests | Loopback HTTPS only |
 | Agent Adapter | `CodexTaskAdapter` plus LocalBackend facade | Pinned CLI protocol/model/effort, closed dynamic tool, exact call correlation, one successful call, process cleanup and fake-process/real-HTTPS integration tests | Live provider smoke is manual; app identity does not attest the Codex binary |
-| Receipt Producer | — | No receipt tests or signing implementation | Not implemented; planned separately |
+| Runtime/App Receipt | `createLocalBackend()`, `executor.invoke()`, `receipts.ts` | Required-field manifest schema, RFC-domain JCS hashes, complete Runtime Receipt verification before engine dispatch, App Receipt tuple/output/hash verification, browser-bundle exclusion tests | Unsigned transient receipts implemented for successful proposal calls; no denial receipt, persistence, producer authentication, or portability |
 | Human Approval | — | No approval artifact or approval UI | Not implemented; planned separately |
 
 ## Negative coverage
@@ -45,7 +45,7 @@ CI evidence, independent interoperability, or production conformance.
 ## Explicit non-claims
 
 The slice does not provide production identity trust, durable user consent,
-Proof-Bound DPoP/mTLS, portable receipts, recovery, replay protection beyond
+Proof-Bound DPoP/mTLS, signed or portable receipts, recovery, replay protection beyond
 the local correlation contract, remote networking, CORS integration, or a
 general-purpose ASP SDK. It does not parse natural-language intent or prove that
 an admitted action fully represents a user's task. The ASP repository and
