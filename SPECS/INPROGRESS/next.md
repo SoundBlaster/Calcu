@@ -2,15 +2,20 @@
 
 ## Active
 
-- **P5-T5 — Adopt ASP SDK manifest, semantic request, and selected Grant values**
-  - Branch: `feature/P5-T5-sdk-selected-grant`
-  - Goal: use the merged SDK offline value validators for Calcu's published
-    proposal manifest and issuer-created request/Grant representations, while
-    retaining application-owned identity verification, Grant issuance,
-    session/revocation state, per-call admission, and loopback HTTPS.
-  - Non-goals: human consent/approval, credential/session issuance by the SDK,
-    replacing executor checks, changing action surface, or claiming ASP
-    certification.
+- **P5-T6 — Validate SDK abstractions with a second small consumer**
+  - Plan: [P5-T6 abstraction spike](P5-T6_SDK_Abstraction_Spike.md)
+  - Comparison: [Hello consumer evidence](P5-T6_Consumer_Comparison.md)
+  - Calcu planning branch: `codex/p5-t6-abstraction-spike`
+  - SDK consumer branch: `codex/hello-second-consumer` ([PR #14](https://github.com/0al-spec/agent-surface-js/pull/14))
+  - Goal: exercise only existing SDK package exports in an independent Hello
+    consumer, then classify what is reusable, application-specific, or not yet
+    supported by evidence.
+  - Boundary: inert representation fixtures only; no claim of live execution,
+    conformance, production authority, or completion of ASP ADP-09.
+
+## Recently Completed (not yet archived)
+
+- P5-T5 — Adopt ASP SDK manifest/Grant values and server-only receipts (PASS; Calcu PR #6 merged; archive bookkeeping pending)
 
 ## Recently Archived
 
