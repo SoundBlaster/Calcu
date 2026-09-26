@@ -3,7 +3,7 @@
 This directory contains the Calcu application-boundary and task-adapter slices for the ASP
 Mediated Proposal flow. It is a development profile named **Compatibility Bearer
 over loopback HTTPS**. It is not a production authorization service and does
-not claim Proof-Bound, DPoP, mTLS, receipt, or human-approval conformance.
+not claim Proof-Bound, DPoP, mTLS, signed-receipt, or human-approval conformance.
 
 Canonical object hashing now delegates the ASP wrapper, domain separation and
 digest encoding to the pinned [TypeScript SDK package](../vendor/README.md).
@@ -126,6 +126,33 @@ limits, and supports timeout plus `AbortSignal`. The credential is never put in
 the action JSON body. There is no CORS trust, arbitrary process launcher, or
 browser import of server modules.
 
+## Local Runtime and App Receipts
+
+For each `calculation.propose` request, `LocalBackend` creates an unsigned
+Runtime Receipt before transport and retains it only in server-side memory.
+The closed Calcu HTTPS request includes the complete receipt in its explicitly
+documented `runtime_receipt` extension and the matching `parent_receipt_hash`.
+The executor recomputes the Runtime Receipt and policy-decision hashes and
+checks its Grant/session/action/input/execution tuple before invoking the math
+engine. After successful evaluation and output-schema validation, it creates an
+unsigned App Receipt linked to the verified Runtime Receipt hash. LocalBackend
+recomputes the App Receipt and policy-decision hashes and checks the full tuple
+and output hash before returning the calculation result.
+
+Both receipt objects remain behind the server boundary; the browser, Codex tool,
+and agent-message projection receive neither receipt nor receipt hash. The
+receipts are transient in-memory diagnostic evidence, not a durable audit log.
+They have no signatures or trusted timestamp and do not authenticate their
+producer, prove user consent, authorize an action, or establish portable
+interoperability. A recomputed unsigned chain is only internally consistent;
+it is not tamper-evident against a party able to replace the whole chain.
+Rejected calls retain the Runtime Receipt but do not produce an App Receipt;
+this proposal-only demo does not claim a complete denial-receipt lifecycle.
+
+The `runtime_receipt` member is a Calcu-specific extension of its local HTTPS
+envelope. It is not advertised as a standardized ASP wire binding and does not
+change the browser API or task-event schema.
+
 The HTTPS tests generate a one-day test certificate with `openssl` in a unique
 temporary directory and use its certificate as the pinned CA. The key is read
 only during the test and removed afterwards.
@@ -141,8 +168,10 @@ The current executable coverage and its deliberate limits are recorded in
 - Runtime Mediator: LocalBackend plus authenticated loopback transport;
 - Agent Adapter: ephemeral Codex app-server with one dynamic tool, backed only by
   LocalBackend;
-- Receipt Producer and human approval: not implemented; deliberately outside
-  this proposal-only development slice.
+- Unsigned local Runtime/App Receipt production and verification: implemented
+  for successful proposal calls only; transient, server-side, and non-portable.
+- Signed/durable receipts and human approval: not implemented; deliberately
+  outside this proposal-only development slice.
 
 Run the local quality gate with:
 

@@ -18,6 +18,27 @@ session contract and tested loopback HTTPS boundary. See [boundary status](../se
 The P5 demo is complete through **P5-T4**. This section does not mark a
 production ASP deployment or change the existing keypad requirements.
 
+#### P5-T5: Adopt merged SDK manifest and Grant value validators
+
+- **Status:** In progress
+- **Description:** Replace Calcu's hand-shaped manifest hash and incomplete
+  Grant representation with SDK-validated offline `OfflineProposalManifest`,
+  `OfflineSemanticGrantRequest`, and `OfflineSelectedGrant` values.
+- **Dependencies:** P5-T4; merged `agent-surface-js` PRs #12 and #13
+- **Boundary:** The SDK validates immutable representations and derived
+  projections only. Calcu remains the authority for identity verification,
+  issuance, credentials, session lifecycle, revocation, freshness, per-action
+  admission and HTTPS transport.
+- **Outputs:** Provenance-pinned SDK package snapshot; SDK-validated manifest,
+  semantic request and selected Grant; server-only unsigned Runtime/App Receipt
+  flow for successful proposal actions; regression tests and updated
+  adoption/conformance documentation.
+- **Acceptance:** Unsupported or mismatched manifest/request/Grant values fail
+  before issuance; selected Grant hash and exposure are SDK-derived; current
+  executor checks still reject stale/revoked/expired authority and invalid
+  Runtime Receipts before engine calls; LocalBackend verifies App Receipts
+  before returning results; browser task API remains unchanged.
+
 ## 1. Overview
 
 This workplan converts the calculator PRD into an implementation-ready task graph for a responsive web application that reproduces the portrait and landscape calculator layouts shown in the root screenshots.

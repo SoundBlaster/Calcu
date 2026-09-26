@@ -30,19 +30,24 @@ export function validateCalculation(value: unknown): Calculation {
     typeof input.left !== 'number' ||
     typeof input.right !== 'number' ||
     !Number.isFinite(input.left) ||
-    !Number.isFinite(input.right)
+    !Number.isFinite(input.right) ||
+    Object.is(input.left, -0) ||
+    Object.is(input.right, -0)
   )
     throw new Error('schema_invalid');
   return input as Calculation;
 }
 
 export function calculate(input: Calculation): CalculationResult {
-  const result = evaluateScientificBinaryOperation(
+  const evaluatedResult = evaluateScientificBinaryOperation(
     input.left,
     input.operator,
     input.right,
   );
-  if (typeof result !== 'number' || !Number.isFinite(result))
+  if (typeof evaluatedResult !== 'number' || !Number.isFinite(evaluatedResult))
     throw new Error('invalid_result');
+  // RFC 8785 canonical JSON represents negative zero as zero. Normalize the
+  // valid mathematical result before schema validation and receipt hashing.
+  const result = Object.is(evaluatedResult, -0) ? 0 : evaluatedResult;
   return { ...input, result };
 }

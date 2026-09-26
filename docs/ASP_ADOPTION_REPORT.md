@@ -157,7 +157,7 @@ shrink to its surface declaration, one action handler, and UI composition.
 | Action Executor | Implemented for one non-persisted proposal action |
 | Runtime Mediator | Implemented through LocalBackend and loopback HTTPS |
 | Agent Adapter | Implemented for exact Codex CLI `0.145.0`; real-provider smoke is manual |
-| Receipt Producer | Not implemented |
+| Runtime/App Receipt | Unsigned, transient server-side receipts are hashed and checked for successful proposal calls; no signatures, durable audit, denial receipts, or portable producer authentication |
 | Human Approval | Not implemented |
 | Proof-Bound DPoP/mTLS | Not implemented |
 | Production agent identity | Not implemented; the ephemeral identity represents the Calcu adapter, not the Codex binary |
@@ -181,8 +181,8 @@ while exposing the next leverage point:
    Calcu without changing protocol semantics;
 2. make a second small application consume that package to reveal accidental
    Calcu coupling;
-3. add Human Approval and signed receipt work as separate profiles rather than
-   expanding this proposal-only demo;
+3. add Human Approval, signed/durable receipt storage, and producer
+   authentication as separate profiles rather than expanding this proposal-only demo;
 4. reserve Proof-Bound transport and production identity for a production
    deployment profile with its own threat model and conformance evidence.
 

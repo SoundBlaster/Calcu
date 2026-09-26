@@ -117,10 +117,13 @@ identity evidence, credential proof, session/generation binding and authenticate
 HTTP deployment profile. Grant IDs/hashes alone are not credentials. A local
 compatibility profile must not be presented as a stronger production profile.
 
-Do not claim Receipt Producer, full ASP conformance, or independent interop. A
-tool trace is not a signed receipt. Implement evidence required by the selected
-closure or report the missing claim. MCP connectivity alone also does not prove
-ASP-over-MCP binding conformance.
+The P5-T5 slice adds unsigned, transient local Runtime/App Receipts for
+successful proposal calls. Do not claim signed/durable Receipt Producer,
+complete denial-receipt behavior, full ASP conformance, or independent interop.
+A tool trace is not a receipt, and an unsigned receipt does not authenticate its
+producer. Implement evidence required by the selected closure or report the
+missing claim. MCP connectivity alone also does not prove ASP-over-MCP binding
+conformance.
 
 ## Delivery slices
 

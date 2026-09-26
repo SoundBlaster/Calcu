@@ -1,11 +1,11 @@
 // @vitest-environment node
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
-import { JsonDocument, SurfaceSnapshot } from '@0al/agent-surface';
+import { SurfaceSnapshot } from '@0al/agent-surface';
 import canonicalize from 'canonicalize';
 import { describe, expect, it } from 'vitest';
-import { surface } from './executor';
 import { artifactHash, byteHash, canonicalHash } from './hash';
+import { preparedSurface, surface } from './manifest';
 
 describe('ASP hash profiles', () => {
   it('matches an independent identity-evidence domain vector', () => {
@@ -75,7 +75,7 @@ describe('ASP hash profiles', () => {
     for (const value of [
       { b: 1, a: 2 },
       { nested: { z: null, a: ['é', 'e\u0301', '😀', true, false] } },
-      { tiny: 1e-7, large: 1e21, fraction: 0.15, zero: -0 },
+      { tiny: 1e-7, large: 1e21, fraction: 0.15 },
       { extension: { surface_hash: 'nested-member-retained' } },
     ]) {
       const original = structuredClone(value);
@@ -89,9 +89,9 @@ describe('ASP hash profiles', () => {
   });
 
   it('agrees with the SDK manifest view for the existing Calcu surface', () => {
-    expect(
-      new SurfaceSnapshot(new JsonDocument(JSON.stringify(surface))).hash(),
-    ).toBe(surface.surface_hash);
+    expect(new SurfaceSnapshot(preparedSurface.document).hash()).toBe(
+      surface.surface_hash,
+    );
   });
 
   it('preserves member-order invariance but not array or domain equivalence', () => {
@@ -108,6 +108,12 @@ describe('ASP hash profiles', () => {
     Number.NEGATIVE_INFINITY,
   ])('still rejects non-finite values instead of serializing %s to null', (invalid) => {
     expect(() => canonicalHash('test', { nested: [invalid] })).toThrow();
+  });
+
+  it('rejects negative zero instead of normalizing it during receipt hashing', () => {
+    expect(() => canonicalHash('test', { nested: [0, -0] })).toThrow(
+      'schema_invalid',
+    );
   });
 
   it('preserves rejection of lone surrogates before hashing', () => {
@@ -133,7 +139,7 @@ describe('ASP hash profiles', () => {
   it('pins the installed SDK package artifact and ASP evidence revision', () => {
     const tarball = readFileSync(
       new URL(
-        '../vendor/0al-agent-surface-0.1.0-experimental.0.tgz',
+        '../vendor/0al-agent-surface-0.1.0-experimental.0-4cd3397.tgz',
         import.meta.url,
       ),
     );
@@ -149,13 +155,16 @@ describe('ASP hash profiles', () => {
         'utf8',
       ),
     );
-    expect(sdkLock.commit).toBe('951871c2d55db25d35512f29cc0970c69aa5cfd9');
-    expect(sdkLock.sources).toEqual([
-      {
-        path: 'drafts/modules/evidence.md',
-        sha256:
-          '594d71c3972b350dbe21fea6078d301fbbc817470ab3feb07a95bd695ae0b86f',
-      },
+    expect(sdkLock.commit).toBe('da550fde6f8be4ff0c1ded15524afb66c2912287');
+    expect(sdkLock.sources).toHaveLength(5);
+    expect(
+      sdkLock.sources.map((source: { path: string }) => source.path),
+    ).toEqual([
+      'drafts/modules/core.md',
+      'drafts/modules/authorization.md',
+      'drafts/modules/privacy.md',
+      'drafts/modules/evidence.md',
+      'drafts/modules/safe-effects.md',
     ]);
   });
 });
