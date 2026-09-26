@@ -319,6 +319,27 @@ describe('LocalBackend → ASP Grant/session-bound Calcu executor', () => {
     ).rejects.toThrow('invalid_result');
   });
 
+  it('normalizes valid negative-zero results before receipt hashing', async () => {
+    const state = setup();
+    const multiply = await state.backend.calculationPropose({
+      operator: 'multiply',
+      left: -1,
+      right: 0,
+    });
+    expect(multiply.result).toBe(0);
+    expect(Object.is(multiply.result, -0)).toBe(false);
+
+    const divide = await state.backend.calculationPropose({
+      operator: 'divide',
+      left: 0,
+      right: -1,
+    });
+    expect(divide.result).toBe(0);
+    expect(Object.is(divide.result, -0)).toBe(false);
+    expect(state.app.engineCalls).toBe(2);
+    expect(localReceiptHistory(state.backend)).toHaveLength(4);
+  });
+
   it('rejects changed mode, extra envelope fields, malformed/oversized JSON', async () => {
     const state = setup();
     const request = await state.capture();
