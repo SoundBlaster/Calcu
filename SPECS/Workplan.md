@@ -16,7 +16,7 @@ session contract and tested loopback HTTPS boundary. See [boundary status](../se
 | P5-T4 | Implemented: regression/conformance evidence and adoption report | P5-T3 |
 | P5-T5 | Complete: SDK-validated manifest/request/Grant values and server-only unsigned Runtime/App Receipts | P5-T4; SDK PRs #12 and #13 |
 
-The P5 demo is complete through **P5-T4**. This section does not mark a
+The P5 demo is complete through **P5-T5**. This section does not mark a
 production ASP deployment or change the existing keypad requirements.
 
 #### ✅ P5-T5: Adopt merged SDK manifest and Grant value validators
@@ -44,7 +44,7 @@ production ASP deployment or change the existing keypad requirements.
 
 - **Status:** Active — Hello consumer spike in [SDK PR #14](https://github.com/0al-spec/agent-surface-js/pull/14); review/merge pending
 - **Description:** Use a minimal Hello application as an independent consumer
-  of the already-published SDK package. Exercise only existing public offline
+  of the existing locally packed SDK artifact. Exercise only existing public offline
   Manifest, semantic-request and selected-Grant values, then compare its
   application-owned code with Calcu to classify reusable SDK behavior versus
   domain/deployment policy.

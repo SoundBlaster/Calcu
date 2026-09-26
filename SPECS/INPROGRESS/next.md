@@ -13,9 +13,12 @@
   - Boundary: inert representation fixtures only; no claim of live execution,
     conformance, production authority, or completion of ASP ADP-09.
 
+## Recently Completed (not yet archived)
+
+- P5-T5 — Adopt ASP SDK manifest/Grant values and server-only receipts (PASS; Calcu PR #6 merged; archive bookkeeping pending)
+
 ## Recently Archived
 
-- P5-T5 — Adopt ASP SDK manifest/Grant values and server-only receipts (PASS; Calcu PR #6 merged)
 - P5-T4 — Verify ASP demo readiness and document adoption (PASS)
 - P4-T8 — Establish repository quality gates and CI reporting (PASS)
 - FU-T1 — Normalize calculator task IDs against existing archive history (PASS)
