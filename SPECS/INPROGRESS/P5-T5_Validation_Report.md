@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-26
 **Branch:** `feature/P5-T5-sdk-selected-grant`
-**Result:** PASS — local validation complete; pull request and CI remain pending.
+**Result:** PASS — merged in PR #6 at `a0fb1fc9` after GitHub CI passed.
 
 ## Implemented
 
@@ -26,10 +26,11 @@
 
 | Gate | Result |
 | --- | --- |
-| `npm run check` | PASS — format, lint, typecheck, 192 Vitest tests, 6 agent-preflight tests, and 13 bundle-isolation tests |
+| `npm run check` | PASS — format, lint, typecheck, 193 Vitest tests, 6 agent-preflight tests, and 13 bundle-isolation tests |
 | `npm run build` | PASS — Vite production build; server-only bundle scan passed across 3 assets |
-| `npm run test:coverage` | PASS — 192 tests; 84.24% statements, 81.04% branches, 92.41% functions, 85.77% lines |
+| `npm run test:coverage` | PASS — 193 tests; 84.25% statements, 81.15% branches, 92.41% functions, 85.78% lines |
 | `git diff --check` | PASS |
+| GitHub CI (`coverage`, `verify`) | PASS |
 
 ## Limits and non-claims
 
@@ -41,7 +42,4 @@ produce an App Receipt. Human approval, denial-receipt lifecycle, signatures,
 durable receipt storage, Proof-Bound transport, and production identity remain
 out of scope. The browser API and task-event schema are unchanged.
 
-## Follow-up
-
-Open a focused PR for this branch and await CI/review. Do not merge without a
-separate explicit instruction.
+The negative-zero output regression was fixed in commit `b61709a` before merge.

@@ -14,13 +14,14 @@ session contract and tested loopback HTTPS boundary. See [boundary status](../se
 | P5-T2 | Implemented development slice: exact Grant/identity/session and loopback HTTPS | P5-T1 |
 | P5-T3 | Implemented: ephemeral Codex adapter, local task host and task UI | P5-T2 |
 | P5-T4 | Implemented: regression/conformance evidence and adoption report | P5-T3 |
+| P5-T5 | Complete: SDK-validated manifest/request/Grant values and server-only unsigned Runtime/App Receipts | P5-T4; SDK PRs #12 and #13 |
 
 The P5 demo is complete through **P5-T4**. This section does not mark a
 production ASP deployment or change the existing keypad requirements.
 
-#### P5-T5: Adopt merged SDK manifest and Grant value validators
+#### ✅ P5-T5: Adopt merged SDK manifest and Grant value validators
 
-- **Status:** In progress
+- **Status:** Complete; merged in Calcu PR #6 (`a0fb1fc9`)
 - **Description:** Replace Calcu's hand-shaped manifest hash and incomplete
   Grant representation with SDK-validated offline `OfflineProposalManifest`,
   `OfflineSemanticGrantRequest`, and `OfflineSelectedGrant` values.
@@ -38,6 +39,39 @@ production ASP deployment or change the existing keypad requirements.
   executor checks still reject stale/revoked/expired authority and invalid
   Runtime Receipts before engine calls; LocalBackend verifies App Receipts
   before returning results; browser task API remains unchanged.
+
+#### P5-T6: Validate SDK abstractions with a second small consumer
+
+- **Status:** Active — Hello consumer spike in [SDK PR #14](https://github.com/0al-spec/agent-surface-js/pull/14); review/merge pending
+- **Description:** Use a minimal Hello application as an independent consumer
+  of the already-published SDK package. Exercise only existing public offline
+  Manifest, semantic-request and selected-Grant values, then compare its
+  application-owned code with Calcu to classify reusable SDK behavior versus
+  domain/deployment policy.
+- **Dependencies:** P5-T5 merged; current SDK `main` package exports
+- **Boundary:** This is an API-reuse spike, not a live agent, full executor,
+  ASP conformance or production-authority implementation. Test identities and
+  Grants are inert representation fixtures. Do not move Calcu identity trust,
+  consent, credential custody, lifecycle state, transactional admission,
+  quotas, HTTPS deployment, or math behavior into the SDK based on one demo.
+- **Outputs:** A separately runnable second consumer using the package root
+  export; positive/negative representation tests; a measured integration
+  inventory mapping each Calcu component to `SDK reusable`, `app-specific`, or
+  `not enough evidence`; a recommendation for the smallest justified SDK
+  extraction and its required security tests.
+- **Acceptance:** The consumer builds against the packaged SDK rather than
+  `src/`; existing SDK APIs suffice without fictional exports; invalid
+  representation fails closed; consumer docs name what is not verified; the
+  comparison does not claim runtime reuse from value-validation reuse. Report
+  developer setup steps and application-specific lines separately from the
+  one-time SDK implementation cost.
+- **Current evidence:** [consumer comparison](INPROGRESS/P5-T6_Consumer_Comparison.md).
+  The packed-SDK Hello candidate passes locally, but the spike remains open
+  until SDK PR #14 is reviewed and merged and this inventory is checked
+  against the resulting package artifact.
+- **Non-goal:** Marking canonical ASP ADP-09 complete or unblocked. Its status,
+  approval and cross-repository sequencing remain owned by the ASP adoption
+  backlog.
 
 ## 1. Overview
 
