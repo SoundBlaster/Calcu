@@ -13,6 +13,7 @@
     "check": "npm run format:check && npm run lint && npm run typecheck && npm run test:run",
     "test": "vitest",
     "test:run": "vitest run && npm run test:agent-preflight && npm run test:agent-bundle",
+    "test:action-authoring-spike": "node scripts/run-action-authoring-spike.mjs",
     "test:agent-preflight": "node --test scripts/agent-preflight/preflight.test.mjs",
     "test:agent-bundle": "node --test scripts/agent-demo/verify-client-bundle.test.mjs",
     "verify:agent-bundle": "node scripts/agent-demo/verify-client-bundle.mjs dist",

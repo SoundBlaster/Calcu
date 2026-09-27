@@ -68,6 +68,8 @@ export type PreparedCalcuSurface = {
   readonly surface: CalcuSurface;
   readonly document: JsonDocument;
   readonly identityAdvertisement: JsonDocument;
+  /** Prepared schema inputs, exposed for offline composition comparisons. */
+  readonly schemaResources: readonly OfflineSchemaResource[];
   readonly manifest: ReturnType<OfflineProposalManifest['prepare']>;
 };
 
@@ -325,9 +327,10 @@ export function prepareCalcuSurface(
   const snapshot = new SurfaceSnapshot(json(manifest));
   const surfaceHash = snapshot.hash();
   const document = json({ ...manifest, surface_hash: surfaceHash });
+  const schemaResources = Object.freeze([...resources]);
   const prepared = new OfflineProposalManifest(
     document,
-    new OfflineSchemaResources(resources),
+    new OfflineSchemaResources(schemaResources),
     identityAdvertisement,
   ).prepare();
   const surface: CalcuSurface = Object.freeze({
@@ -345,7 +348,13 @@ export function prepareCalcuSurface(
     }),
     surface_hash: prepared.surfaceHash,
   });
-  return { surface, document, identityAdvertisement, manifest: prepared };
+  return {
+    surface,
+    document,
+    identityAdvertisement,
+    schemaResources,
+    manifest: prepared,
+  };
 }
 
 export const preparedSurface = prepareCalcuSurface();
