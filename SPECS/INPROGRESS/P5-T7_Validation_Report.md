@@ -6,7 +6,9 @@ private and experimental.
 
 ## Scope and pins
 
-- Calcu baseline: `5d1870b68dc172b6e6bb5453d3dde3352d19c4fc`.
+- Calcu baseline: reachable `main` commit
+  `a628c252986882d4e9f3734c560238ce38207596` (the equivalent P5-T7 design
+  change was already merged as PR #9 before this spike commit was rebased).
 - Prototype generator: agent-surface-js
   `03fd21c8bca70968b08e4585c14d1f6971978797`.
 - Calcu's installed full-manifest validators: agent-surface-js artifact commit
@@ -26,7 +28,9 @@ private and experimental.
 | `git diff --check` | PASS. |
 
 The complete test suite and CI were not run; this report records only the
-targeted spike and proportional checks.
+targeted spike and proportional checks. The original local branch commit used
+before rebase was not reachable from the repository after PR #9 merged, so the
+reachable main commit above is the reproducible baseline reference.
 
 ## Evidence and decision
 

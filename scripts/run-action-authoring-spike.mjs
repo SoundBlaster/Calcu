@@ -39,7 +39,7 @@ if (actualCommit !== expectedCommit) {
 
 const dirty = spawnSync(
   'git',
-  ['status', '--porcelain', '--untracked-files=no'],
+  ['status', '--porcelain', '--untracked-files=normal'],
   {
     cwd: sdkRoot,
     encoding: 'utf8',
@@ -51,7 +51,7 @@ if (dirty.status !== 0) {
 }
 if (dirty.stdout.trim() !== '') {
   console.error(
-    'The pinned SDK checkout has tracked local changes; use a clean checkout.',
+    'The pinned SDK checkout has tracked or untracked local changes; use a clean checkout.',
   );
   process.exit(2);
 }

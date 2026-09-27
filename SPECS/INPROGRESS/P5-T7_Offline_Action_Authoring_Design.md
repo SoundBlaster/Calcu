@@ -201,8 +201,8 @@ signatures.
 
 ## 10. Calcu acceptance-spike evidence (2026-09-27)
 
-The bounded local spike uses Calcu source baseline commit
-`5d1870b68dc172b6e6bb5453d3dde3352d19c4fc` and the private action-authoring
+The bounded local spike uses the reachable Calcu main baseline commit
+`a628c252986882d4e9f3734c560238ce38207596` and the private action-authoring
 prototype at agent-surface-js commit
 `03fd21c8bca70968b08e4585c14d1f6971978797`. It imports the real Calcu
 `calculate` handler reference but only binds it; a Proxy call counter remained
