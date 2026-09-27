@@ -21,7 +21,8 @@ Calcu or fictional SDK APIs.
 Use the existing native Hello application as the starting point. Its current
 ASP composition file is explicitly design-only and imports nonexistent sketch
 packages; it must remain labeled that way unless the spike replaces the fake
-agent/runtime path with a small, honest consumer of the current published SDK.
+agent/runtime path with a small, honest consumer of the current locally packed
+SDK artifact.
 
 The consumer may exercise offline validation of its own manifest, schemas,
 semantic request and selected Grant representation. Any identity and Grant
@@ -53,10 +54,11 @@ conformance.
    values and explicit labels that checks do not authenticate or authorize.
 4. **Complete locally:** measure consumer-specific code and document current
    API friction and limits in the [comparison report](P5-T6_Consumer_Comparison.md).
-5. **Pending review:** merge the focused SDK consumer PR, verify the exact
-   resulting package artifact, then revise the reuse inventory. Recommend a
-   runtime extraction only if a second consumer demonstrates real duplication
-   and the corresponding security contract has executable acceptance tests.
+5. **Complete:** merge the focused SDK consumer PR, compare its locally packed
+   merged-tree artifact with Calcu's pinned package, and revise the reuse
+   inventory. The exported `dist/` and `spec-lock.json` match; package metadata
+   differs only in development scripts. No runtime extraction is justified by
+   this representation-only second consumer.
 
 ## Acceptance criteria
 

@@ -42,7 +42,7 @@ production ASP deployment or change the existing keypad requirements.
 
 #### P5-T6: Validate SDK abstractions with a second small consumer
 
-- **Status:** Active — Hello consumer spike in [SDK PR #14](https://github.com/0al-spec/agent-surface-js/pull/14); review/merge pending
+- **Status:** Complete bounded spike — [SDK PR #14](https://github.com/0al-spec/agent-surface-js/pull/14) merged as `11eeafe0ae9e2ae9527705ccfc51f97ab9e90fa5`; comparison verified against Calcu's pinned package artifact
 - **Description:** Use a minimal Hello application as an independent consumer
   of the existing locally packed SDK artifact. Exercise only existing public offline
   Manifest, semantic-request and selected-Grant values, then compare its
@@ -66,9 +66,11 @@ production ASP deployment or change the existing keypad requirements.
   developer setup steps and application-specific lines separately from the
   one-time SDK implementation cost.
 - **Current evidence:** [consumer comparison](INPROGRESS/P5-T6_Consumer_Comparison.md).
-  The packed-SDK Hello candidate passes locally, but the spike remains open
-  until SDK PR #14 is reviewed and merged and this inventory is checked
-  against the resulting package artifact.
+  The packed-SDK Hello consumer and Calcu use the same exported runtime
+  payload; only package development scripts differ. Offline value validation
+  is demonstrated SDK reuse, declarations and policy remain application-owned,
+  and stateful runtime primitives need separate contracts and another live
+  implementation before extraction.
 - **Non-goal:** Marking canonical ASP ADP-09 complete or unblocked. Its status,
   approval and cross-repository sequencing remain owned by the ASP adoption
   backlog.
