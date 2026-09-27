@@ -2,16 +2,20 @@
 
 ## Recently Completed (not yet archived)
 
+- P5-T7 — Bounded Calcu offline action-authoring acceptance spike (PASS for
+  offline representation validation; no-go for production adoption on this
+  single-action evidence; API remains private/experimental)
+
 - P5-T6 — Validate SDK abstractions with a second small consumer (PASS; SDK PR #14 merged; package payload compared; inventory updated)
 
 - P5-T5 — Adopt ASP SDK manifest/Grant values and server-only receipts (PASS; Calcu PR #6 merged; archive bookkeeping pending)
 
 ## Next
 
-- P5-T7 — Review the offline action-authoring design proposal before authorizing
-  any SDK prototype. See
-  [P5-T7 design](P5-T7_Offline_Action_Authoring_Design.md). No API or code
-  implementation is included yet.
+- No P5-T7 production implementation is selected. See the
+  [P5-T7 design and acceptance evidence](P5-T7_Offline_Action_Authoring_Design.md);
+  revisit only after separately authorized evidence from another independent
+  action/consumer and an exact schema-hash compatibility decision.
 
 ## Recently Archived
 

@@ -77,7 +77,9 @@ mark a production ASP deployment or change the existing keypad requirements.
   backlog.
 
 #### P5-T7: Design an offline action-authoring spike
-- **Status:** Design proposal ready; prototype not started.
+- **Status:** Bounded Calcu acceptance spike complete; no-go for production
+  adoption on the current single-action evidence. The authoring API remains
+  private and experimental.
 - **Description:** Determine whether one explicit, inert operation declaration
   can reduce repeated application-owned action/schema representation wiring in
   Calcu and Hello while producing existing SDK-validated offline artifacts.
@@ -86,19 +88,23 @@ mark a production ASP deployment or change the existing keypad requirements.
   automation. Identity, consent, Grant/session lifecycle, admission, receipts,
   transport, agent/provider behavior and app handlers remain outside the proposed
   authoring layer. Adding an operation must never expand a Grant implicitly.
-- **Outputs:** Design proposal at
+- **Outputs:** Design and evidence at
   [P5-T7 Offline Action Authoring](INPROGRESS/P5-T7_Offline_Action_Authoring_Design.md),
-  including candidate declaration parts, consumer comparison method, required
-  negative tests, success criteria and unresolved decisions.
+  a bounded test-only Calcu full-manifest composition check, and
+  [P5-T7 validation report](INPROGRESS/P5-T7_Validation_Report.md). The
+  candidate passed pinned offline validators, but the generated redundant
+  operator `type` changes schema and surface hashes and the complete-manifest
+  authoring reduction did not justify production integration.
 - **Acceptance:** Reviewers can distinguish app policy from mechanical
   duplication; choose or reject a single runtime-validatable schema source;
   enumerate exact derived artifacts and boundary tests; and decide whether the
   expected reduction justifies SDK implementation and maintenance. No public SDK
   API is implied by this design.
-- **Next gate:** Only after design review, authorize a private offline prototype.
-  The prototype must validate packed-package output in both consumers and may
-  not change live Calcu execution, ASP normative text or the canonical adoption
-  backlog.
+- **Next gate:** Hold the API and implementation private/experimental. Do not
+  integrate it into Calcu or expose package-root exports. Reconsider only with
+  separately authorized evidence from another independent action/consumer and
+  an exact hash-compatibility decision; no change to live execution, ASP
+  normative text or canonical adoption status follows from this spike.
 
 ## 1. Overview
 
