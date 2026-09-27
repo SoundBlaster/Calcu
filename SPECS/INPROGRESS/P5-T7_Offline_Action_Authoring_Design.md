@@ -1,0 +1,198 @@
+# P5-T7: Offline Action Authoring — Design Proposal
+
+**Status:** Design proposal; no SDK API or implementation is approved by this document.
+**Owner:** Calcu adoption spike; any SDK change remains a separate reviewed deliverable.
+**Depends on:** P5-T5 and P5-T6.
+
+## 1. Purpose
+
+P5-T6 demonstrated that the current TypeScript SDK can validate offline ASP
+representations in both Calcu and a small Hello consumer. It also showed that
+application-owned IDs, schemas, classifications and representation wiring are
+still repeated by each consumer. P5-T7 will determine whether a small,
+application-first authoring layer can reduce that duplication without hiding
+policy, changing ASP wire semantics or claiming runtime authority.
+
+This is an ergonomics and representation-generation investigation. It is not a
+proposal to make applications ASP-centric: a native application must remain
+useful without ASP, and ASP integration should be an optional composition.
+
+## 2. Question and hypothesis
+
+**Question:** Can one explicit operation declaration describe an existing
+application capability once, then produce the same supported offline ASP action
+and schema representations that consumers currently assemble manually?
+
+**Hypothesis:** A small declarative authoring model can reduce repeated
+representation plumbing if it derives only validated schemas and manifest
+fragments, while requiring application authors to state all security-relevant
+metadata and handler bindings explicitly.
+
+The experiment must be allowed to conclude that the abstraction is not worth
+its one-time SDK implementation and maintenance cost.
+
+## 3. Candidate authoring model
+
+Evaluate an inert, typed operation declaration containing these conceptual
+parts:
+
+| Part | Ownership and requirement |
+| --- | --- |
+| Stable ASP action ID | Explicit application-owned wire identifier. |
+| Execution mode and side-effect declaration | Explicit; never inferred from function names, return types or annotations. |
+| Closed input and output models | One runtime-validatable source of truth that can supply TypeScript types and JSON Schema; exact supported schema constraints remain mandatory. |
+| Explicit data-exposure and risk/effect metadata | Application-authored policy; no classification inferred from TypeScript types, names or descriptions. |
+| Handler binding | Explicit reference to an application-owned function/object. Never discover or export arbitrary public methods. Handler code is not serialized into the manifest. |
+| Resource/schema references | Stable, checked references derived from the declaration or explicitly supplied; dangling or conflicting references fail preparation. |
+
+The concrete TypeScript syntax and schema library are intentionally undecided.
+The design should compare the existing SDK's supported JSON Schema boundary with
+the proposed authoring shape before selecting either. Avoid maintaining a
+TypeScript interface and a separately handwritten JSON Schema for the same
+payload unless the experiment demonstrates a safe consistency check.
+
+Construction should be inert. An explicit preparation step should reject
+invalid or unsupported declarations before a host starts. This layer may derive
+offline schemas and action/resource manifest fragments, but it must not issue,
+select or modify a Grant.
+
+## 4. Consumers and comparison method
+
+Use the two existing consumers as different-shaped examples:
+
+1. **Hello:** a fixed-output, inert `greeting.propose` representation. It has no
+   live authority, agent, transport, runtime or executable ASP action. Its role
+   is to test whether the authoring shape remains natural for a tiny optional
+   integration.
+2. **Calcu:** the existing `calculation.propose` proposal action with its
+   closed `operator`, `left` and `right` input, exact output shape, and explicit
+   exposure/effect declarations. Its native math behavior remains application
+   code behind the current trusted executor boundary.
+
+For each consumer, compare the manual baseline with the experimental
+declaration and derived artifacts. Record separately:
+
+- per-operation declarations and wiring;
+- consumer setup and composition steps;
+- explicit policy decisions still made by the application author;
+- tests and negative cases required;
+- one-time SDK implementation and maintenance cost;
+- generated artifact size/shape and validation behavior.
+
+Do not use raw line count as the success metric. Report whether policy decisions
+became clearer, stayed explicit, or were accidentally obscured.
+
+## 5. Authority and semantic boundaries
+
+The authoring layer must preserve these invariants:
+
+- A declaration or generated manifest is a description, not authority, consent,
+  identity evidence, authentication, proof of intent or ASP conformance.
+- Adding an operation must not silently enlarge the allowed action/scope set in
+  any Grant. Grant and session validation remain separate and independently
+  enforced.
+- Data exposure, risk/effects, execution mode, side-effect status and handler
+  allow-list are explicit inputs; no security property is guessed from code
+  shape, identifiers, comments or LLM output.
+- Generated JSON must preserve exact supported ASP wire field names and be
+  accepted by the existing offline validators. No alternate wire vocabulary.
+- Preparation validates declarations but does not run handlers, perform I/O,
+  start a listener, or acquire credentials.
+- The handler stays application-owned and is invoked only by the existing
+  trusted execution path after admission. The authoring API must not create a
+  direct agent-to-handler bypass.
+- Agent/provider selection, prompts, model profiles and agent planning remain
+  outside the provider-neutral ASP SDK core.
+- This work does not revise ASP normative text or change the canonical adoption
+  backlog/status.
+
+## 6. Required prototype evidence, if separately authorized
+
+If this design is accepted for implementation, the follow-up prototype should
+remain offline and consumer-scoped until its generated representation passes
+the current validators. It should produce no network traffic and execute no
+handler. Required evidence:
+
+1. Canonical/generated comparison for the supported action and schema fragments
+   in both consumers, with deliberate, reviewed differences called out.
+2. Positive validation through the package root exports from a packed SDK
+   artifact, not source or test-only imports.
+3. Negative tests for at least:
+   - duplicate action IDs;
+   - missing required explicit metadata;
+   - open input/output schemas or unsupported schema keywords;
+   - dangling/conflicting schema references;
+   - declaration/type/schema mismatch;
+   - ambiguous or missing handler binding;
+   - attempts to auto-register undeclared methods;
+   - attempts to expand a Grant's actions/scopes by adding a declaration.
+4. An inertness test proving declaration/preparation performs no handler calls,
+   I/O, transport startup or credential access.
+5. Re-run both consumer examples and their existing negative checks; report
+   changes in app effort and SDK complexity separately.
+
+The exact artifact comparison strategy (deep semantic equality versus canonical
+byte equality) must be chosen against the current hash/wire contract before
+coding. Do not assume byte identity where ordering or canonicalization is not
+normative.
+
+## 7. Out of scope
+
+P5-T7 does not implement or generalize:
+
+- Grant issuance/selection, identity verification, consent or principal policy;
+- session stores, revocation, quotas, transactional admission or fencing;
+- executor, mediator, event delivery or bidirectional agent runtime;
+- Runtime/App Receipt production, signing or verification;
+- HTTP/TLS transports, Codex adapters, UI or process supervision;
+- arbitrary TypeScript reflection, decorator magic or automatic method export;
+- platform-specific Swift/Rust/Go authoring APIs;
+- new normative ASP requirements, conformance claims or ADP backlog completion.
+
+These may be considered only as separately scoped work after evidence from more
+than one live implementation establishes a reusable contract.
+
+## 8. Decision gates and success criteria
+
+The design phase is complete when reviewers can answer, with evidence and
+explicit open questions:
+
+1. Which repeated consumer declarations are true mechanical duplication, and
+   which are necessarily app policy?
+2. What is the single runtime-validatable source of truth for input/output
+   shape, and how are TypeScript types derived without casts or drift?
+3. Which exact existing offline representations may be derived, and which must
+   remain explicit or application-owned?
+4. How does adding an operation remain independent from Grant authority?
+5. What negative tests establish closed schemas, explicit metadata, inertness
+   and handler allow-listing?
+6. Does the reduction in per-consumer plumbing justify SDK implementation,
+   support and compatibility cost?
+
+Proceed to a prototype only if the answer to the final question is positive and
+the previous boundaries have a testable design. Otherwise record the negative
+result and keep the current explicit representation APIs.
+
+### Design recommendation
+
+Proceed with an offline prototype only. Keep it private to the experimental
+branch until both consumers validate the output and reviewers accept the
+authority-boundary tests. Do not add package-root exports, commit a public API
+name, or alter Calcu's live execution path during the initial design review.
+
+## 9. Open questions
+
+- Should authoring start from a schema-first builder, a runtime schema object
+  with inferred static types, or a small closed descriptor format?
+- Can the current SDK schema support cover both consumers without a second
+  schema DSL or a dependency whose maintenance outweighs the benefit?
+- Which pieces of the ASP manifest are intrinsic to an action, and which belong
+  to surface-level application policy that should not be copied per operation?
+- Is handler association needed in the first offline prototype, or should the
+  first slice generate representation only and test allow-list binding
+  separately?
+- What compatibility/versioning promise, if any, is justified before a second
+  independent live runtime uses the authoring layer?
+
+These remain open; the examples in SDK design guidance are not approved API
+signatures.

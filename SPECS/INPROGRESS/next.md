@@ -6,6 +6,13 @@
 
 - P5-T5 — Adopt ASP SDK manifest/Grant values and server-only receipts (PASS; Calcu PR #6 merged; archive bookkeeping pending)
 
+## Next
+
+- P5-T7 — Review the offline action-authoring design proposal before authorizing
+  any SDK prototype. See
+  [P5-T7 design](P5-T7_Offline_Action_Authoring_Design.md). No API or code
+  implementation is included yet.
+
 ## Recently Archived
 
 - P5-T4 — Verify ASP demo readiness and document adoption (PASS)

@@ -16,8 +16,9 @@ session contract and tested loopback HTTPS boundary. See [boundary status](../se
 | P5-T4 | Implemented: regression/conformance evidence and adoption report | P5-T3 |
 | P5-T5 | Complete: SDK-validated manifest/request/Grant values and server-only unsigned Runtime/App Receipts | P5-T4; SDK PRs #12 and #13 |
 
-The P5 demo is complete through **P5-T5**. This section does not mark a
-production ASP deployment or change the existing keypad requirements.
+The P5 demo implementation is complete through **P5-T5**; the P5-T6
+second-consumer comparison is complete and recorded below. This section does not
+mark a production ASP deployment or change the existing keypad requirements.
 
 #### ✅ P5-T5: Adopt merged SDK manifest and Grant value validators
 
@@ -73,6 +74,30 @@ production ASP deployment or change the existing keypad requirements.
   implementation before extraction.
 - **Non-goal:** Marking canonical ASP ADP-09 complete or unblocked. Its status,
   approval and cross-repository sequencing remain owned by the ASP adoption
+  backlog.
+
+#### P5-T7: Design an offline action-authoring spike
+- **Status:** Design proposal ready; prototype not started.
+- **Description:** Determine whether one explicit, inert operation declaration
+  can reduce repeated application-owned action/schema representation wiring in
+  Calcu and Hello while producing existing SDK-validated offline artifacts.
+- **Dependencies:** P5-T5 and P5-T6.
+- **Boundary:** This is an ergonomics/representation experiment, not authority
+  automation. Identity, consent, Grant/session lifecycle, admission, receipts,
+  transport, agent/provider behavior and app handlers remain outside the proposed
+  authoring layer. Adding an operation must never expand a Grant implicitly.
+- **Outputs:** Design proposal at
+  [P5-T7 Offline Action Authoring](INPROGRESS/P5-T7_Offline_Action_Authoring_Design.md),
+  including candidate declaration parts, consumer comparison method, required
+  negative tests, success criteria and unresolved decisions.
+- **Acceptance:** Reviewers can distinguish app policy from mechanical
+  duplication; choose or reject a single runtime-validatable schema source;
+  enumerate exact derived artifacts and boundary tests; and decide whether the
+  expected reduction justifies SDK implementation and maintenance. No public SDK
+  API is implied by this design.
+- **Next gate:** Only after design review, authorize a private offline prototype.
+  The prototype must validate packed-package output in both consumers and may
+  not change live Calcu execution, ASP normative text or the canonical adoption
   backlog.
 
 ## 1. Overview
