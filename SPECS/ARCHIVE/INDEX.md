@@ -1,11 +1,14 @@
 # Tasks Archive
 
-**Last Updated:** 2026-09-05
+**Last Updated:** 2026-09-28
 
 ## Archived Tasks
 
 | Task ID | Folder | Archived | Verdict |
 |---------|--------|----------|---------|
+| P5-T7 | [P5-T7_Offline_Action_Authoring/](P5-T7_Offline_Action_Authoring/) | 2026-09-28 | PASS |
+| P5-T6 | [P5-T6_Validate_SDK_Abstractions_With_Second_Small_Consumer/](P5-T6_Validate_SDK_Abstractions_With_Second_Small_Consumer/) | 2026-09-28 | PASS |
+| P5-T5 | [P5-T5_Adopt_ASP_SDK_Values/](P5-T5_Adopt_ASP_SDK_Values/) | 2026-09-28 | PASS |
 | P5-T4 | [P5-T4_Verify_ASP_demo_readiness_and_document_adoption/](P5-T4_Verify_ASP_demo_readiness_and_document_adoption/) | 2026-09-05 | PASS |
 | P4-T8 | [P4-T8_Establish_repository_quality_gates_and_CI_reporting/](P4-T8_Establish_repository_quality_gates_and_CI_reporting/) | 2026-03-25 | PASS |
 | FU-T2 | [FU-T2_Re-scope_remaining_Phase_1_setup_tasks_after_scaffold_delivery/](FU-T2_Re-scope_remaining_Phase_1_setup_tasks_after_scaffold_delivery/) | 2026-03-25 | PASS |
@@ -70,6 +73,9 @@
 
 | Date | Task ID | Action |
 |------|---------|--------|
+| 2026-09-28 | P5-T7 | Archived Offline Action Authoring (PASS; production adoption remains no-go) |
+| 2026-09-28 | P5-T6 | Archived SDK second-consumer comparison (PASS) |
+| 2026-09-28 | P5-T5 | Archived ASP SDK values integration (PASS) |
 | 2026-09-05 | REVIEW_p5_t4_asp_adoption_readiness | Archived REVIEW_p5_t4_asp_adoption_readiness report |
 | 2026-09-05 | P5-T4 | Archived task with validation report (PASS) |
 | 2026-03-25 | REVIEW_p4_t8_quality_gates_ci | Archived REVIEW_p4_t8_quality_gates_ci report |

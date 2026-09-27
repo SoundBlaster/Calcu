@@ -27,10 +27,12 @@ private and experimental.
 | `npm run test:action-authoring-spike` without `AGENT_SURFACE_JS_ROOT` | Expected fail-fast, exit 2 with an explicit setup message. |
 | `git diff --check` | PASS. |
 
-The complete test suite and CI were not run; this report records only the
-targeted spike and proportional checks. The original local branch commit used
-before rebase was not reachable from the repository after PR #9 merged, so the
-reachable main commit above is the reproducible baseline reference.
+The complete local test suite was not run; this report records only the targeted
+spike and proportional checks. After PR #10 was opened, GitHub CI checks
+`verify` and `coverage` passed on reviewed head `40315252be17ac43df0bf1f3b8bbfe3a40b34bff`.
+The original local branch commit used before rebase was not reachable from the
+repository after PR #9 merged, so the reachable main commit above is the
+reproducible baseline reference.
 
 ## Evidence and decision
 

@@ -81,3 +81,7 @@ Update `server/README.md`, `server/CONFORMANCE.md`,
 ASP repository. The protected HTTPS action envelope may gain only the minimal
 receipt/hash fields needed for this proposal flow; the browser API and task
 event schema remain unchanged.
+
+---
+**Archived:** 2026-09-28
+**Verdict:** PASS
