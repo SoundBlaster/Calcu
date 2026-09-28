@@ -22,7 +22,9 @@ mark a production ASP deployment or change the existing keypad requirements.
 
 #### ✅ P5-T5: Adopt merged SDK manifest and Grant value validators
 
-- **Status:** Complete; merged in Calcu PR #6 (`a0fb1fc9`)
+- **Status:** Complete and archived in
+  [P5-T5 archive](ARCHIVE/P5-T5_Adopt_ASP_SDK_Values/); merged in Calcu PR #6
+  (`a0fb1fc9`)
 - **Description:** Replace Calcu's hand-shaped manifest hash and incomplete
   Grant representation with SDK-validated offline `OfflineProposalManifest`,
   `OfflineSemanticGrantRequest`, and `OfflineSelectedGrant` values.
@@ -41,9 +43,13 @@ mark a production ASP deployment or change the existing keypad requirements.
   Runtime Receipts before engine calls; LocalBackend verifies App Receipts
   before returning results; browser task API remains unchanged.
 
-#### P5-T6: Validate SDK abstractions with a second small consumer
+#### ✅ P5-T6: Validate SDK abstractions with a second small consumer
 
-- **Status:** Complete bounded spike — [SDK PR #14](https://github.com/0al-spec/agent-surface-js/pull/14) merged as `11eeafe0ae9e2ae9527705ccfc51f97ab9e90fa5`; comparison verified against Calcu's pinned package artifact
+- **Status:** Complete and archived in
+  [P5-T6 archive](ARCHIVE/P5-T6_Validate_SDK_Abstractions_With_Second_Small_Consumer/);
+  [SDK PR #14](https://github.com/0al-spec/agent-surface-js/pull/14) merged as
+  `11eeafe0ae9e2ae9527705ccfc51f97ab9e90fa5`; comparison verified against
+  Calcu's pinned package artifact
 - **Description:** Use a minimal Hello application as an independent consumer
   of the existing locally packed SDK artifact. Exercise only existing public offline
   Manifest, semantic-request and selected-Grant values, then compare its
@@ -66,7 +72,7 @@ mark a production ASP deployment or change the existing keypad requirements.
   comparison does not claim runtime reuse from value-validation reuse. Report
   developer setup steps and application-specific lines separately from the
   one-time SDK implementation cost.
-- **Current evidence:** [consumer comparison](INPROGRESS/P5-T6_Consumer_Comparison.md).
+- **Current evidence:** [consumer comparison](ARCHIVE/P5-T6_Validate_SDK_Abstractions_With_Second_Small_Consumer/P5-T6_Consumer_Comparison.md) and [validation report](ARCHIVE/P5-T6_Validate_SDK_Abstractions_With_Second_Small_Consumer/P5-T6_Validation_Report.md).
   The packed-SDK Hello consumer and Calcu use the same exported runtime
   payload; only package development scripts differ. Offline value validation
   is demonstrated SDK reuse, declarations and policy remain application-owned,
@@ -76,10 +82,11 @@ mark a production ASP deployment or change the existing keypad requirements.
   approval and cross-repository sequencing remain owned by the ASP adoption
   backlog.
 
-#### P5-T7: Design an offline action-authoring spike
-- **Status:** Bounded Calcu acceptance spike complete; no-go for production
-  adoption on the current single-action evidence. The authoring API remains
-  private and experimental.
+#### ✅ P5-T7: Design an offline action-authoring spike
+- **Status:** Bounded spike archived in
+  [P5-T7 archive](ARCHIVE/P5-T7_Offline_Action_Authoring/); no-go for
+  production adoption on the current single-action evidence. The authoring API
+  remains private and experimental.
 - **Description:** Determine whether one explicit, inert operation declaration
   can reduce repeated application-owned action/schema representation wiring in
   Calcu and Hello while producing existing SDK-validated offline artifacts.
@@ -88,10 +95,10 @@ mark a production ASP deployment or change the existing keypad requirements.
   automation. Identity, consent, Grant/session lifecycle, admission, receipts,
   transport, agent/provider behavior and app handlers remain outside the proposed
   authoring layer. Adding an operation must never expand a Grant implicitly.
-- **Outputs:** Design and evidence at
-  [P5-T7 Offline Action Authoring](INPROGRESS/P5-T7_Offline_Action_Authoring_Design.md),
-  a bounded test-only Calcu full-manifest composition check, and
-  [P5-T7 validation report](INPROGRESS/P5-T7_Validation_Report.md). The
+- **Outputs:** Design and evidence in
+  [P5-T7 Offline Action Authoring](ARCHIVE/P5-T7_Offline_Action_Authoring/P5-T7_Offline_Action_Authoring_Design.md),
+  a bounded test-only Calcu full-manifest composition check, and the
+  [P5-T7 validation report](ARCHIVE/P5-T7_Offline_Action_Authoring/P5-T7_Validation_Report.md). The
   candidate passed pinned offline validators, but the generated redundant
   operator `type` changes schema and surface hashes and the complete-manifest
   authoring reduction did not justify production integration.

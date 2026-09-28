@@ -14,7 +14,7 @@ description: "Use when a task is complete and you need to move its PRD artifacts
 | `TASK_ID` | Task identifier (e.g., `P1-T1`) |
 | `TASK_NAME` | Task name in PascalCase (e.g., `Create_Project_Structure`) |
 | `VERDICT` | One of: `PASS`, `FAIL`, `PARTIAL` |
-| `DATE` | Archive date in `YYYY-MM-DD` format |
+| `DATE` | Archive date as the UTC calendar date in `YYYY-MM-DD` format; obtain it with `date -u +%F` |
 
 ## Steps
 
@@ -54,8 +54,8 @@ EOF
 # If missing, restore it; do not insert the separator as a data row.
 # Insert row: | ${DATE} | ${TASK_ID} | Archived ${TASK_NAME} (${VERDICT}) |
 
-# 8. Update INDEX.md - set Last Updated date
-# Set **Last Updated:** ${DATE}
+# 8. Update INDEX.md - set Last Updated UTC date
+# Set **Last Updated (UTC):** ${DATE}
 ```
 
 ## Postconditions

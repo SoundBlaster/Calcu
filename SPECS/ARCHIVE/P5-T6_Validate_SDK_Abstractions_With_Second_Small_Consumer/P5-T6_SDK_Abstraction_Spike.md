@@ -91,3 +91,7 @@ conformance.
   `examples/design/hello-composition/`.
 - If a second consumer requires a new runtime contract, stop after recording the
   gap and propose the smallest separately reviewable SDK slice before coding it.
+
+---
+**Archived:** 2026-09-27
+**Verdict:** PASS

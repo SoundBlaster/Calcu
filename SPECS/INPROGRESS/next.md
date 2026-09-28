@@ -2,23 +2,21 @@
 
 ## Recently Completed (not yet archived)
 
-- P5-T7 — Bounded Calcu offline action-authoring acceptance spike (PASS for
-  offline representation validation; no-go for production adoption on this
-  single-action evidence; API remains private/experimental)
-
-- P5-T6 — Validate SDK abstractions with a second small consumer (PASS; SDK PR #14 merged; package payload compared; inventory updated)
-
-- P5-T5 — Adopt ASP SDK manifest/Grant values and server-only receipts (PASS; Calcu PR #6 merged; archive bookkeeping pending)
+None.
 
 ## Next
 
 - No P5-T7 production implementation is selected. See the
-  [P5-T7 design and acceptance evidence](P5-T7_Offline_Action_Authoring_Design.md);
-  revisit only after separately authorized evidence from another independent
+  [P5-T7 design and acceptance evidence](../ARCHIVE/P5-T7_Offline_Action_Authoring/P5-T7_Offline_Action_Authoring_Design.md);
+  see also the [validation report](../ARCHIVE/P5-T7_Offline_Action_Authoring/P5-T7_Validation_Report.md).
+  Revisit only after separately authorized evidence from another independent
   action/consumer and an exact schema-hash compatibility decision.
 
 ## Recently Archived
 
+- P5-T7 — Bounded Calcu offline action-authoring acceptance spike (PASS; no-go for production adoption on single-action evidence)
+- P5-T6 — Validate SDK abstractions with a second small consumer (PASS; representation-level reuse demonstrated, runtime extraction not justified)
+- P5-T5 — Adopt ASP SDK manifest/Grant values and server-only receipts (PASS; merged in Calcu PR #6)
 - P5-T4 — Verify ASP demo readiness and document adoption (PASS)
 - P4-T8 — Establish repository quality gates and CI reporting (PASS)
 - FU-T1 — Normalize calculator task IDs against existing archive history (PASS)

@@ -286,7 +286,11 @@ clone or mutate another checkout.
 The test is skipped during ordinary Vitest discovery unless the dedicated
 runner sets its private opt-in marker; the dedicated command fails clearly if
 the SDK-root environment variable is absent, the commit differs, the tracked
-tree is dirty, or the SDK build fails. This is a
+or ordinary untracked tree is dirty, or the SDK build fails. This is a
 repeatable manual cross-repository spike, not a durable cross-repo CI gate or
 live synchronization mechanism; it uses no copied manifest fixture or vendored
 generated SDK artifact.
+
+---
+**Archived:** 2026-09-27
+**Verdict:** PASS — bounded offline acceptance spike; no-go for production adoption on single-action evidence.

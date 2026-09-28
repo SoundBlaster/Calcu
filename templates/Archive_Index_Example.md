@@ -1,6 +1,6 @@
 # Tasks Archive
 
-**Last Updated:** YYYY-MM-DD
+**Last Updated (UTC):** YYYY-MM-DD
 
 ## Archived Tasks
 

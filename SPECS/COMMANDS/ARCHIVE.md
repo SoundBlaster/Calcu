@@ -12,6 +12,8 @@ Scan for completed tasks and archive them from `SPECS/INPROGRESS/` to `SPECS/ARC
 - `SPECS/INPROGRESS/next.md` — current task pointer
 - `SPECS/INPROGRESS/{TASK_ID}_*.md` — task files to archive
 
+Archive dates, including `Last Updated`, must use the UTC calendar date. Obtain it with `date -u +%F`. Do not rewrite historical dates unless the original timestamp is known.
+
 ## Algorithm
 
 1. **Scan for completed tasks** in workplan:
@@ -27,7 +29,7 @@ Scan for completed tasks and archive them from `SPECS/INPROGRESS/` to `SPECS/ARC
      - `TASK_ID` — task identifier (e.g., `P1-T1`)
      - `TASK_NAME` — task name
      - `VERDICT` — from validation report
-     - `DATE` — current date
+     - `DATE` — current UTC date from `date -u +%F`
    - When updating `SPECS/ARCHIVE/INDEX.md`, preserve the Archive Log header separator row directly beneath the header.
 
 3. **Update `SPECS/INPROGRESS/next.md`:**
@@ -74,7 +76,7 @@ SPECS/
 ```markdown
 # Tasks Archive
 
-**Last Updated:** YYYY-MM-DD
+**Last Updated (UTC):** YYYY-MM-DD
 
 ## Archived Tasks
 
