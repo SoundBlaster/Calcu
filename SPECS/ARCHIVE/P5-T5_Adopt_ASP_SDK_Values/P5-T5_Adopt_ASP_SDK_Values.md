@@ -83,5 +83,5 @@ receipt/hash fields needed for this proposal flow; the browser API and task
 event schema remain unchanged.
 
 ---
-**Archived:** 2026-09-28
+**Archived:** 2026-09-27
 **Verdict:** PASS

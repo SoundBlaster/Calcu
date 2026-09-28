@@ -292,5 +292,5 @@ live synchronization mechanism; it uses no copied manifest fixture or vendored
 generated SDK artifact.
 
 ---
-**Archived:** 2026-09-28
+**Archived:** 2026-09-27
 **Verdict:** PASS — bounded offline acceptance spike; no-go for production adoption on single-action evidence.

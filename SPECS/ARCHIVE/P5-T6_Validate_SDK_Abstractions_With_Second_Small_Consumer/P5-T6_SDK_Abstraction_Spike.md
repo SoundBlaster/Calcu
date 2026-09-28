@@ -93,5 +93,5 @@ conformance.
   gap and propose the smallest separately reviewable SDK slice before coding it.
 
 ---
-**Archived:** 2026-09-28
+**Archived:** 2026-09-27
 **Verdict:** PASS
