@@ -188,6 +188,14 @@ continues to enforce disclosure and future access. There is no agent/provider
 deletion promise. The UI explains this before submission. See
 [the handling policy](../server/RETENTION.md) for field ownership and limits.
 
+The task panel additionally requires an explicit action/disclosure selection
+against a server-issued, one-use, expiring offer for the current task. The demo
+checks the resulting server-only permit against its surface immediately before
+Grant issuance. Missing choices, changed tasks/surfaces and replay fail closed.
+This is development access confirmation, not authenticated end-user identity,
+durable consent or exact-action approval. See
+[the permission design and executable evidence](../server/TASK_PERMISSIONS.md).
+
 The experiment is successful as a boundary test and intentionally unsuccessful
 as a claim that ASP is already cheap to adopt. It validates the architecture
 while exposing the next leverage point:

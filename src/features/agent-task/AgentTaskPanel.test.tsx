@@ -48,6 +48,44 @@ const completed = {
   agent_message: 'Calcu returned 36.',
   trace,
 };
+
+function mockTaskFetch() {
+  const run = vi.fn<typeof fetch>();
+  vi.spyOn(globalThis, 'fetch').mockImplementation((url, options) => {
+    if (url === '/api/tasks/permissions') {
+      return Promise.resolve(
+        new Response(
+          JSON.stringify({
+            offer_id: 'a'.repeat(64),
+            expires_at: Date.now() + 60_000,
+            action_id: 'calculation.propose',
+            retention: 'user_managed',
+            data_classes: [
+              {
+                id: 'calculation.content',
+                label: 'Calculation content',
+                classification: 'sensitive',
+              },
+              {
+                id: 'calculation.runtime_context',
+                label: 'Runtime context',
+                classification: 'sensitive',
+              },
+              {
+                id: 'calculation.status',
+                label: 'Calculation status',
+                classification: 'private',
+              },
+            ],
+          }),
+          { headers: { 'content-type': 'application/json' } },
+        ),
+      );
+    }
+    return run(url, options);
+  });
+  return run;
+}
 const rootTask = 'What is the square root of 111 multiplied by 2?';
 const rootResult = {
   operator: 'multiply',
@@ -117,6 +155,98 @@ describe('AgentTaskPanel', () => {
     return found;
   }
 
+  async function reviewAccess() {
+    await act(async () => button('Review access').click());
+    act(() => {
+      container
+        .querySelectorAll<HTMLInputElement>('input[type="checkbox"]')
+        .forEach((item) => {
+          item.click();
+        });
+    });
+  }
+
+  async function runTask() {
+    await reviewAccess();
+    await act(async () => button('Allow and run with Codex').click());
+  }
+
+  it('requires both permissions and invalidates the selection when the task changes', async () => {
+    const run = mockTaskFetch().mockResolvedValue(
+      response([accepted, toolResult, completed]),
+    );
+    render();
+    expect(container.querySelector('fieldset')).toBeNull();
+    await act(async () => button('Review access').click());
+    expect(button('Allow and run with Codex').disabled).toBe(true);
+    const checks = container.querySelectorAll<HTMLInputElement>(
+      'input[type="checkbox"]',
+    );
+    act(() => checks.item(0).click());
+    expect(button('Allow and run with Codex').disabled).toBe(true);
+    act(() => checks.item(1).click());
+    expect(button('Allow and run with Codex').disabled).toBe(false);
+    changeTask('Another calculation');
+    expect(container.querySelector('fieldset')).toBeNull();
+    expect(button('Review access').disabled).toBe(false);
+    expect(run).not.toHaveBeenCalled();
+    await runTask();
+    const body = JSON.parse(String(run.mock.calls[0]?.[1]?.body));
+    expect(body.task).toBe('Another calculation');
+    expect(body.permission.actions).toEqual(['calculation.propose']);
+    expect(body.permission.data_classes).toHaveLength(3);
+    expect(container.querySelector('fieldset')).toBeNull();
+  });
+
+  it('does not enable execution after a malformed access offer', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ offer_id: 'forged' })),
+    );
+    render();
+    await act(async () => button('Review access').click());
+    expect(container.querySelector('fieldset')).toBeNull();
+    expect(container.textContent).toContain('permission_unavailable');
+  });
+
+  it('requires a fresh review when the selected offer expires', async () => {
+    const run = mockTaskFetch().mockResolvedValue(
+      response([accepted, toolResult, completed]),
+    );
+    render();
+    await reviewAccess();
+    const time = Date.now();
+    vi.spyOn(Date, 'now').mockReturnValue(time + 61_000);
+    await act(async () => button('Allow and run with Codex').click());
+    expect(run).not.toHaveBeenCalled();
+    expect(container.querySelector('fieldset')).toBeNull();
+    expect(container.textContent).toContain('permission_required');
+  });
+
+  it('ignores a cancelled preview that finishes late', async () => {
+    const run = mockTaskFetch();
+    const implementation = vi.mocked(fetch).getMockImplementation();
+    if (!implementation) throw new Error('Missing test implementation');
+    let release: (() => void) | undefined;
+    vi.mocked(fetch).mockImplementation(
+      (url, options) =>
+        new Promise<Response>((resolve) => {
+          release = () => {
+            void implementation(url, options).then(resolve);
+          };
+        }),
+    );
+    render();
+    act(() => button('Review access').click());
+    act(() => button('Cancel').click());
+    await act(async () => {
+      release?.();
+      await Promise.resolve();
+    });
+    expect(container.querySelector('fieldset')).toBeNull();
+    expect(container.textContent).toContain('Task cancelled.');
+    expect(run).not.toHaveBeenCalled();
+  });
+
   function changeTask(value: string) {
     const input = container.querySelector('textarea');
     if (!input) throw new Error('Missing task input');
@@ -131,11 +261,11 @@ describe('AgentTaskPanel', () => {
   }
 
   it('separates the requested task, verified action, and agent prose', async () => {
-    const fetchMock = vi
-      .spyOn(globalThis, 'fetch')
-      .mockResolvedValue(response([accepted, toolResult, completed]));
+    const fetchMock = mockTaskFetch().mockResolvedValue(
+      response([accepted, toolResult, completed]),
+    );
     render();
-    await act(async () => button('Run with Codex').click());
+    await runTask();
 
     expect(fetchMock).toHaveBeenCalledWith(
       '/api/tasks/run',
@@ -161,10 +291,10 @@ describe('AgentTaskPanel', () => {
   });
 
   it('shows the requested root task separately from the admitted multiplication', async () => {
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue(response(rootEvents()));
+    mockTaskFetch().mockResolvedValue(response(rootEvents()));
     render();
     changeTask(rootTask);
-    await act(async () => button('Run with Codex').click());
+    await runTask();
 
     expect(container.textContent).toContain(rootTask);
     expect(container.textContent).toContain('111 × 2 = 222');
@@ -175,13 +305,12 @@ describe('AgentTaskPanel', () => {
   });
 
   it('keeps the submitted task immutable until the next generation', async () => {
-    const fetchMock = vi
-      .spyOn(globalThis, 'fetch')
+    const fetchMock = mockTaskFetch()
       .mockResolvedValueOnce(response(rootEvents()))
       .mockResolvedValueOnce(response([accepted, toolResult, completed]));
     render();
     changeTask(rootTask);
-    await act(async () => button('Run with Codex').click());
+    await runTask();
 
     changeTask('What is 15% of 240?');
     const requested = container.querySelector(
@@ -190,7 +319,7 @@ describe('AgentTaskPanel', () => {
     expect(requested?.textContent).toContain(rootTask);
     expect(requested?.textContent).not.toContain('15% of 240');
 
-    await act(async () => button('Run with Codex').click());
+    await runTask();
     expect(fetchMock).toHaveBeenCalledTimes(2);
     const nextRequested = container.querySelector(
       '[aria-labelledby="requested-task-label"]',
@@ -202,8 +331,7 @@ describe('AgentTaskPanel', () => {
   });
 
   it('rejects an agent-only answer and supports retry', async () => {
-    const fetchMock = vi
-      .spyOn(globalThis, 'fetch')
+    const fetchMock = mockTaskFetch()
       .mockResolvedValueOnce(
         response([
           accepted,
@@ -217,16 +345,16 @@ describe('AgentTaskPanel', () => {
       )
       .mockResolvedValueOnce(response([accepted, toolResult, completed]));
     render();
-    await act(async () => button('Run with Codex').click());
+    await runTask();
     expect(container.textContent).toContain('Task failed: unverified_result');
 
-    await act(async () => button('Run with Codex').click());
+    await runTask();
     expect(fetchMock).toHaveBeenCalledTimes(2);
     expect(container.textContent).toContain('240 × 0.15 = 36');
   });
 
   it('rejects a terminal result that differs from the tool evidence', async () => {
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+    mockTaskFetch().mockResolvedValue(
       response([
         accepted,
         toolResult,
@@ -237,21 +365,22 @@ describe('AgentTaskPanel', () => {
       ]),
     );
     render();
-    await act(async () => button('Run with Codex').click());
+    await runTask();
     expect(container.textContent).toContain('Task failed: unverified_result');
     expect(container.textContent).not.toContain('= 999');
   });
 
   it('cancels a running request and ignores its late completion', async () => {
     let resolveFetch: ((value: Response) => void) | undefined;
-    vi.spyOn(globalThis, 'fetch').mockImplementation(
+    mockTaskFetch().mockImplementation(
       () =>
         new Promise<Response>((resolvePromise) => {
           resolveFetch = resolvePromise;
         }),
     );
     render();
-    act(() => button('Run with Codex').click());
+    await reviewAccess();
+    act(() => button('Allow and run with Codex').click());
     act(() => button('Cancel').click());
     expect(container.textContent).toContain('Task cancelled.');
 

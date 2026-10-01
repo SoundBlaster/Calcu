@@ -8,9 +8,15 @@ import {
 } from 'node:http';
 import { extname, join, normalize, resolve } from 'node:path';
 import type { CodexTaskEvent, CodexTaskResult } from './codexAdapter';
+import type {
+  ApprovedTaskPermission,
+  createTaskPermissionBroker,
+} from './taskPermissions';
 
-const MAX_REQUEST_BYTES = 4_608;
 const MAX_TASK_BYTES = 4 * 1024;
+// JSON can encode each task byte as six ASCII bytes (e.g. "\u0001").
+// Reserve space for the fixed permission envelope as well as the task.
+const MAX_REQUEST_BYTES = 6 * MAX_TASK_BYTES + 1024;
 const SESSION_COOKIE = 'calcu_agent_session';
 const CSP = [
   "default-src 'self'",
@@ -39,17 +45,20 @@ const SAFE_ERROR_CODES = new Set([
   'task_busy',
   'cancelled',
   'backend_unavailable',
+  'permission_invalid',
 ]);
 
 export type TaskExecution = (
   task: string,
   signal: AbortSignal,
   onEvent: (event: CodexTaskEvent) => void,
+  permission: ApprovedTaskPermission,
 ) => Promise<CodexTaskResult>;
 
 export type TaskHostOptions = {
   distDirectory: string;
   executeTask: TaskExecution;
+  permissions: ReturnType<typeof createTaskPermissionBroker>;
   sessionToken?: string;
 };
 
@@ -96,7 +105,7 @@ function secureEqual(left: string, right: string) {
   return a.length === b.length && timingSafeEqual(a, b);
 }
 
-async function readTask(request: IncomingMessage) {
+async function readTask(request: IncomingMessage, preview: boolean) {
   const contentLength = request.headers['content-length'];
   if (
     !contentLength ||
@@ -122,12 +131,16 @@ async function readTask(request: IncomingMessage) {
   if (!value || typeof value !== 'object' || Array.isArray(value))
     throw new Error('task_invalid');
   const record = value as Record<string, unknown>;
-  if (Object.keys(record).length !== 1 || typeof record.task !== 'string')
+  const keys = preview ? ['task'] : ['permission', 'task'];
+  if (
+    Object.keys(record).sort().join() !== keys.sort().join() ||
+    typeof record.task !== 'string'
+  )
     throw new Error('task_invalid');
   const task = record.task.trim();
   if (!task || Buffer.byteLength(task) > MAX_TASK_BYTES)
     throw new Error('task_invalid');
-  return task;
+  return { task, selection: record.permission };
 }
 
 const CONTENT_TYPES: Record<string, string> = {
@@ -206,7 +219,8 @@ export function createTaskHttpServer(options: TaskHostOptions) {
       writeJson(response, 403, { error: { code: 'unauthorized' } });
       return;
     }
-    if (request.url !== '/api/tasks/run') {
+    const preview = request.url === '/api/tasks/permissions';
+    if (!preview && request.url !== '/api/tasks/run') {
       await serveStatic(options.distDirectory, request, response, sessionToken);
       return;
     }
@@ -236,8 +250,17 @@ export function createTaskHttpServer(options: TaskHostOptions) {
     const controller = new AbortController();
     activeTask = { taskId, controller };
     let task: string;
+    let permission: ApprovedTaskPermission;
     try {
-      task = await readTask(request);
+      const parsed = await readTask(request, preview);
+      task = parsed.task;
+      if (response.destroyed) throw new Error('cancelled');
+      if (preview) {
+        writeJson(response, 200, options.permissions.offer(task));
+        if (activeTask?.taskId === taskId) activeTask = undefined;
+        return;
+      }
+      permission = options.permissions.accept(task, parsed.selection);
     } catch {
       if (activeTask?.taskId === taskId) activeTask = undefined;
       writeJson(response, 400, { error: { code: 'task_invalid' } });
@@ -278,6 +301,7 @@ export function createTaskHttpServer(options: TaskHostOptions) {
             });
           }
         },
+        permission,
       );
       terminal = true;
       send({

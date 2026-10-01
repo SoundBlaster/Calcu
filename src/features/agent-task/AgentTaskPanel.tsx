@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import styles from './AgentTaskPanel.module.css';
+import { readPermissionOffer, type TaskPermissionOffer } from './permissions';
 import {
   type CalculationResult,
   consumeTaskStream,
@@ -10,7 +11,13 @@ import {
   verifiedResult,
 } from './protocol';
 
-type PanelState = 'idle' | 'running' | 'success' | 'error' | 'cancelled';
+type PanelState =
+  | 'idle'
+  | 'reviewing'
+  | 'running'
+  | 'success'
+  | 'error'
+  | 'cancelled';
 
 const EXAMPLE = 'What is 15% of 240?';
 
@@ -30,6 +37,10 @@ export function AgentTaskPanel() {
   const [trace, setTrace] = useState<SafeTaskTrace>();
   const [agentMessage, setAgentMessage] = useState('');
   const [error, setError] = useState('');
+  const [offer, setOffer] = useState<TaskPermissionOffer>();
+  const [reviewedTask, setReviewedTask] = useState('');
+  const [allowAction, setAllowAction] = useState(false);
+  const [allowData, setAllowData] = useState(false);
   const generation = useRef(0);
   const activeController = useRef<AbortController | undefined>(undefined);
 
@@ -43,6 +54,26 @@ export function AgentTaskPanel() {
 
   const submit = async () => {
     const taskSnapshot = task.trim();
+    if (
+      !offer ||
+      !allowAction ||
+      !allowData ||
+      reviewedTask !== taskSnapshot ||
+      offer.expires_at <= Date.now()
+    ) {
+      setOffer(undefined);
+      setError('permission_required');
+      setState('error');
+      return;
+    }
+    const permission = {
+      offer_id: offer.offer_id,
+      actions: [offer.action_id],
+      data_classes: offer.data_classes.map((item) => item.id),
+    };
+    setOffer(undefined);
+    setAllowAction(false);
+    setAllowData(false);
     const currentGeneration = ++generation.current;
     activeController.current?.abort();
     const controller = new AbortController();
@@ -111,7 +142,7 @@ export function AgentTaskPanel() {
         method: 'POST',
         credentials: 'same-origin',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ task: taskSnapshot }),
+        body: JSON.stringify({ task: taskSnapshot, permission }),
         signal: controller.signal,
       });
       await consumeTaskStream(response, controller.signal, applyEvent);
@@ -135,12 +166,54 @@ export function AgentTaskPanel() {
     }
   };
 
+  const reviewAccess = async () => {
+    const taskSnapshot = task.trim();
+    const currentGeneration = ++generation.current;
+    activeController.current?.abort();
+    const controller = new AbortController();
+    activeController.current = controller;
+    setOffer(undefined);
+    setAllowAction(false);
+    setAllowData(false);
+    setError('');
+    setState('reviewing');
+    try {
+      const response = await fetch('/api/tasks/permissions', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ task: taskSnapshot }),
+        signal: controller.signal,
+      });
+      if (!response.ok) throw new Error('permission_unavailable');
+      const text = await response.text();
+      if (text.length > 4096) throw new Error('permission_invalid');
+      const permissionOffer = readPermissionOffer(JSON.parse(text));
+      if (generation.current !== currentGeneration || controller.signal.aborted)
+        return;
+      setOffer(permissionOffer);
+      setReviewedTask(taskSnapshot);
+      setState('idle');
+    } catch {
+      if (generation.current !== currentGeneration || controller.signal.aborted)
+        return;
+      setError('permission_unavailable');
+      setState('error');
+    } finally {
+      if (generation.current === currentGeneration)
+        activeController.current = undefined;
+    }
+  };
+
   const cancel = () => {
     generation.current += 1;
     activeController.current?.abort();
     activeController.current = undefined;
     setState('cancelled');
     setPhase('');
+    setOffer(undefined);
+    setAllowAction(false);
+    setAllowData(false);
   };
 
   return (
@@ -168,18 +241,81 @@ export function AgentTaskPanel() {
         maxLength={4096}
         rows={4}
         disabled={state === 'running'}
-        onChange={(event) => setTask(event.target.value)}
+        onChange={(event) => {
+          setTask(event.target.value);
+          setOffer(undefined);
+          setAllowAction(false);
+          setAllowData(false);
+          if (state === 'reviewing') {
+            generation.current += 1;
+            activeController.current?.abort();
+            activeController.current = undefined;
+            setState('idle');
+          }
+        }}
       />
+      {offer ? (
+        <fieldset>
+          <legend>Access for this task</legend>
+          <p>
+            Codex (gpt-5.6-luna, low) may request one calculation. This does not
+            approve an exact operation or verify your task's meaning.
+          </p>
+          <label>
+            <input
+              type="checkbox"
+              checked={allowAction}
+              onChange={(event) => setAllowAction(event.target.checked)}
+            />
+            Allow calculation.propose: add, subtract, multiply or divide. No
+            other application actions.
+          </label>
+          <ul>
+            {offer.data_classes.map((item) => (
+              <li key={item.id}>
+                {item.label} ({item.classification})
+              </li>
+            ))}
+          </ul>
+          <label>
+            <input
+              type="checkbox"
+              checked={allowData}
+              onChange={(event) => setAllowData(event.target.checked)}
+            />
+            Allow the operation, operands, result and runtime context to be
+            disclosed. Agent data handling is user-managed.
+          </label>
+          <p>
+            Both permissions are required for this action. Decline by leaving
+            them unchecked; the ordinary calculator remains available. This
+            selection expires after one minute and is used once.
+          </p>
+        </fieldset>
+      ) : null}
       <div className={styles.actions}>
-        <button
-          className={styles.primary}
-          type="button"
-          disabled={state === 'running' || !task.trim()}
-          onClick={() => void submit()}
-        >
-          Run with Codex
-        </button>
-        {state === 'running' ? (
+        {!offer ? (
+          <button
+            className={styles.primary}
+            type="button"
+            disabled={
+              state === 'running' || state === 'reviewing' || !task.trim()
+            }
+            onClick={() => void reviewAccess()}
+          >
+            Review access
+          </button>
+        ) : (
+          <button
+            className={styles.primary}
+            type="button"
+            disabled={!allowAction || !allowData || !task.trim()}
+            onClick={() => void submit()}
+          >
+            Allow and run with Codex
+          </button>
+        )}
+        {state === 'running' || state === 'reviewing' ? (
           <button className={styles.secondary} type="button" onClick={cancel}>
             Cancel
           </button>
@@ -187,6 +323,7 @@ export function AgentTaskPanel() {
       </div>
 
       <div className={styles.status} role="status" aria-live="polite">
+        {state === 'reviewing' ? 'Loading access request…' : null}
         {state === 'running' ? `Running${phase ? ` · ${phase}` : '…'}` : null}
         {state === 'cancelled' ? 'Task cancelled.' : null}
         {state === 'error' ? `Task failed: ${error}` : null}
