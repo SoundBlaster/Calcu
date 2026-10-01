@@ -58,3 +58,8 @@ the selected agent's behavior. No live retention collector is needed.
 ADP-03 remains open for the complete trusted selection/consent/current-authority
 path and associated lifecycle decisions. Classifying outputs and deriving a
 Grant projection do not by themselves establish those missing guarantees.
+
+The demo now has [task-scoped access selection](./TASK_PERMISSIONS.md): explicit
+action/disclosure choices, checked against a one-use server offer before issuance.
+This addresses local selection wiring only, not authenticated principal,
+durable consent or exact-action Human Approval. It does not resume retention probes.

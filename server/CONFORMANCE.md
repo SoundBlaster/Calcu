@@ -12,7 +12,8 @@ claim.
 | Runtime Mediator | `createLocalBackend()` and `transport.ts` | Typed request construction, no body credential, exact response correlation and HTTPS integration tests | Loopback HTTPS only |
 | Agent Adapter | `CodexTaskAdapter` plus LocalBackend facade | Pinned CLI protocol/model/effort, closed dynamic tool, exact call correlation, one successful call, process cleanup and fake-process/real-HTTPS integration tests | Live provider smoke is manual; app identity does not attest the Codex binary |
 | Runtime/App Receipt | `createLocalBackend()`, `executor.invoke()`, `receipts.ts` | Required-field manifest schema, RFC-domain JCS hashes, complete Runtime Receipt verification before engine dispatch, App Receipt tuple/output/hash verification, browser-bundle exclusion tests | Unsigned transient receipts implemented for successful proposal calls; no denial receipt, persistence, producer authentication, or portability |
-| Human Approval | — | No approval artifact or approval UI | Not implemented; planned separately |
+| Task access selection | `taskPermissions.ts`, `taskHost.ts`, task panel | Exact action/class sets, one-use expiring offers, task/surface binding, pre-issuance permit validation and direct API rejection tests | Local development confirmation; no authenticated user identity or durable consent |
+| Human Approval | — | No exact-action/effect approval artifact; task access selection is not Human Approval | Not implemented; planned separately |
 
 ## Negative coverage
 

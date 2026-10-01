@@ -9,7 +9,12 @@ import {
   createEphemeralDevelopmentIdentity,
 } from './identity';
 import { createLocalBackend } from './localBackend';
+import { prepareCalcuSurface } from './manifest';
 import { createTaskHttpServer } from './taskHost';
+import {
+  createTaskPermissionBroker,
+  issuePermittedTaskGrant,
+} from './taskPermissions';
 import { createAuthenticatedHttpsTransport } from './transport';
 
 async function closeServer(server: import('node:http').Server) {
@@ -43,20 +48,28 @@ async function main() {
   });
   const taskHost = createTaskHttpServer({
     distDirectory: resolve('dist'),
-    async executeTask(task, signal, onEvent) {
-      const access = executor.issue({
-        subject: { user: 'calcu-demo-user' },
-        delegate: {
-          runtime: 'calcu-local-task-host',
-          agent: identity.evidence.subject,
+    permissions: createTaskPermissionBroker(prepareCalcuSurface()),
+    async executeTask(task, signal, onEvent, permission) {
+      if (signal.aborted) throw new Error('cancelled');
+      const access = issuePermittedTaskGrant(
+        executor,
+        {
+          subject: { user: 'calcu-demo-user' },
+          delegate: {
+            runtime: 'calcu-local-task-host',
+            agent: identity.evidence.subject,
+          },
+          identity: {
+            evidence: identity.evidence,
+            artifactBytes: identity.artifactBytes,
+          },
+          audience: surface.credential_audience,
+          expires_at: Date.now() + 60_000,
         },
-        identity: {
-          evidence: identity.evidence,
-          artifactBytes: identity.artifactBytes,
-        },
-        audience: surface.credential_audience,
-        expires_at: Date.now() + 60_000,
-      });
+        permission,
+        task,
+        surface,
+      );
       const transport = createAuthenticatedHttpsTransport({
         endpoint: `https://127.0.0.1:${actionAddress.port}/agent-actions`,
         ca: tls.cert,

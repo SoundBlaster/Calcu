@@ -6,7 +6,9 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { CodexTaskResult } from './codexAdapter';
+import { prepareCalcuSurface } from './manifest';
 import { createTaskHttpServer, type TaskExecution } from './taskHost';
+import { createTaskPermissionBroker } from './taskPermissions';
 
 const openServers: ReturnType<typeof createTaskHttpServer>[] = [];
 const directories: string[] = [];
@@ -60,6 +62,7 @@ async function fixture(
     distDirectory: directory,
     executeTask,
     sessionToken: 'session-token',
+    permissions: createTaskPermissionBroker(prepareCalcuSurface()),
   });
   await host.listen();
   openServers.push(host);
@@ -126,21 +129,129 @@ function send(
   });
 }
 
-function runRequest(
+async function permissionBody(
+  current: Awaited<ReturnType<typeof fixture>>,
+  body: string,
+) {
+  const preview = await send(current.port, {
+    method: 'POST',
+    path: '/api/tasks/permissions',
+    origin: current.origin,
+    cookie: 'calcu_agent_session=session-token',
+    contentType: 'application/json',
+    body,
+  });
+  if (preview.status !== 200) return { error: preview };
+  const offer = JSON.parse(preview.body);
+  return {
+    body: JSON.stringify({
+      ...JSON.parse(body),
+      permission: {
+        offer_id: offer.offer_id,
+        actions: [offer.action_id],
+        data_classes: offer.data_classes.map((item: { id: string }) => item.id),
+      },
+    }),
+  };
+}
+
+async function runRequest(
   fixtureValue: Awaited<ReturnType<typeof fixture>>,
   body: string,
 ) {
+  const prepared = await permissionBody(fixtureValue, body);
+  if (prepared.error) return prepared.error;
   return send(fixtureValue.port, {
     method: 'POST',
     path: '/api/tasks/run',
     origin: fixtureValue.origin,
     cookie: 'calcu_agent_session=session-token',
     contentType: 'application/json',
-    body,
+    body: prepared.body,
   });
 }
 
 describe('local task HTTP host', () => {
+  it('never executes a task without the exact one-use permission selection', async () => {
+    const current = await fixture();
+    const raw = (body: unknown) =>
+      send(current.port, {
+        method: 'POST',
+        path: '/api/tasks/run',
+        origin: current.origin,
+        cookie: 'calcu_agent_session=session-token',
+        contentType: 'application/json',
+        body: JSON.stringify(body),
+      });
+    expect((await raw({ task: 'calculate' })).status).toBe(400);
+    const preview = await send(current.port, {
+      method: 'POST',
+      path: '/api/tasks/permissions',
+      origin: current.origin,
+      cookie: 'calcu_agent_session=session-token',
+      contentType: 'application/json',
+      body: JSON.stringify({ task: 'calculate' }),
+    });
+    const offer = JSON.parse(preview.body);
+    expect(preview.headers['cache-control']).toBe('no-store');
+    expect(preview.body).not.toMatch(
+      /credential|grant_hash|identity_evidence|Passport/,
+    );
+    const selection = {
+      offer_id: offer.offer_id,
+      actions: [offer.action_id],
+      data_classes: offer.data_classes.map((item: { id: string }) => item.id),
+    };
+    expect(
+      (
+        await raw({
+          task: 'calculate',
+          permission: { ...selection, data_classes: ['calculation.status'] },
+        })
+      ).status,
+    ).toBe(400);
+    expect(
+      (
+        await raw({
+          task: 'calculate',
+          permission: { ...selection, actions: ['calculation.delete'] },
+        })
+      ).status,
+    ).toBe(400);
+    expect((await raw({ task: 'changed', permission: selection })).status).toBe(
+      400,
+    );
+    expect(current.executeTask).not.toHaveBeenCalled();
+    expect(
+      (await raw({ task: 'calculate', permission: selection })).status,
+    ).toBe(200);
+    expect(
+      (await raw({ task: 'calculate', permission: selection })).status,
+    ).toBe(400);
+    expect(current.executeTask).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([
+    'origin',
+    'cookie',
+    'host',
+  ])('protects permission offers against wrong %s', async (kind) => {
+    const current = await fixture();
+    const denied = await send(current.port, {
+      method: 'POST',
+      path: '/api/tasks/permissions',
+      origin: kind === 'origin' ? 'http://attacker.example' : current.origin,
+      host: kind === 'host' ? 'attacker.example' : current.hostHeader,
+      cookie:
+        kind === 'cookie'
+          ? 'calcu_agent_session=wrong'
+          : 'calcu_agent_session=session-token',
+      contentType: 'application/json',
+      body: JSON.stringify({ task: 'calculate' }),
+    });
+    expect(denied.status).toBe(403);
+    expect(current.executeTask).not.toHaveBeenCalled();
+  });
   it('sets a strict process cookie and streams only the safe task projection', async () => {
     const current = await fixture(async (_task, _signal, onEvent) => {
       onEvent({ type: 'progress', phase: 'starting' });
@@ -263,7 +374,12 @@ describe('local task HTTP host', () => {
         );
       });
     const current = await fixture(execute);
-    const body = JSON.stringify({ task: 'disconnect me' });
+    const prepared = await permissionBody(
+      current,
+      JSON.stringify({ task: 'disconnect me' }),
+    );
+    if (!prepared.body) throw new Error('Missing test permission');
+    const body = prepared.body;
     await new Promise<void>((resolve, reject) => {
       const req = request(
         {

@@ -69,6 +69,16 @@ After authenticating the exact CLI version, run:
 npm run agent:demo
 ```
 
+Enter a task, select **Review access**, then explicitly allow the calculation
+action and its required disclosure before selecting **Allow and run with Codex**.
+Editing the task, retrying or using an expired selection requires a new review.
+Leaving either permission unchecked starts no agent and issues no Grant. The
+ordinary calculator needs neither permission.
+
+This is a one-task development access confirmation, not exact-action Human
+Approval, an Approval Receipt or proof of the browser user's identity. See the
+[task permission design](./server/TASK_PERMISSIONS.md).
+
 Task text is sent to the configured model provider. ASP authority remains in the
 local server process. This Compatibility Bearer experiment is not production
 certification. See the [adoption report](./docs/ASP_ADOPTION_REPORT.md),
