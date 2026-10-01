@@ -48,7 +48,7 @@ const completed = {
   agent_message: 'Calcu returned 36.',
   trace,
 };
-const rootTask = 'Сколько будет корень из 111 умноженный на 2?';
+const rootTask = 'What is the square root of 111 multiplied by 2?';
 const rootResult = {
   operator: 'multiply',
   left: 111,
@@ -73,7 +73,7 @@ function rootEvents() {
       type: 'task.completed',
       task_id: 'task-1',
       application_result: rootResult,
-      agent_message: 'По результату приложения: 222.',
+      agent_message: 'The application returned 222.',
       trace: rootTrace,
     },
   ];
@@ -98,6 +98,16 @@ describe('AgentTaskPanel', () => {
   function render() {
     act(() => root.render(<AgentTaskPanel />));
   }
+
+  it('explains disclosure and revocation limits before a task is submitted', () => {
+    render();
+    const text = container.textContent ?? '';
+    expect(text).toContain(
+      'agent also receives the operation, operands and result.',
+    );
+    expect(text).toContain('responsible for how it handles disclosed data.');
+    expect(text).toContain('does not delete information already disclosed.');
+  });
 
   function button(label: string) {
     const found = Array.from(container.querySelectorAll('button')).find(
@@ -133,7 +143,7 @@ describe('AgentTaskPanel', () => {
     );
     expect(container.textContent).toContain('240 × 0.15 = 36');
     expect(container.textContent).toContain('Requested task');
-    expect(container.textContent).toContain('Сколько будет 15% от 240?');
+    expect(container.textContent).toContain('What is 15% of 240?');
     expect(container.textContent).toContain('Verified application action');
     expect(container.textContent).not.toContain('Verified Calcu result');
     expect(container.querySelector('[role="note"]')?.textContent).toContain(
@@ -173,19 +183,19 @@ describe('AgentTaskPanel', () => {
     changeTask(rootTask);
     await act(async () => button('Run with Codex').click());
 
-    changeTask('Сколько будет 15% от 240?');
+    changeTask('What is 15% of 240?');
     const requested = container.querySelector(
       '[aria-labelledby="requested-task-label"]',
     );
     expect(requested?.textContent).toContain(rootTask);
-    expect(requested?.textContent).not.toContain('15% от 240');
+    expect(requested?.textContent).not.toContain('15% of 240');
 
     await act(async () => button('Run with Codex').click());
     expect(fetchMock).toHaveBeenCalledTimes(2);
     const nextRequested = container.querySelector(
       '[aria-labelledby="requested-task-label"]',
     );
-    expect(nextRequested?.textContent).toContain('Сколько будет 15% от 240?');
+    expect(nextRequested?.textContent).toContain('What is 15% of 240?');
     expect(nextRequested?.textContent).not.toContain(rootTask);
     expect(container.textContent).toContain('240 × 0.15 = 36');
     expect(container.textContent).not.toContain('111 × 2 = 222');

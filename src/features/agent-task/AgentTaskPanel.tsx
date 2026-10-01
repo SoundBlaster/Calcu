@@ -12,7 +12,7 @@ import {
 
 type PanelState = 'idle' | 'running' | 'success' | 'error' | 'cancelled';
 
-const EXAMPLE = 'Сколько будет 15% от 240?';
+const EXAMPLE = 'What is 15% of 240?';
 
 const OPERATOR_LABELS: Record<CalculationResult['operator'], string> = {
   add: '+',
@@ -149,13 +149,17 @@ export function AgentTaskPanel() {
         <p className={styles.eyebrow}>ASP mediated demo</p>
         <h1 id="agent-task-title">Ask Codex to calculate</h1>
         <p className={styles.disclosure}>
-          Текст задачи отправляется настроенному model provider. ASP authority,
-          Grant и credentials остаются в локальном server boundary.
+          Your task is sent to the configured model provider. ASP authority,
+          Grant and credentials remain within the local server boundary. The
+          agent also receives the operation, operands and result. You choose the
+          agent and are responsible for how it handles disclosed data. Revoking
+          access prevents new calls but does not delete information already
+          disclosed.
         </p>
       </header>
 
       <label className={styles.label} htmlFor="agent-task-input">
-        Задача
+        Task
       </label>
       <textarea
         id="agent-task-input"

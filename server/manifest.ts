@@ -6,6 +6,7 @@ import {
   OfflineSchemaResources,
   SurfaceSnapshot,
 } from '@0al/agent-surface';
+import { calculationDataClasses, calculationDataExposure } from './exposure';
 import {
   TEST_FRESHNESS_PROFILE,
   TEST_KEY_BINDING_PROFILE,
@@ -235,11 +236,7 @@ export function prepareCalcuSurface(
       additionalProperties: false,
     }),
   ];
-  const actionExposure = {
-    classes: ['application.result'],
-    redaction: { mode: 'none' },
-    retention: { mode: 'user_managed' },
-  };
+  const actionExposure = calculationDataExposure();
   const controlExposure = {
     classes: [],
     redaction: { mode: 'none' },
@@ -250,7 +247,7 @@ export function prepareCalcuSurface(
     app_id: appId,
     issuer,
     surface_mode: 'proposal_only',
-    surface_version: '0.1.0',
+    surface_version: '0.1.1',
     surface_url: `${issuer}/.well-known/agent-surface.json`,
     compatibility: {
       min_runtime: 'application-runtime/0.1',
@@ -276,14 +273,7 @@ export function prepareCalcuSurface(
       },
     },
     scopes: [{ id: scopeId, description: 'Prepare an application proposal.' }],
-    data_classes: [
-      {
-        id: 'application.result',
-        classification: 'private',
-        label: 'Application result',
-        description: 'Application-owned calculation result.',
-      },
-    ],
+    data_classes: calculationDataClasses(),
     resources: [],
     actions: [
       {

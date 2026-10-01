@@ -7,6 +7,7 @@ import {
   type PreparedOfflineSemanticGrantRequest,
 } from '@0al/agent-surface';
 import { calculate, exact, validateCalculation } from './calcu';
+import { serializeCalculationResponse } from './exposure';
 import { byteHash, canonicalHash } from './hash';
 import type {
   IdentityEvidence,
@@ -560,7 +561,7 @@ export function createCalcuExecutor({
         output,
       ),
     );
-    return JSON.stringify({
+    return serializeCalculationResponse({
       type: 'action.result',
       payload: {
         ...expectedBinding,
