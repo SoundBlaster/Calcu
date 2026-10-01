@@ -150,7 +150,10 @@ export function AgentTaskPanel() {
         <h1 id="agent-task-title">Ask Codex to calculate</h1>
         <p className={styles.disclosure}>
           Текст задачи отправляется настроенному model provider. ASP authority,
-          Grant и credentials остаются в локальном server boundary.
+          Grant и credentials остаются в локальном server boundary. Агенту также
+          передаются операция, числа и результат. Вы выбираете агента и
+          отвечаете за его обращение с полученными данными. Отзыв доступа
+          запрещает новые вызовы, но не удаляет уже переданные сведения.
         </p>
       </header>
 

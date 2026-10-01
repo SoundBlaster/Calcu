@@ -1,67 +1,60 @@
-# Calcu retention feasibility: ADP-03
+# Calcu data handling: ADP-03
 
-Status: candidate contract with partial local evidence, not an advertised ASP
-retention capability. No live Codex or provider test was performed.
+## Selected action contract
 
-## Concrete candidate
+Calcu selects `redaction: {"mode":"none"}` and
+`retention: {"mode":"user_managed"}` for `calculation.propose`.
+The user chooses the agent and is responsible for how that agent handles
+disclosed data. Calcu does not promise agent/provider deletion, training
+restrictions, model unlearning or forensic erasure. Retention probes are not
+required to qualify this selected action contract and will not be resumed.
 
-For application-originated calculator output delivered to the runtime/agent:
+The application still controls which data leaves its boundary. User-entered
+task text is deliberate user disclosure; it does not authorize an agent to read
+additional application data. Grant revocation prevents subsequent calls; it
+does not retrieve previously disclosed information.
 
-```json
-{"mode":"transient","delete_on_grant_end":true}
-```
+## Application-owned classification
 
-This is a proposed `data_exposure.retention` member, not a complete manifest or
-Grant. The current development surface does not contain that contract. It means
-no durable runtime/agent payload persistence, and release of runtime-controlled
-plaintext copies when the Grant ends. It does not promise forensic erasure,
-deterministic garbage collection, provider deletion or model unlearning.
-
-The application owns its returned UI projection; revoking agent authority does
-not erase the user's displayed calculator result. This ownership must remain
-explicit in the eventual contract, not be used to relabel an agent cache as UI.
-Task-input retention is a separate application policy, not implied by the
-action-output exposure rule. This experiment introduces no synthetic-only gate.
-
-## Copy ownership and evidence
-
-| Copy | Owner and lifetime | Evidence / limit |
+| Class | Classification | Covered fields |
 | --- | --- | --- |
-| User textarea, submitted snapshot, result, trace, unverified prose | Application UI React state until replacement/unmount; cancellation hides completion but does not prove state erasure | Existing panel/protocol tests; no new history/export or durable browser store |
-| Task-host local variables and serialized responses | Application host request scope | Not a runtime/agent cache; `no-store` is a transport control, not proof of deletion |
-| Adapter protocol buffer, pending parse queue, task, tool result and prose | Adapter execution scope | Listeners/timer removed and child stopped at settlement; no deterministic JS-memory wipe claim |
-| Temporary work directory and `TMPDIR` | Adapter-created, removed in `finally` after process stop | `retentionBoundary.test.ts` verifies removal of a deliberately written synthetic file on success, malformed response, timeout and cancellation |
-| Optional diagnostics | Adapter/demo stderr sink | Only fixed stages/status and classified error codes; raw IDs, methods, error text and status are not forwarded. Adversarial marker tests cover those channels |
-| Codex thread/model context | External CLI, selected as agent | Fixture validates `ephemeral: true`; actual pinned CLI's rollout/cache/diagnostic behavior is not proven by the fake process |
-| Remote model/provider copies | Downstream provider | No additional whole-path/training profile selected; no provider deletion or training assertion |
-| Grant and identity records | Authoritative executor Map | Revoke disables authority but retains records. Separate lifecycle/minimization debt; not calculator output and not fixed here |
+| `calculation.content` | `sensitive` | Operator, operands and result, including echoed values and UI trace |
+| `calculation.runtime_context` | `sensitive` | Subject/delegate, Grant/session/surface binding, correlation, execution and receipt metadata received by the mediator |
+| `calculation.status` | `private` | Fixed statuses, action identifiers and allowlisted error codes |
 
-## Executable checks
+These are Calcu policy choices, not mandatory ASP categories. The application
+does not infer that arbitrary numbers are safe merely because they are numbers.
+The class catalog and action exposure are part of surface version `0.1.1` and
+its canonical hash. The existing SDK derives the exact exposure projection for
+the trusted Grant request and selected Grant; editing the action declaration is
+not permission to invoke it. An old surface binding is rejected before execution.
 
-```sh
-npx vitest run server/retentionBoundary.test.ts server/codexAdapter.test.ts
-```
+`server/exposure.ts` maps every leaf of the successful runtime envelope. Unknown
+fields or unexpected nested values fail before serialization. Existing closed
+schemas and receipt checks remain responsible for required fields, types and
+integrity. HTTP errors contain only fixed, allowlisted codes, never raw errors.
+This is a static upper-bound policy, not a dynamic sensitivity detector.
 
-The seven added checks exercise a real child **fake** app-server without
-credentials or network requests. Three diagnostic cases failed before the fix
-because CLI-controlled text was forwarded to the diagnostic sink. They now
-pass. Four lifecycle cases verify temporary-directory cleanup; they do not
-prove that a real CLI never writes elsewhere, or that it cannot read data before
-cleanup. Returned application-owned output remains available after cleanup.
+The `grant.revoked` control-event declaration remains a separate empty-class
+source with `transient` retention and `delete_on_grant_end: true`. It is included
+in the Grant source closure; its policy does not change action-output retention.
+This demo does not implement general event delivery.
 
-## Decision
+## Copies and evidence limits
 
-`transient` is a concrete design candidate, not yet a verified capability for
-the complete Calcu/Codex path. The remaining feasibility check is specifically
-the selected CLI agent's local rollout/cache/diagnostic behavior and the
-adapter's outstanding-reference lifecycle, not a request for enterprise/ZDR or
-a synthetic-only workload. Current public app-server documentation describes
-in-memory ephemeral forks, but does not establish all retention behavior of
-the demo's pinned CLI `0.145.0`:
-[official app-server documentation](https://developers.openai.com/codex/app-server/).
+| Copy | Owner and lifetime | Limit |
+| --- | --- | --- |
+| Textarea, submitted snapshot, result, trace and agent prose | Application UI state until replacement/unmount | Cancellation hides completion; no memory-erasure claim |
+| Task host and adapter buffers | Local application/adapter execution scope | No deterministic JavaScript-memory wipe claim |
+| Temporary work directory | Adapter; removed after child process termination | Fake-process cleanup tests are local hygiene evidence only |
+| CLI/model/provider context | User-selected agent and provider | No deletion, retention or training assertion |
+| Grant/identity records | Authoritative executor Map | Revocation disables authority; record minimization is separate debt |
 
-Do not advertise this capability or use a Grant requiring it until the base
-runtime-agent contract is enforceable. A future isolated real-CLI test must use
-synthetic markers and an explicitly approved credential strategy; never copy
-the user's auth store merely to run the experiment. Grant/identity record
-minimization and UI unmount cancellation remain separate follow-up debt.
+Earlier `transient` action-output feasibility work is superseded by the
+user-managed choice. Existing `retentionBoundary.test.ts` tests remain useful
+for diagnostic redaction and temporary-directory cleanup; they do not establish
+the selected agent's behavior. No live retention collector is needed.
+
+ADP-03 remains open for the complete trusted selection/consent/current-authority
+path and associated lifecycle decisions. Classifying outputs and deriving a
+Grant projection do not by themselves establish those missing guarantees.

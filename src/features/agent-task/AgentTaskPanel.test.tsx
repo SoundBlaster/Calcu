@@ -99,6 +99,16 @@ describe('AgentTaskPanel', () => {
     act(() => root.render(<AgentTaskPanel />));
   }
 
+  it('explains disclosure and revocation limits before a task is submitted', () => {
+    render();
+    const text = container.textContent ?? '';
+    expect(text).toContain(
+      'Агенту также передаются операция, числа и результат.',
+    );
+    expect(text).toContain('отвечаете за его обращение с полученными данными.');
+    expect(text).toContain('не удаляет уже переданные сведения.');
+  });
+
   function button(label: string) {
     const found = Array.from(container.querySelectorAll('button')).find(
       (item) => item.textContent === label,

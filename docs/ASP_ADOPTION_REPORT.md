@@ -173,6 +173,21 @@ a development credential profile.
 
 ## Adoption conclusion and next steps
 
+### Application-owned disclosure refinement
+
+Surface `0.1.1` distinguishes sensitive calculation content and runtime context
+from private fixed statuses. The complete mediator-visible envelope is covered,
+not just the four fields sent to the model. A field-coverage gate rejects unknown
+output fields before serialization; existing schemas and receipt validation
+still enforce structure and integrity. The SDK-derived Grant exposure includes
+the action and its empty-class control-event source. This does not implement
+human consent or qualify a production authority path.
+
+The action uses `user_managed` retention: the user chooses the agent, while Calcu
+continues to enforce disclosure and future access. There is no agent/provider
+deletion promise. The UI explains this before submission. See
+[the handling policy](../server/RETENTION.md) for field ownership and limits.
+
 The experiment is successful as a boundary test and intentionally unsuccessful
 as a claim that ASP is already cheap to adopt. It validates the architecture
 while exposing the next leverage point:

@@ -18,6 +18,7 @@ const ERROR_CODES = new Set([
   'identity_evidence_unavailable',
   'integrity_mismatch',
   'audience_mismatch',
+  'data_exposure_violation',
 ]);
 
 type Executor = ReturnType<typeof createCalcuExecutor>;
