@@ -172,6 +172,20 @@ async function runRequest(
 }
 
 describe('local task HTTP host', () => {
+  it.each([
+    '\n',
+    '"',
+    '\\',
+    '\u0001',
+  ])('accepts a maximum-size decoded task with escaped %j through preview and run', async (character) => {
+    const current = await fixture();
+    const task = `x${character.repeat(4094)}x`;
+    expect(Buffer.byteLength(task)).toBe(4096);
+    const response = await runRequest(current, JSON.stringify({ task }));
+    expect(response.status).toBe(200);
+    expect(current.executeTask).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(current.executeTask).mock.calls[0]?.[0]).toBe(task);
+  });
   it('never executes a task without the exact one-use permission selection', async () => {
     const current = await fixture();
     const raw = (body: unknown) =>

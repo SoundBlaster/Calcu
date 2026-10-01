@@ -13,8 +13,10 @@ import type {
   createTaskPermissionBroker,
 } from './taskPermissions';
 
-const MAX_REQUEST_BYTES = 4_608;
 const MAX_TASK_BYTES = 4 * 1024;
+// JSON can encode each task byte as six ASCII bytes (e.g. "\u0001").
+// Reserve space for the fixed permission envelope as well as the task.
+const MAX_REQUEST_BYTES = 6 * MAX_TASK_BYTES + 1024;
 const SESSION_COOKIE = 'calcu_agent_session';
 const CSP = [
   "default-src 'self'",
