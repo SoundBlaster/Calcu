@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import styles from './AgentTaskPanel.module.css';
+import { PanelGlyph } from './PanelGlyph';
 import { readPermissionOffer, type TaskPermissionOffer } from './permissions';
 import {
   type CalculationResult,
@@ -287,7 +288,12 @@ export function AgentTaskPanel() {
       </div>
       {offer ? (
         <fieldset className={styles.permissions}>
-          <legend>Access for this task</legend>
+          <legend>
+            <span className={styles.accessGlyph}>
+              <PanelGlyph name="shield" />
+            </span>
+            Access for this task
+          </legend>
           <p className={styles.accessDescription}>
             Codex (gpt-5.6-luna, low) may request one calculation. This does not
             approve an exact operation or verify your task's meaning.
@@ -301,6 +307,9 @@ export function AgentTaskPanel() {
                 checked={allowAction}
                 onChange={(event) => setAllowAction(event.target.checked)}
               />
+              <span className={styles.glyphTile}>
+                <PanelGlyph name="calculator" />
+              </span>
               <span>
                 <strong>Allow calculation</strong>
                 <span className={styles.permissionDescription}>
@@ -329,6 +338,9 @@ export function AgentTaskPanel() {
                 checked={allowData}
                 onChange={(event) => setAllowData(event.target.checked)}
               />
+              <span className={styles.glyphTile}>
+                <PanelGlyph name="document" />
+              </span>
               <span>
                 <strong>Allow disclosure of operation details</strong>
                 <span className={styles.permissionDescription}>
@@ -361,6 +373,9 @@ export function AgentTaskPanel() {
               </span>
             </p>
             <div className={styles.expiry}>
+              <span className={styles.clockGlyph}>
+                <PanelGlyph name="hourglass" />
+              </span>
               <span>{secondsLeft === 0 ? 'Expired' : 'Expires in'}</span>
               <time>
                 {Math.floor(secondsLeft / 60)
@@ -391,6 +406,7 @@ export function AgentTaskPanel() {
             disabled={!allowAction || !allowData || !task.trim()}
             onClick={() => void submit()}
           >
+            <PanelGlyph name="play" />
             Allow and run with Codex
           </button>
         )}
@@ -401,6 +417,7 @@ export function AgentTaskPanel() {
         ) : null}
       </div>
       <p className={styles.footer}>
+        <PanelGlyph name="shield" />
         Your data. Your choice. Permissions apply only to this task.
       </p>
 

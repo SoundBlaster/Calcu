@@ -14,9 +14,10 @@
 .workspace {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: clamp(24px, 4vw, 56px);
-  align-items: center;
-  width: min(100%, 1000px);
+  gap: 18px;
+  align-items: start;
+  align-content: start;
+  width: min(100%, 760px);
   min-height: calc(100vh - (var(--calc-page-padding) * 2));
   margin: 0 auto;
 }
@@ -24,4 +25,10 @@
 .workspace > section {
   min-height: auto;
   margin-inline: auto;
+}
+
+.workspace > section:last-child {
+  --calc-display-min-height: 60px;
+  --calc-display-font-size: 3.5rem;
+  --calc-stage-gap: 12px;
 }
