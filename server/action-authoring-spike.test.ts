@@ -1,7 +1,4 @@
 // @vitest-environment node
-import { execFileSync } from 'node:child_process';
-import { resolve } from 'node:path';
-import { pathToFileURL } from 'node:url';
 import {
   CanonicalObjectHash,
   JsonDocument,
@@ -9,264 +6,143 @@ import {
   OfflineSchemaResources,
   SurfaceSnapshot,
 } from '@0al/agent-surface';
-import { describe, expect, it } from 'vitest';
-import { calculate } from './calcu';
+import { describe, expect, expectTypeOf, it } from 'vitest';
+import {
+  type CandidateInput,
+  type CandidateOutput,
+  prepareCalcuActionCandidate,
+} from './action-authoring-candidate';
+import { type Calculation, type CalculationResult, calculate } from './calcu';
+import { calculationDataExposure } from './exposure';
 import { prepareCalcuSurface } from './manifest';
 
-const ACTION_AUTHORING_COMMIT = '03fd21c8bca70968b08e4585c14d1f6971978797';
-const INPUT_SCHEMA_HASH_DOMAIN =
+const actionId = 'calculation.propose';
+const inputDomain =
   'https://github.com/0al-spec/agent-surface/hash/action-input-schema/v1';
-const FIXTURE_SCHEMA_BASE = 'https://calcu.example.test/schemas/';
-const PRODUCTION_ISSUER = 'https://calcu.local';
+const json = (value: unknown) => new JsonDocument(JSON.stringify(value));
 
-type RecordValue = Record<string, unknown>;
-type GeneratedCalcuAction = {
-  actionDocuments: JsonDocument[];
-  schemaResources: { uri: string; document: JsonDocument }[];
-};
-
-function record(value: unknown): RecordValue {
+function record(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value))
     throw new Error('expected_object');
-  return value as RecordValue;
+  return value as Record<string, unknown>;
 }
 
-function document(value: unknown) {
-  return new JsonDocument(JSON.stringify(value));
-}
+describe('application-owned offline action authoring', () => {
+  it('infers the existing application contract without introducing operations', () => {
+    expectTypeOf<CandidateInput>().toEqualTypeOf<Calculation>();
+    expectTypeOf<CandidateOutput>().toExtend<CalculationResult>();
+    expectTypeOf<CalculationResult>().toExtend<CandidateOutput>();
+  });
+  it.each([
+    'https://calcu.local',
+    'https://calcu.example.test',
+  ])('composes the complete candidate at %s without invoking its handler', (issuer) => {
+    let handlerCalls = 0;
+    const generated = prepareCalcuActionCandidate((input) => {
+      handlerCalls += 1;
+      return calculate(input);
+    }, issuer);
+    const baseline = prepareCalcuSurface('calcu.local', issuer);
+    const baselineValue = record(baseline.document.parse());
+    const baselineAction = record((baselineValue.actions as unknown[])[0]);
+    const generatedAction = record(generated.actionDocuments[0].parse());
+    expect(generatedAction.data_exposure).toEqual(calculationDataExposure());
+    const { input_schema_hash: oldHash, ...oldMetadata } = baselineAction;
+    const { input_schema_hash: newHash, ...newMetadata } = generatedAction;
+    expect(newMetadata).toEqual(oldMetadata);
+    expect(generated.schemaResources).toHaveLength(2);
+    expect(Object.isFrozen(generated.schemaResources)).toBe(true);
 
-function requireResource<
-  Resource extends { uri: string; document: JsonDocument },
->(resources: readonly Resource[], uri: string): Resource {
-  const resource = resources.find((candidate) => candidate.uri === uri);
-  if (!resource) throw new Error('missing_schema_resource');
-  return resource;
-}
-
-describe('offline action-authoring complete Calcu manifest spike', () => {
-  const spikeIt =
-    process.env.CALCU_ACTION_AUTHORING_SPIKE === '1' ? it : it.skip;
-
-  spikeIt(
-    'composes and validates a test-only candidate without changing runtime authority',
-    async () => {
-      const repo = process.env.AGENT_SURFACE_JS_ROOT;
-      if (!repo)
-        throw new Error(
-          'Set AGENT_SURFACE_JS_ROOT to the agent-surface-js checkout',
-        );
-      const sdkRoot = resolve(repo);
-      const sdkCommit = execFileSync(
-        'git',
-        ['-C', sdkRoot, 'rev-parse', 'HEAD'],
-        { encoding: 'utf8' },
-      ).trim();
-      expect(sdkCommit).toBe(ACTION_AUTHORING_COMMIT);
-
-      const experiment = resolve(
-        sdkRoot,
-        'experiments/offline-action-authoring/dist/consumers/calcu.js',
+    for (const resource of generated.schemaResources) {
+      const oldResource = baseline.schemaResources.find(
+        (item) => item.uri === resource.uri,
       );
-      const { prepareCalcu } = await import(pathToFileURL(experiment).href);
-      let handlerCalls = 0;
-      const calculateReference = new Proxy(calculate, {
-        apply(target, thisArgument, argumentsList) {
-          handlerCalls += 1;
-          return Reflect.apply(target, thisArgument, argumentsList);
+      expect(oldResource).toBeDefined();
+      const oldSchema = record(oldResource?.document.parse());
+      const newSchema = record(resource.document.parse());
+      const properties = record(newSchema.properties);
+      expect(properties.operator).toEqual({
+        ...record(record(oldSchema.properties).operator),
+        type: 'string',
+      });
+      // Compare the one known redundant keyword without modifying source data.
+      expect({
+        ...newSchema,
+        properties: {
+          ...properties,
+          operator: record(oldSchema.properties).operator,
         },
-      });
-      const generated = prepareCalcu(
-        calculateReference,
-      ) as GeneratedCalcuAction;
+      }).toEqual(oldSchema);
+    }
+    const input = generated.schemaResources.find(
+      (item) => item.uri === generatedAction.input_schema,
+    );
+    expect(input).toBeDefined();
+    if (!input) throw new Error('missing_input');
+    expect(newHash).toBe(
+      new CanonicalObjectHash(inputDomain).digest(input.document),
+    );
+    expect(newHash).not.toBe(oldHash);
 
-      const baseline = prepareCalcuSurface();
-      expect(Object.isFrozen(baseline.schemaResources)).toBe(true);
-      expect(Object.isFrozen(generated.schemaResources)).toBe(true);
-      const baselineDocument = record(baseline.document.parse());
-      const baselineAction = record((baselineDocument.actions as unknown[])[0]);
-      const baselineInputUri = String(baselineAction.input_schema);
-      const baselineOutputUri = String(baselineAction.output_schema);
-      const prototypeAction = record(generated.actionDocuments[0].parse());
-
-      const productionSchemaBase = `${PRODUCTION_ISSUER}/schemas/`;
-      const remapUri = (uri: string) => {
-        if (!uri.startsWith(FIXTURE_SCHEMA_BASE))
-          throw new Error('unexpected_prototype_schema_uri');
-        return `${productionSchemaBase}${uri.slice(FIXTURE_SCHEMA_BASE.length)}`;
-      };
-      const generatedResources = generated.schemaResources.map((resource) => {
-        const uri = remapUri(resource.uri);
-        const schema = record(resource.document.parse());
-        schema.$id = uri;
-        return { uri, document: document(schema) };
-      });
-      const generatedInputUri = remapUri(String(prototypeAction.input_schema));
-      const generatedOutputUri = remapUri(
-        String(prototypeAction.output_schema),
-      );
-      const generatedAction = {
-        ...prototypeAction,
-        input_schema: generatedInputUri,
-        input_schema_hash: new CanonicalObjectHash(
-          INPUT_SCHEMA_HASH_DOMAIN,
-        ).digest(
-          requireResource(generatedResources, generatedInputUri).document,
-        ),
-        output_schema: generatedOutputUri,
-      };
-
-      const untouchedResources = baseline.schemaResources.filter(
-        (resource) =>
-          resource.uri !== baselineInputUri &&
-          resource.uri !== baselineOutputUri,
-      );
-      const candidateResources = Object.freeze([
-        ...generatedResources,
-        ...untouchedResources,
-      ]);
-      const candidateWithoutHash: RecordValue = {
-        ...baselineDocument,
-        actions: [generatedAction],
-      };
-      delete candidateWithoutHash.surface_hash;
-      const candidateHash = new SurfaceSnapshot(
-        document(candidateWithoutHash),
-      ).hash();
-      const candidateDocument = document({
-        ...candidateWithoutHash,
-        surface_hash: candidateHash,
-      });
-      const candidate = new OfflineProposalManifest(
-        candidateDocument,
-        new OfflineSchemaResources(candidateResources),
-        baseline.identityAdvertisement,
-      ).prepare();
-
-      const { input_schema_hash: _baselineHash, ...baselineActionWithoutHash } =
-        baselineAction;
-      const {
-        input_schema_hash: _generatedHash,
-        ...generatedActionWithoutHash
-      } = generatedAction;
-
-      expect(generatedActionWithoutHash).toEqual(baselineActionWithoutHash);
-      expect(generatedInputUri).toBe(baselineInputUri);
-      expect(generatedOutputUri).toBe(baselineOutputUri);
-      expect(candidate.surfaceHash).toBe(candidateHash);
-      expect(handlerCalls).toBe(0);
-      expect(Object.isFrozen(candidateResources)).toBe(true);
-      candidate.validateInput(
-        'calculation.propose',
-        document({ operator: 'add', left: 2, right: 3 }),
-      );
-      candidate.validateOutput(
-        'calculation.propose',
-        document({ operator: 'add', left: 2, right: 3, result: 5 }),
-      );
+    const untouched = baseline.schemaResources.filter(
+      (item) =>
+        !generated.schemaResources.some((other) => other.uri === item.uri),
+    );
+    const { surface_hash: oldSurfaceHash, ...withoutHash } = baselineValue;
+    const candidateValue = { ...withoutHash, actions: [generatedAction] };
+    const surfaceHash = new SurfaceSnapshot(json(candidateValue)).hash();
+    const candidate = new OfflineProposalManifest(
+      json({ ...candidateValue, surface_hash: surfaceHash }),
+      new OfflineSchemaResources([...generated.schemaResources, ...untouched]),
+      baseline.identityAdvertisement,
+    ).prepare();
+    expect(candidate.surfaceHash).toBe(surfaceHash);
+    expect(surfaceHash).not.toBe(oldSurfaceHash);
+    const {
+      actions: _actions,
+      surface_hash: _hash,
+      ...candidateHost
+    } = record(candidate.document.parse());
+    const { actions: _oldActions, ...baselineHost } = withoutHash;
+    expect(candidateHost).toEqual(baselineHost);
+    expect(untouched).toHaveLength(2);
+    for (const operator of ['add', 'subtract', 'multiply', 'divide']) {
+      const request = json({ operator, left: 240, right: 0.15 });
+      candidate.validateInput(actionId, request);
+      baseline.manifest.validateInput(actionId, request);
+    }
+    const validOutput = json({
+      operator: 'multiply',
+      left: 240,
+      right: 0.15,
+      result: 36,
+    });
+    candidate.validateOutput(actionId, validOutput);
+    baseline.manifest.validateOutput(actionId, validOutput);
+    for (const invalid of [
+      { operator: 'sqrt', left: 111, right: 2 },
+      { operator: 'multiply', left: '240', right: 0.15 },
+      { operator: 'multiply', left: 240 },
+      { operator: 'multiply', left: 240, right: 0.15, credential: 'forbidden' },
+    ]) {
+      expect(() => candidate.validateInput(actionId, json(invalid))).toThrow();
       expect(() =>
-        candidate.validateInput(
-          'calculation.propose',
-          document({ operator: 'add', left: 2, right: 3, extra: true }),
-        ),
+        baseline.manifest.validateInput(actionId, json(invalid)),
       ).toThrow();
-
-      const nonAction = (value: RecordValue) => {
-        const {
-          actions: _actions,
-          surface_hash: _surfaceHash,
-          ...rest
-        } = value;
-        return rest;
-      };
-      expect(nonAction(record(candidate.document.parse()))).toEqual(
-        nonAction(baselineDocument),
-      );
-      expect(
-        candidateResources.filter((item) => !generatedResources.includes(item)),
-      ).toEqual(untouchedResources);
-
-      const oldInput = requireResource(
-        baseline.schemaResources,
-        baselineInputUri,
-      );
-      const newInput = requireResource(generatedResources, generatedInputUri);
-      const oldOutput = requireResource(
-        baseline.schemaResources,
-        baselineOutputUri,
-      );
-      const newOutput = requireResource(generatedResources, generatedOutputUri);
-      const oldInputSchema = record(oldInput.document.parse());
-      const newInputSchema = record(newInput.document.parse());
-      const oldOutputSchema = record(oldOutput.document.parse());
-      const newOutputSchema = record(newOutput.document.parse());
-
-      const manualSchemaWithoutIdentity = (schema: RecordValue) => {
-        const { $schema: _dialect, $id: _id, ...body } = schema;
-        return body;
-      };
-      const generatedInputBody = manualSchemaWithoutIdentity(newInputSchema);
-      const generatedOutputBody = manualSchemaWithoutIdentity(newOutputSchema);
-      const manualInputBody = manualSchemaWithoutIdentity(oldInputSchema);
-      const manualOutputBody = manualSchemaWithoutIdentity(oldOutputSchema);
-      const manualInputOperator = record(
-        record(manualInputBody.properties).operator,
-      );
-      const generatedInputOperator = record(
-        record(generatedInputBody.properties).operator,
-      );
-      const manualOutputOperator = record(
-        record(manualOutputBody.properties).operator,
-      );
-      const generatedOutputOperator = record(
-        record(generatedOutputBody.properties).operator,
-      );
-      const generatedInputOperatorWithType = { ...generatedInputOperator };
-      const generatedOutputOperatorWithType = { ...generatedOutputOperator };
-      expect(generatedInputOperator).toEqual({
-        ...manualInputOperator,
-        type: 'string',
-      });
-      expect(generatedOutputOperator).toEqual({
-        ...manualOutputOperator,
-        type: 'string',
-      });
-      delete generatedInputOperator.type;
-      delete generatedOutputOperator.type;
-      expect(generatedInputBody).toEqual(manualInputBody);
-      expect(generatedOutputBody).toEqual(manualOutputBody);
-      expect(record(candidate.document.parse()).scopes).toEqual(
-        baselineDocument.scopes,
-      );
-
-      const actionDifference = {
-        input_schema_hash: {
-          baseline: baselineAction.input_schema_hash,
-          candidate: generatedAction.input_schema_hash,
-        },
-      };
-      const report = JSON.stringify({
-        actionDifference,
-        schemaDifference: {
-          inputOperator: {
-            baseline: manualInputOperator,
-            candidate: generatedInputOperatorWithType,
-          },
-          outputOperator: {
-            baseline: manualOutputOperator,
-            candidate: generatedOutputOperatorWithType,
-          },
-        },
-        surfaceHash: {
-          baseline: baseline.surface.surface_hash,
-          candidate: candidate.surfaceHash,
-        },
-        handlerCalls,
-      });
-      process.stdout.write(`[P5-T7 action-authoring spike] ${report}\n`);
-      expect(generatedAction.input_schema_hash).not.toBe(
-        baselineAction.input_schema_hash,
-      );
-      expect(candidate.surfaceHash).not.toBe(baseline.surface.surface_hash);
-    },
-  );
+    }
+    expect(() =>
+      candidate.validateOutput(
+        actionId,
+        json({ operator: 'multiply', left: 240, right: 0.15, result: '36' }),
+      ),
+    ).toThrow();
+    expect(() =>
+      candidate.validateInput('calculation.sqrt', json({})),
+    ).toThrow();
+    expect(handlerCalls).toBe(0);
+    expect(JSON.stringify(candidateValue)).not.toContain('handler');
+    expect(
+      prepareCalcuActionCandidate(calculate, issuer).actionDocuments[0].parse(),
+    ).toEqual(generated.actionDocuments[0].parse());
+  });
 });

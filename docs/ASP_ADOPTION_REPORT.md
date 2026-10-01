@@ -211,3 +211,10 @@ while exposing the next leverage point:
 
 The detailed role mapping remains in [the conformance report](../server/CONFORMANCE.md),
 and the original staged plan remains in [the demo plan](../SPECS/ASP_DEMO_PLAN.md).
+
+## Offline authoring follow-up
+
+The [Calcu-owned candidate report](OFFLINE_ACTION_AUTHORING.md) records the
+private SDK authoring experiment, exact schema/hash difference and remaining
+production migration boundary. It does not change this application's live
+authority or promote offline checks to runtime conformance evidence.

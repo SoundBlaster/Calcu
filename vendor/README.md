@@ -39,3 +39,25 @@ here validate bounded offline representations only. They do not authenticate
 identity, prove consent, issue authority, manage sessions, enforce live expiry,
 admit an action, or establish ASP certification; Calcu retains those
 application-side checks.
+
+## Private offline authoring experiment
+
+`0al-offline-action-authoring-prototype-0.0.0-prototype.tgz` is built from SDK
+commit `307cbc693c98375f155d051fad2728e004749444`. It is an unpublished private
+experiment, installed only as a dev dependency; it is not a base SDK export.
+Its MIT notice is retained in `offline-action-authoring-LICENSE.txt`.
+
+Archive SHA-256:
+`ee1a49edc9a1f8afb220469134e6f4a0b9ec67b4c5302643947ef2289558dc03`.
+The lockfile pins archive integrity and TypeBox `0.34.52`. Reproduce from that
+clean SDK checkout with:
+
+```sh
+npm ci
+npm run build:action-authoring-prototype
+npm pack ./experiments/offline-action-authoring --pack-destination /absolute/path/to/Calcu/vendor
+```
+
+The consumer deliberately imports the generic prototype, not its historical
+Calcu fixture. Calcu owns the action declaration and current disclosure policy.
+See [the experiment report](../docs/OFFLINE_ACTION_AUTHORING.md).
