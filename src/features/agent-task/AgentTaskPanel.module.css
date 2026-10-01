@@ -35,7 +35,8 @@
   color: var(--calc-text-muted);
   font-size: 0.8rem;
   line-height: 1.65;
-  max-width: 54ch;
+  max-width: none;
+  width: 100%;
 }
 
 .label {
