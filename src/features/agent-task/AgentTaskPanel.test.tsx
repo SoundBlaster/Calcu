@@ -131,6 +131,46 @@ describe('AgentTaskPanel', () => {
     act(() => root.unmount());
     container.remove();
     vi.restoreAllMocks();
+    vi.useRealTimers();
+  });
+
+  it('expires the visible offer and requests fresh unchecked permissions', async () => {
+    vi.useFakeTimers();
+    const run = mockTaskFetch();
+    await render();
+    await reviewAccess();
+    expect(container.querySelector('time')?.textContent).toBe('01:00');
+    await act(async () => {
+      vi.advanceTimersByTime(60_000);
+    });
+    expect(container.querySelector('time')?.textContent).toBe('00:00');
+    expect(
+      Array.from(
+        container.querySelectorAll<HTMLInputElement>('input[type="checkbox"]'),
+      ).every((input) => input.disabled),
+    ).toBe(true);
+    await act(async () => {
+      button('Review access').click();
+    });
+    expect(container.querySelector('time')?.textContent).toBe('01:00');
+    expect(
+      Array.from(
+        container.querySelectorAll<HTMLInputElement>('input[type="checkbox"]'),
+      ).every((input) => !input.checked && !input.disabled),
+    ).toBe(true);
+    expect(run).not.toHaveBeenCalled();
+  });
+
+  it('invalidates selected permissions when choosing a different example', async () => {
+    const run = mockTaskFetch();
+    await render();
+    await reviewAccess();
+    await act(async () => {
+      button('Add 38 and 57').click();
+    });
+    expect(container.querySelector('textarea')?.value).toBe('Add 38 and 57');
+    expect(container.querySelector('fieldset')).toBeNull();
+    expect(run).not.toHaveBeenCalled();
   });
 
   function render() {

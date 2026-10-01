@@ -58,7 +58,7 @@ Editing the task invalidates the offer and unchecks both permissions. Running
 consumes the local offer before the request; retry must review again. Preview
 loading uses AbortController and client generation checks: cancelled or stale
 offers cannot re-enable execution. Expiration is rechecked on submit and at the
-server; this version does not display a live countdown. No persistent approval
+server; the UI displays the remaining time and requires a fresh access request after expiry. No persistent approval
 preferences or “always allow” mode are introduced.
 
 ## Evidence and non-claims
