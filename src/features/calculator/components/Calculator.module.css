@@ -3,6 +3,7 @@
   width: min(100%, var(--calc-shell-max-width));
   margin-inline-start: auto;
   display: grid;
+  container-type: inline-size;
   gap: var(--calc-stage-gap);
   align-content: end;
 }
@@ -10,7 +11,7 @@
 .landscape {
   width: 100%;
   margin-inline-start: 0;
-  align-content: stretch;
+  align-content: start;
 }
 
 .topBar {

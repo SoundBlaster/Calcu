@@ -11,7 +11,7 @@ export const layoutTokens = {
     stageGapPortrait: 'clamp(18px, 3vw, 28px)',
     stageGapLandscape: 'clamp(16px, 2.6vw, 24px)',
     keyGapPortrait: '12px',
-    keyGapLandscape: '14px',
+    keyGapLandscape: 'clamp(6px, 1.2cqw, 12px)',
   },
   display: {
     minHeightPortrait: 'clamp(136px, 24vh, 176px)',
@@ -25,11 +25,11 @@ export const layoutTokens = {
   button: {
     radius: '999px',
     sizePortrait: 'clamp(72px, 12vw, 92px)',
-    sizeLandscape: 'clamp(68px, 8vw, 88px)',
+    sizeLandscape: 'clamp(40px, 6cqw, 64px)',
     fontSizePortrait: 'clamp(1.7rem, 4vw, 2.15rem)',
-    fontSizeLandscape: 'clamp(1.5rem, 2.8vw, 1.95rem)',
+    fontSizeLandscape: 'clamp(0.8rem, 2cqw, 1.5rem)',
     contentPaddingInlinePortrait: '12px',
-    contentPaddingInlineLandscape: '10px',
+    contentPaddingInlineLandscape: '4px',
     zeroColumnSpan: 2,
   },
   colors: {

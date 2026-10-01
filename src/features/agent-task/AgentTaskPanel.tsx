@@ -1,5 +1,6 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from './AgentTaskPanel.module.css';
+import { PanelGlyph } from './PanelGlyph';
 import { readPermissionOffer, type TaskPermissionOffer } from './permissions';
 import {
   type CalculationResult,
@@ -43,6 +44,30 @@ export function AgentTaskPanel() {
   const [allowData, setAllowData] = useState(false);
   const generation = useRef(0);
   const activeController = useRef<AbortController | undefined>(undefined);
+  const [secondsLeft, setSecondsLeft] = useState(60);
+  useEffect(() => {
+    if (!offer) return;
+    const update = () =>
+      setSecondsLeft(
+        Math.max(0, Math.ceil((offer.expires_at - Date.now()) / 1000)),
+      );
+    update();
+    const timer = setInterval(update, 1000);
+    return () => clearInterval(timer);
+  }, [offer]);
+
+  const changeTask = (value: string) => {
+    setTask(value);
+    setOffer(undefined);
+    setAllowAction(false);
+    setAllowData(false);
+    if (state === 'reviewing') {
+      generation.current += 1;
+      activeController.current?.abort();
+      activeController.current = undefined;
+      setState('idle');
+    }
+  };
 
   const clearOutput = () => {
     setResult(undefined);
@@ -239,62 +264,131 @@ export function AgentTaskPanel() {
         className={styles.input}
         value={task}
         maxLength={4096}
-        rows={4}
+        rows={2}
         disabled={state === 'running'}
-        onChange={(event) => {
-          setTask(event.target.value);
-          setOffer(undefined);
-          setAllowAction(false);
-          setAllowData(false);
-          if (state === 'reviewing') {
-            generation.current += 1;
-            activeController.current?.abort();
-            activeController.current = undefined;
-            setState('idle');
-          }
-        }}
+        onChange={(event) => changeTask(event.target.value)}
       />
+      <div className={styles.examples}>
+        <div className={styles.chips}>
+          {[EXAMPLE, '240 × 0.15', 'Add 38 and 57', 'Divide 1024 by 8'].map(
+            (example) => (
+              <button
+                type="button"
+                key={example}
+                disabled={state === 'running'}
+                aria-pressed={task === example}
+                onClick={() => changeTask(example)}
+              >
+                {example}
+              </button>
+            ),
+          )}
+        </div>
+        <span className={styles.counter}>{task.length}/4096</span>
+      </div>
       {offer ? (
-        <fieldset>
-          <legend>Access for this task</legend>
-          <p>
+        <fieldset className={styles.permissions}>
+          <legend>
+            <span className={styles.accessGlyph}>
+              <PanelGlyph name="shield" />
+            </span>
+            Access for this task
+          </legend>
+          <p className={styles.accessDescription}>
             Codex (gpt-5.6-luna, low) may request one calculation. This does not
             approve an exact operation or verify your task's meaning.
           </p>
-          <label>
-            <input
-              type="checkbox"
-              checked={allowAction}
-              onChange={(event) => setAllowAction(event.target.checked)}
-            />
-            Allow calculation.propose: add, subtract, multiply or divide. No
-            other application actions.
-          </label>
-          <ul>
-            {offer.data_classes.map((item) => (
-              <li key={item.id}>
-                {item.label} ({item.classification})
-              </li>
-            ))}
-          </ul>
-          <label>
-            <input
-              type="checkbox"
-              checked={allowData}
-              onChange={(event) => setAllowData(event.target.checked)}
-            />
-            Allow the operation, operands, result and runtime context to be
-            disclosed. Agent data handling is user-managed.
-          </label>
-          <p>
-            Both permissions are required for this action. Decline by leaving
-            them unchecked; the ordinary calculator remains available. This
-            selection expires after one minute and is used once.
-          </p>
+          <div className={styles.permissionCard}>
+            <label className={styles.permissionLabel}>
+              <input
+                type="checkbox"
+                className={styles.toggle}
+                disabled={secondsLeft === 0}
+                checked={allowAction}
+                onChange={(event) => setAllowAction(event.target.checked)}
+              />
+              <span className={styles.glyphTile}>
+                <PanelGlyph name="calculator" />
+              </span>
+              <span>
+                <strong>Allow calculation</strong>
+                <span className={styles.permissionDescription}>
+                  Let the agent perform basic arithmetic: add, subtract,
+                  multiply or divide. No other application actions.
+                </span>
+              </span>
+            </label>
+            <div className={styles.shared}>
+              <span>What will be shared</span>
+              <ul>
+                {offer.data_classes.map((item) => (
+                  <li key={item.id}>
+                    {item.label} ({item.classification})
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          <div className={styles.permissionCard}>
+            <label className={styles.permissionLabel}>
+              <input
+                type="checkbox"
+                className={styles.toggle}
+                disabled={secondsLeft === 0}
+                checked={allowData}
+                onChange={(event) => setAllowData(event.target.checked)}
+              />
+              <span className={styles.glyphTile}>
+                <PanelGlyph name="document" />
+              </span>
+              <span>
+                <strong>Allow disclosure of operation details</strong>
+                <span className={styles.permissionDescription}>
+                  Allow the operation, operands, result and runtime context to
+                  be disclosed. Agent data handling is user-managed.
+                </span>
+              </span>
+            </label>
+            <div className={styles.shared}>
+              <span>What will be shared</span>
+              <ul>
+                {['Operation', 'Operands', 'Result', 'Runtime context'].map(
+                  (label) => (
+                    <li key={label}>{label}</li>
+                  ),
+                )}
+              </ul>
+            </div>
+          </div>
+          <div className={styles.permissionNote}>
+            <span className={styles.infoIcon} aria-hidden="true">
+              i
+            </span>
+            <p>
+              <strong>Both permissions are required for this action.</strong>
+              <span>
+                Decline by leaving them unchecked; the ordinary calculator
+                remains available. This selection expires after one minute and
+                is used once.
+              </span>
+            </p>
+            <div className={styles.expiry}>
+              <span className={styles.clockGlyph}>
+                <PanelGlyph name="hourglass" />
+              </span>
+              <span>{secondsLeft === 0 ? 'Expired' : 'Expires in'}</span>
+              <time>
+                {Math.floor(secondsLeft / 60)
+                  .toString()
+                  .padStart(2, '0')}
+                :{(secondsLeft % 60).toString().padStart(2, '0')}
+              </time>
+            </div>
+          </div>
         </fieldset>
       ) : null}
       <div className={styles.actions}>
-        {!offer ? (
+        {!offer || secondsLeft === 0 ? (
           <button
             className={styles.primary}
             type="button"
@@ -312,15 +406,20 @@ export function AgentTaskPanel() {
             disabled={!allowAction || !allowData || !task.trim()}
             onClick={() => void submit()}
           >
+            <PanelGlyph name="play" />
             Allow and run with Codex
           </button>
         )}
-        {state === 'running' || state === 'reviewing' ? (
+        {offer || state === 'running' || state === 'reviewing' ? (
           <button className={styles.secondary} type="button" onClick={cancel}>
             Cancel
           </button>
         ) : null}
       </div>
+      <p className={styles.footer}>
+        <PanelGlyph name="shield" />
+        Your data. Your choice. Permissions apply only to this task.
+      </p>
 
       <div className={styles.status} role="status" aria-live="polite">
         {state === 'reviewing' ? 'Loading access request…' : null}
