@@ -15,9 +15,11 @@ session contract and tested loopback HTTPS boundary. See [boundary status](../se
 | P5-T3 | Implemented: ephemeral Codex adapter, local task host and task UI | P5-T2 |
 | P5-T4 | Implemented: regression/conformance evidence and adoption report | P5-T3 |
 | P5-T5 | Complete: SDK-validated manifest/request/Grant values and server-only unsigned Runtime/App Receipts | P5-T4; SDK PRs #12 and #13 |
-| P5-T8 | Implemented for review: merged preparation (A); SDK live selection and retirement/restart qualification (B) | P5-T5; accepted P5-T7 follow-up; SDK #32 and Calcu #16 |
+| P5-T8 | Complete: preparation #18 and live selection/retirement #19 merged | P5-T5; accepted P5-T7 follow-up; SDK #32 and Calcu #16 |
+| P5-T9 | P5-T9A private qualification complete; no-go for extraction; P5-T9A-F deadline/input repair next | P5-T8; SDK companion report |
 
-The P5 demo implementation is complete through **P5-T5**; the P5-T6
+The bounded P5 demo and SDK consumer work are complete through **P5-T8**;
+P5-T9A completed the private qualification; P5-T9A-F is next. The P5-T6
 second-consumer comparison is complete and recorded below. This section does not
 mark a production ASP deployment or change the existing keypad requirements.
 
@@ -110,16 +112,16 @@ mark a production ASP deployment or change the existing keypad requirements.
   expected reduction justifies SDK implementation and maintenance. No public SDK
   API is implied by this design.
 - **Follow-up (2026-10-02 UTC):** SDK PR #32 qualified an optional public
-  authoring subpath with Calcu/Hello consumer fixtures. Calcu now uses it only
-  in the offline candidate, preserving two-namespace prototype goldens and
-  the existing difference from live hashes. The base package/root authority
-  boundary is unchanged; no live execution, ASP normative text or canonical
-  adoption status changes follow. A live description migration still requires
-  a separate version/resource/old-authority transition plan.
+  authoring subpath with Calcu/Hello consumer fixtures. Calcu first connected it
+  to the offline candidate, preserving two-namespace prototype goldens and
+  documenting its difference from the former live hashes. P5-T8 subsequently
+  qualified and merged the separate version/resource/old-authority transition.
+  Authoring itself still grants no authority or canonical adoption status.
 
-#### ⏳ P5-T8: Migrate the live manifest to SDK authoring
+#### ✅ P5-T8: Migrate the live manifest to SDK authoring
 
-- **Status:** P5-T8A merged in Calcu #18; P5-T8B implemented for review. Plan in
+- **Status:** P5-T8A merged in Calcu #18; P5-T8B merged in Calcu #19
+  (`ee4681f1df73a75611a9c348162714a5b750c7cb`). Plan in
   [P5-T8 Live SDK Manifest Migration](INPROGRESS/P5-T8_Live_SDK_Manifest_Migration.md).
   The selected live version is `0.1.2`; Calcu #16 supplied accepted offline evidence.
   See [P5-T8A preparation evidence](../docs/LIVE_SDK_MANIFEST_PREPARATION.md).
@@ -138,6 +140,24 @@ mark a production ASP deployment or change the existing keypad requirements.
 - **Boundary:** Application identity/consent/issuance/admission stay explicit.
   One proposal action and Compatibility Bearer development profile remain;
   general SDK runtime extraction and dual live-snapshot support are later work.
+
+#### ⏳ P5-T9: Qualify an admitting executor to handler binding
+
+- **Status:** P5-T9A private qualification complete, no-go for public extraction;
+  P5-T9A-F dispatch deadlines/input snapshot correction is next. See the
+  [report](../docs/HANDLER_BINDING_CHARACTERIZATION.md) and
+  [qualification plan](INPROGRESS/P5-T9_Admitting_Handler_Binding.md).
+- **Dependencies:** Merged P5-T8A/B and the companion SDK design.
+- **Outputs:** Current dispatch obligation map, private contract fixture,
+  second proposal comparison and measured go/no-go decision; later focused
+  public SDK and packed Calcu consumer slices only after qualification.
+- **Acceptance:** The binding preserves independent admission, final current
+  authority checks, quota accounting and immutable input; rejection before
+  dispatch makes zero handler calls. Invalid output after execution is reported
+  as failed presentation with the observed handler call retained.
+- **Boundary:** Handler registration creates no authority. Host policy/state
+  and application business rules stay explicit; authoring remains handler-free.
+  This consumer task does not change canonical ADP status or RFC maturity.
 
 ## 1. Overview
 

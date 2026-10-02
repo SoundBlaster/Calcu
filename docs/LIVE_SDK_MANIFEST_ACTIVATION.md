@@ -1,6 +1,7 @@
 # P5-T8B — SDK-authored live manifest and bounded retirement
 
-Status: implemented for review, 2026-10-02 UTC. The default live selection is
+Status: merged in [Calcu #19](https://github.com/SoundBlaster/Calcu/pull/19) as
+`ee4681f1df73a75611a9c348162714a5b750c7cb`, 2026-10-02 UTC. The default live selection is
 `0.1.2`; P5-T8A was merged in [Calcu #18](https://github.com/SoundBlaster/Calcu/pull/18).
 This is still the Compatibility Bearer loopback-HTTPS development profile.
 ASP normative text, SDK package/source lock and tool surface are unchanged.
@@ -188,10 +189,11 @@ screenshots and DOM measurements at 960 × 858 and 390 × 844 verified that both
 metadata rows fit without overflow; the narrow page had no horizontal overflow.
 Both permissions remained unchecked and no model task was sent. The temporary
 viewport override was reset and the audit-owned listener was confirmed closed.
-This verifies these two widths, not an exhaustive browser/device matrix. CI
-must still run the full gate on the new pushed head.
+This verifies these two widths, not an exhaustive browser/device matrix. Full
+CI verification remained a separate gate, completed before merge as noted below.
 
-Next: review this activation/lifecycle change and CI, then merge separately.
-After merge/synchronization, optionally smoke the authenticated local demo;
-use the measured cost to choose a bounded SDK follow-up, not to automate
-authority issuance or expose additional application operations.
+GitHub verify and coverage passed on the final PR head `729cc14` before merge.
+The selected next slice is
+[P5-T9 admitting handler binding qualification](../SPECS/INPROGRESS/P5-T9_Admitting_Handler_Binding.md),
+using this merged baseline and the measured cost. An authenticated local smoke
+remains optional and separate from deterministic fixture/HTTPS evidence.

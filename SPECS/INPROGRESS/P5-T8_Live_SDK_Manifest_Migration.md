@@ -1,6 +1,8 @@
 # P5-T8 — Migrate the live manifest to SDK authoring
 
-Status: P5-T8A merged and P5-T8B implemented for review, 2026-10-02 UTC.
+Status: P5-T8A and P5-T8B merged, 2026-10-02 UTC. Activation landed in
+[Calcu #19](https://github.com/SoundBlaster/Calcu/pull/19) as
+`ee4681f1df73a75611a9c348162714a5b750c7cb` with green verify/coverage CI.
 P5-T8A preparation is implemented; see
 [snapshot/fixture evidence](../../docs/LIVE_SDK_MANIFEST_PREPARATION.md).
 P5-T8B selects the SDK snapshot; see
