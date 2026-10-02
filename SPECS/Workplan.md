@@ -17,6 +17,7 @@ session contract and tested loopback HTTPS boundary. See [boundary status](../se
 | P5-T5 | Complete: SDK-validated manifest/request/Grant values and server-only unsigned Runtime/App Receipts | P5-T4; SDK PRs #12 and #13 |
 | P5-T8 | Complete: preparation #18 and live selection/retirement #19 merged | P5-T5; accepted P5-T7 follow-up; SDK #32 and Calcu #16 |
 | P5-T9 | P5-T9A complete; P5-T9A-F repair merged #21; P5-T9A-H comparison implemented pending PR/CI/merge, wrapper no-go; extraction gated | P5-T8; SDK companion report |
+| P5-T10A | Private prototype locally verified; 169 → 82 facade lines; pending PR/CI/merge, public extraction gated | P5-T9A-H evidence; current SDK JSON/hash primitives |
 
 The bounded P5 demo and SDK consumer work are complete through **P5-T8**;
 P5-T9A completed the private qualification; P5-T9A-F merged in Calcu #21.
@@ -164,6 +165,22 @@ mark a production ASP deployment or change the existing keypad requirements.
 - **Boundary:** Handler registration creates no authority. Host policy/state
   and application business rules stay explicit; authoring remains handler-free.
   This consumer task does not change canonical ADP status or RFC maturity.
+
+#### ⏳ P5-T10A: Qualify a private request/result exchange
+
+- **Status:** Implemented and locally verified; pending PR/CI/merge. See the
+  [proposal exchange plan](INPROGRESS/P5-T10A_Private_Proposal_Exchange.md).
+- **Evidence:** [Contract and measured comparison](../docs/PRIVATE_PROPOSAL_EXCHANGE.md);
+  126 targeted cases, 469 total Vitest tests and local build/coverage gates pass.
+  Continue to portable-contract/independent-consumer qualification before public API.
+- **Outputs:** Exact selected wire contract, immutable private request/result
+  mechanism, test-only Calcu facade, real-HTTPS parity and measured cost.
+- **Boundary:** Executor admission and current authority stay application-owned.
+  Calcu retains receipt policy, disclosure, credentials, transport and domain
+  result checks. No public SDK export or live migration is selected here.
+- **Acceptance:** Request/hash compatibility, independent expected-context
+  validation, input custody, negative result cases, lifecycle/quota parity and
+  separate accounting of engine entry versus accepted presentation.
 
 ## 1. Overview
 
