@@ -215,6 +215,7 @@ and the original staged plan remains in [the demo plan](../SPECS/ASP_DEMO_PLAN.m
 ## Offline authoring follow-up
 
 The [Calcu-owned candidate report](OFFLINE_ACTION_AUTHORING.md) records the
-private SDK authoring experiment, exact schema/hash difference and remaining
-production migration boundary. It does not change this application's live
+public offline SDK consumer migration, preserved prototype-candidate hashes,
+exact difference from handwritten live schemas and remaining live migration
+boundary. It does not change this application's live
 authority or promote offline checks to runtime conformance evidence.

@@ -1,4 +1,5 @@
 // @vitest-environment node
+import { createHash } from 'node:crypto';
 import {
   CanonicalObjectHash,
   JsonDocument,
@@ -6,13 +7,14 @@ import {
   OfflineSchemaResources,
   SurfaceSnapshot,
 } from '@0al/agent-surface';
+import canonicalize from 'canonicalize';
 import { describe, expect, expectTypeOf, it } from 'vitest';
 import {
   type CandidateInput,
   type CandidateOutput,
   prepareCalcuActionCandidate,
 } from './action-authoring-candidate';
-import { type Calculation, type CalculationResult, calculate } from './calcu';
+import type { Calculation, CalculationResult } from './calcu';
 import { calculationDataExposure } from './exposure';
 import { prepareCalcuSurface } from './manifest';
 
@@ -20,6 +22,38 @@ const actionId = 'calculation.propose';
 const inputDomain =
   'https://github.com/0al-spec/agent-surface/hash/action-input-schema/v1';
 const json = (value: unknown) => new JsonDocument(JSON.stringify(value));
+
+// Captured before the dependency switch, from Calcu f4dfe285 / prototype
+// 307cbc693c98375f155d051fad2728e004749444. These are migration oracles,
+// not expectations recomputed by the replacement authoring implementation.
+const prototypeBaselines = [
+  {
+    issuer: 'https://calcu.local',
+    baselineSurfaceHash: 'sha-256:JbCWzyXu_BiZqOhg_tomfvSI2MZOIyD_yVKR-DlDbaY',
+    inputHash: 'sha-256:RjICwvHoNxNlNu4qIDqYyU6tZzh5_dFrsbMSrFLDBs4',
+    candidateSurfaceHash: 'sha-256:nZyMGsHPo4siY2If0BAho0MRMX3C6wnKfSGcAX4iTr4',
+    manifestJcsSha256:
+      '7db68bbfe045777f8deb443d6840c0127abd87685ac033d89acf7d68cd7ae5ad',
+    resourcesJcsSha256:
+      'c789abbe8af98d2185c0af3cdb07ddcfd8276f7aede7c40fe47be49506929a3f',
+  },
+  {
+    issuer: 'https://calcu.example.test',
+    baselineSurfaceHash: 'sha-256:E4HAtpWx1TmEpgeqacO_XTAUc-AbpGZpuqR1AC0nnMc',
+    inputHash: 'sha-256:6hWVDudXd9mAU-u_G3DVEAkq9OBT9Abka5XMeYPuSxE',
+    candidateSurfaceHash: 'sha-256:dOD2OhTj6PSVK_s1jEy08Abygonvd-AkPC0xmQLevSk',
+    manifestJcsSha256:
+      '97e5ab6e86382d6e397253ef2782bd8d11d49b8fded489473049010ac3452967',
+    resourcesJcsSha256:
+      'b4365b50a323471fbad3a47f9133b84d2537108c1feb2bb8d686c9df035d1c96',
+  },
+];
+
+function jcsDigest(value: unknown): string {
+  const source = canonicalize(value);
+  if (typeof source !== 'string') throw new Error('invalid_test_vector');
+  return createHash('sha256').update(source).digest('hex');
+}
 
 function record(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value))
@@ -32,16 +66,15 @@ describe('application-owned offline action authoring', () => {
     expectTypeOf<CandidateInput>().toEqualTypeOf<Calculation>();
     expectTypeOf<CandidateOutput>().toExtend<CalculationResult>();
     expectTypeOf<CalculationResult>().toExtend<CandidateOutput>();
+    expectTypeOf<typeof prepareCalcuActionCandidate>().parameters.toEqualTypeOf<
+      [issuer?: string]
+    >();
   });
-  it.each([
-    'https://calcu.local',
-    'https://calcu.example.test',
-  ])('composes the complete candidate at %s without invoking its handler', (issuer) => {
-    let handlerCalls = 0;
-    const generated = prepareCalcuActionCandidate((input) => {
-      handlerCalls += 1;
-      return calculate(input);
-    }, issuer);
+  it.each(
+    prototypeBaselines,
+  )('preserves the full offline candidate at $issuer without an execution handle', (golden) => {
+    const { issuer } = golden;
+    const generated = prepareCalcuActionCandidate(issuer);
     const baseline = prepareCalcuSurface('calcu.local', issuer);
     const baselineValue = record(baseline.document.parse());
     const baselineAction = record((baselineValue.actions as unknown[])[0]);
@@ -51,7 +84,19 @@ describe('application-owned offline action authoring', () => {
     const { input_schema_hash: newHash, ...newMetadata } = generatedAction;
     expect(newMetadata).toEqual(oldMetadata);
     expect(generated.schemaResources).toHaveLength(2);
+    expect(generated.actionDocuments).toHaveLength(1);
     expect(Object.isFrozen(generated.schemaResources)).toBe(true);
+    expect(Object.isFrozen(generated)).toBe(true);
+    for (const name of ['handler', 'invoke', 'run', 'issue', 'grant'])
+      expect(name in generated).toBe(false);
+    expect(
+      jcsDigest(
+        generated.schemaResources.map(({ uri, document }) => ({
+          uri,
+          schema: document.parse(),
+        })),
+      ),
+    ).toBe(golden.resourcesJcsSha256);
 
     for (const resource of generated.schemaResources) {
       const oldResource = baseline.schemaResources.find(
@@ -83,6 +128,7 @@ describe('application-owned offline action authoring', () => {
       new CanonicalObjectHash(inputDomain).digest(input.document),
     );
     expect(newHash).not.toBe(oldHash);
+    expect(newHash).toBe(golden.inputHash);
 
     const untouched = baseline.schemaResources.filter(
       (item) =>
@@ -97,6 +143,11 @@ describe('application-owned offline action authoring', () => {
       baseline.identityAdvertisement,
     ).prepare();
     expect(candidate.surfaceHash).toBe(surfaceHash);
+    expect(surfaceHash).toBe(golden.candidateSurfaceHash);
+    expect(oldSurfaceHash).toBe(golden.baselineSurfaceHash);
+    expect(jcsDigest(candidate.document.parse())).toBe(
+      golden.manifestJcsSha256,
+    );
     expect(surfaceHash).not.toBe(oldSurfaceHash);
     const {
       actions: _actions,
@@ -105,6 +156,7 @@ describe('application-owned offline action authoring', () => {
     } = record(candidate.document.parse());
     const { actions: _oldActions, ...baselineHost } = withoutHash;
     expect(candidateHost).toEqual(baselineHost);
+    expect(candidateHost.scopes).toHaveLength(1);
     expect(untouched).toHaveLength(2);
     for (const operator of ['add', 'subtract', 'multiply', 'divide']) {
       const request = json({ operator, left: 240, right: 0.15 });
@@ -139,10 +191,23 @@ describe('application-owned offline action authoring', () => {
     expect(() =>
       candidate.validateInput('calculation.sqrt', json({})),
     ).toThrow();
-    expect(handlerCalls).toBe(0);
+    for (const source of [
+      '{"operator":"multiply","operator":"add","left":240,"right":0.15}',
+      '{"operator":"multiply","left":-0,"right":0.15}',
+      '{"operator":"multiply","left":1e999,"right":0.15}',
+      '{"operator":"multiply",',
+    ]) {
+      // Preserve the raw JSON: stringify would erase duplicate keys and -0.
+      expect(() =>
+        candidate.validateInput(actionId, new JsonDocument(source)),
+      ).toThrow();
+      expect(() =>
+        baseline.manifest.validateInput(actionId, new JsonDocument(source)),
+      ).toThrow();
+    }
     expect(JSON.stringify(candidateValue)).not.toContain('handler');
     expect(
-      prepareCalcuActionCandidate(calculate, issuer).actionDocuments[0].parse(),
+      prepareCalcuActionCandidate(issuer).actionDocuments[0].parse(),
     ).toEqual(generated.actionDocuments[0].parse());
   });
 });

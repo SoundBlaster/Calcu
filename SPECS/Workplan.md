@@ -85,8 +85,9 @@ mark a production ASP deployment or change the existing keypad requirements.
 #### ✅ P5-T7: Design an offline action-authoring spike
 - **Status:** Bounded spike archived in
   [P5-T7 archive](ARCHIVE/P5-T7_Offline_Action_Authoring/); no-go for
-  production adoption on the current single-action evidence. The authoring API
-  remains private and experimental.
+  production adoption on the original single-action evidence. The historical
+  experiment remains archived; the separately authorized public-module
+  offline migration is recorded in [the current report](../docs/OFFLINE_ACTION_AUTHORING.md).
 - **Description:** Determine whether one explicit, inert operation declaration
   can reduce repeated application-owned action/schema representation wiring in
   Calcu and Hello while producing existing SDK-validated offline artifacts.
@@ -107,11 +108,13 @@ mark a production ASP deployment or change the existing keypad requirements.
   enumerate exact derived artifacts and boundary tests; and decide whether the
   expected reduction justifies SDK implementation and maintenance. No public SDK
   API is implied by this design.
-- **Next gate:** Hold the API and implementation private/experimental. Do not
-  integrate it into Calcu or expose package-root exports. Reconsider only with
-  separately authorized evidence from another independent action/consumer and
-  an exact hash-compatibility decision; no change to live execution, ASP
-  normative text or canonical adoption status follows from this spike.
+- **Follow-up (2026-10-02 UTC):** SDK PR #32 qualified an optional public
+  authoring subpath with Calcu/Hello consumer fixtures. Calcu now uses it only
+  in the offline candidate, preserving two-namespace prototype goldens and
+  the existing difference from live hashes. The base package/root authority
+  boundary is unchanged; no live execution, ASP normative text or canonical
+  adoption status changes follow. A live description migration still requires
+  a separate version/resource/old-authority transition plan.
 
 ## 1. Overview
 

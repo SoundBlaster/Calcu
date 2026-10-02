@@ -2,15 +2,18 @@
 
 ## Recently Completed (not yet archived)
 
-None.
+- Public SDK authoring subpath connected to Calcu's offline candidate;
+  [compatibility and validation report](../../docs/OFFLINE_ACTION_AUTHORING.md).
+  No live description or authority migration.
 
 ## Next
 
-- No P5-T7 production implementation is selected. See the
+- Design a separately reviewed live description migration only after accepting
+  the public offline-consumer evidence above: versioned immutable schema
+  resources, changed live hashes and explicit handling of old authority.
+  No such runtime implementation is selected yet. Historical baseline: the
   [P5-T7 design and acceptance evidence](../ARCHIVE/P5-T7_Offline_Action_Authoring/P5-T7_Offline_Action_Authoring_Design.md);
   see also the [validation report](../ARCHIVE/P5-T7_Offline_Action_Authoring/P5-T7_Validation_Report.md).
-  Revisit only after separately authorized evidence from another independent
-  action/consumer and an exact schema-hash compatibility decision.
 
 ## Recently Archived
 
