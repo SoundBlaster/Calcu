@@ -2,6 +2,7 @@
 import { spawn } from 'node:child_process';
 import { existsSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import type { Writable } from 'node:stream';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it, vi } from 'vitest';
 import { CodexTaskAdapter } from './codexAdapter';
@@ -41,6 +42,45 @@ function harness(scenario: string, timeoutMs = 2000) {
 }
 
 describe('Calcu-owned retention boundaries (fake Codex only)', () => {
+  it.each([
+    false,
+    true,
+  ])('contains asynchronous stdin failure (cancelled=%s)', async (cancelled) => {
+    let stdin: Writable | undefined;
+    let cwd = '';
+    const backend = { calculationPropose: vi.fn(async () => result) };
+    const controller = new AbortController();
+    const adapter = new CodexTaskAdapter({
+      command: process.execPath,
+      appServerArgs: [fakeServer, 'timeout'],
+      verifyVersion: async () => 'codex-cli 0.145.0',
+      killGraceMs: 20,
+      spawnCodex(command, args, options) {
+        cwd = String(options.cwd);
+        const child = spawn(command, args, { ...options, stdio: 'pipe' });
+        stdin = child.stdin;
+        return child;
+      },
+    });
+    await expect(
+      adapter.run(marker, backend, controller.signal, (event) => {
+        if (event.type !== 'progress' || event.phase !== 'starting') return;
+        if (cancelled) controller.abort();
+        // Deterministic version of a pipe write completing with EPIPE after the
+        // synchronous writable check (or after cancellation has settled the task).
+        queueMicrotask(() =>
+          stdin?.emit(
+            'error',
+            Object.assign(new Error(marker), { code: 'EPIPE' }),
+          ),
+        );
+      }),
+    ).rejects.toThrow(cancelled ? 'cancelled' : 'agent_process_exited');
+    expect(backend.calculationPropose).not.toHaveBeenCalled();
+    expect(cwd).not.toBe('');
+    expect(existsSync(cwd)).toBe(false);
+  });
+
   it.each([
     'diagnostic_error',
     'diagnostic_method',

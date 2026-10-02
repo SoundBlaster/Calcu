@@ -336,11 +336,6 @@ export class CodexTaskAdapter implements CodexTaskRunner {
         detached: true,
       });
       const stopProcess = createProcessStopper(child, this.#killGraceMs);
-      const send = (message: unknown) => {
-        if (!child?.stdin.writable) throw new Error('agent_process_exited');
-        child.stdin.write(`${JSON.stringify(message)}\n`);
-      };
-
       return await new Promise<CodexTaskResult>((resolve, reject) => {
         let settled = false;
         let stdoutBytes = 0;
@@ -377,6 +372,16 @@ export class CodexTaskAdapter implements CodexTaskRunner {
         );
         timeout.unref();
         signal.addEventListener('abort', abort, { once: true });
+
+        // writable is only a snapshot: the peer can close its pipe after the
+        // check. Keep this listener through process shutdown, including after
+        // cancellation, to contain asynchronous EPIPE/write errors.
+        child?.stdin.on('error', () => fail('agent_process_exited'));
+        const send = (message: unknown) => {
+          if (settled) return;
+          if (!child?.stdin.writable) throw new Error('agent_process_exited');
+          child.stdin.write(`${JSON.stringify(message)}\n`);
+        };
 
         const processMessage = async (value: unknown) => {
           if (settled) return;
