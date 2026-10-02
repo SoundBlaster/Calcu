@@ -16,7 +16,7 @@ import {
 } from './action-authoring-candidate';
 import type { Calculation, CalculationResult } from './calcu';
 import { calculationDataExposure } from './exposure';
-import { prepareCalcuSurface } from './manifest';
+import { loadLegacyCalcuSurface } from './fixtures/legacy-surface';
 
 const actionId = 'calculation.propose';
 const inputDomain =
@@ -75,7 +75,7 @@ describe('application-owned offline action authoring', () => {
   )('preserves the full offline candidate at $issuer without an execution handle', (golden) => {
     const { issuer } = golden;
     const generated = prepareCalcuActionCandidate(issuer);
-    const baseline = prepareCalcuSurface('calcu.local', issuer);
+    const baseline = loadLegacyCalcuSurface(issuer);
     const baselineValue = record(baseline.document.parse());
     const baselineAction = record((baselineValue.actions as unknown[])[0]);
     const generatedAction = record(generated.actionDocuments[0].parse());

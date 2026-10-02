@@ -63,6 +63,12 @@ preferences or “always allow” mode are introduced.
 
 ## Evidence and non-claims
 
+The current broker and executor still select version `0.1.1`. P5-T8A's
+[SDK-authored `0.1.2` candidate](../docs/LIVE_SDK_MANIFEST_PREPARATION.md) is
+prepared only; these offers cannot select its version or schema namespace.
+Rebinding access review and authority to it requires the separate P5-T8B
+activation/retirement transition.
+
 `taskPermissions.test.ts` checks exact selection, expiry, replacement, replay,
 forged permits, changed task/surface and one-time issuance. It also runs a valid
 selection through the real issuer, LocalBackend and executor (in-process test

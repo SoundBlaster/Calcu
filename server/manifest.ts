@@ -6,6 +6,8 @@ import {
   OfflineSchemaResources,
   SurfaceSnapshot,
 } from '@0al/agent-surface';
+import type { PreparedActionInventory } from '@0al/agent-surface/authoring';
+import { calculationActionInventory } from './calculation-declaration';
 import { calculationDataClasses, calculationDataExposure } from './exposure';
 import {
   TEST_FRESHNESS_PROFILE,
@@ -85,9 +87,11 @@ function schemaResource(uri: string, schema: Record<string, unknown>) {
   } satisfies OfflineSchemaResource;
 }
 
-export function prepareCalcuSurface(
-  appId = 'calcu.local',
-  issuer = 'https://calcu.local',
+function prepareCalcuManifest(
+  appId: string,
+  issuer: string,
+  surfaceVersion: string,
+  inventory?: PreparedActionInventory,
 ): PreparedCalcuSurface {
   const actionId = 'calculation.propose';
   const scopeId = actionId;
@@ -108,30 +112,32 @@ export function prepareCalcuSurface(
     max_artifact_bytes: 262_144,
   };
   const identityAdvertisement = json(identityAdvertisementValue);
-  const input = schemaResource(inputUri, {
-    type: 'object',
-    properties: {
-      operator: { enum: ['add', 'subtract', 'multiply', 'divide'] },
-      left: { type: 'number' },
-      right: { type: 'number' },
-    },
-    required: ['operator', 'left', 'right'],
-    additionalProperties: false,
-  });
-  const output = schemaResource(outputUri, {
-    type: 'object',
-    properties: {
-      operator: { enum: ['add', 'subtract', 'multiply', 'divide'] },
-      left: { type: 'number' },
-      right: { type: 'number' },
-      result: { type: 'number' },
-    },
-    required: ['operator', 'left', 'right', 'result'],
-    additionalProperties: false,
-  });
+  // Retain the legacy live schema bytes until the separate activation slice.
+  const actionSchemas = inventory?.schemaResources ?? [
+    schemaResource(inputUri, {
+      type: 'object',
+      properties: {
+        operator: { enum: ['add', 'subtract', 'multiply', 'divide'] },
+        left: { type: 'number' },
+        right: { type: 'number' },
+      },
+      required: ['operator', 'left', 'right'],
+      additionalProperties: false,
+    }),
+    schemaResource(outputUri, {
+      type: 'object',
+      properties: {
+        operator: { enum: ['add', 'subtract', 'multiply', 'divide'] },
+        left: { type: 'number' },
+        right: { type: 'number' },
+        result: { type: 'number' },
+      },
+      required: ['operator', 'left', 'right', 'result'],
+      additionalProperties: false,
+    }),
+  ];
   const resources: OfflineSchemaResource[] = [
-    input,
-    output,
+    ...actionSchemas,
     schemaResource(eventUri, { type: 'object' }),
     schemaResource(receiptUri, {
       type: 'object',
@@ -247,7 +253,7 @@ export function prepareCalcuSurface(
     app_id: appId,
     issuer,
     surface_mode: 'proposal_only',
-    surface_version: '0.1.1',
+    surface_version: surfaceVersion,
     surface_url: `${issuer}/.well-known/agent-surface.json`,
     compatibility: {
       min_runtime: 'application-runtime/0.1',
@@ -275,7 +281,7 @@ export function prepareCalcuSurface(
     scopes: [{ id: scopeId, description: 'Prepare an application proposal.' }],
     data_classes: calculationDataClasses(),
     resources: [],
-    actions: [
+    actions: inventory?.actionDocuments.map((document) => document.parse()) ?? [
       {
         id: actionId,
         scope: scopeId,
@@ -290,7 +296,7 @@ export function prepareCalcuSurface(
         input_schema: inputUri,
         input_schema_hash: new CanonicalObjectHash(
           INPUT_SCHEMA_HASH_DOMAIN,
-        ).digest(input.document),
+        ).digest(actionSchemas[0].document),
         output_schema: outputUri,
         data_exposure: actionExposure,
       },
@@ -345,6 +351,25 @@ export function prepareCalcuSurface(
     schemaResources,
     manifest: prepared,
   };
+}
+
+/** Legacy live selection; activation is explicitly deferred to P5-T8B. */
+export function prepareCalcuSurface(
+  appId = 'calcu.local',
+  issuer = 'https://calcu.local',
+): PreparedCalcuSurface {
+  return prepareCalcuManifest(appId, issuer, '0.1.1');
+}
+
+/** Qualified server-only candidate, not the demo's selected live surface. */
+export function prepareSdkCalcuSurface(
+  appId = 'calcu.local',
+  issuer = 'https://calcu.local',
+): PreparedCalcuSurface {
+  const inventory = calculationActionInventory().prepare(
+    `${issuer}/schemas/0.1.2/`,
+  );
+  return prepareCalcuManifest(appId, issuer, '0.1.2', inventory);
 }
 
 export const preparedSurface = prepareCalcuSurface();

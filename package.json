@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@0al/agent-surface": "file:vendor/0al-agent-surface-0.1.0-experimental.0-c8908ab.tgz",
+    "@sinclair/typebox": "0.34.52",
     "canonicalize": "^4.0.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
@@ -32,7 +33,6 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.8",
-    "@sinclair/typebox": "0.34.52",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",

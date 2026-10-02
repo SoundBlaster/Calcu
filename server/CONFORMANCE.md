@@ -35,6 +35,15 @@ It also keeps the immutable submitted task separate from the exact admitted
 action and labels model prose as unverified. This provenance presentation does
 not establish semantic equivalence between the request and the action.
 
+## SDK manifest preparation (not live)
+
+P5-T8A statically qualifies a complete SDK-authored version `0.1.2` candidate,
+including immutable legacy fixtures and exact two-namespace resource digests.
+The demo/issuer/executor still use the old `0.1.1` selection. The
+[preparation tests/report](../docs/LIVE_SDK_MANIFEST_PREPARATION.md) do not
+establish new-version admission, host replacement, portable interoperability
+or a conformance promotion. Those live transition checks remain P5-T8B.
+
 ## Manual live evidence
 
 On 2026-09-05, `npm run agent:demo` was run with authenticated Codex CLI

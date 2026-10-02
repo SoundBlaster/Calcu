@@ -1,0 +1,460 @@
+{
+  "provenance": {
+    "calcu_commit": "7f837fd1eaad4dec78b3c7f612e52a8fa7a870a4",
+    "surface_version": "0.1.1",
+    "purpose": "immutable pre-SDK live manifest baseline"
+  },
+  "app_id": "calcu.local",
+  "issuer": "https://calcu.local",
+  "manifest": {
+    "protocol": "agent-surface/0.1",
+    "app_id": "calcu.local",
+    "issuer": "https://calcu.local",
+    "surface_mode": "proposal_only",
+    "surface_version": "0.1.1",
+    "surface_url": "https://calcu.local/.well-known/agent-surface.json",
+    "compatibility": {
+      "min_runtime": "application-runtime/0.1",
+      "schema_dialect": "https://json-schema.org/draft/2020-12/schema",
+      "agent_identity_evidence_profiles": [
+        {
+          "profile": "https://github.com/0al-spec/agent-surface/profiles/agent-identity-evidence/v1",
+          "format_profile": "https://github.com/0al-spec/agent-surface/profiles/agent-passport-minimal/v1",
+          "artifact_digest_profile": "https://github.com/0al-spec/agent-surface/hash/agent-passport-artifact/v1",
+          "verification_profiles": [
+            "https://calcu.local/profiles/agent-passport-ed25519-test/v1"
+          ],
+          "key_binding_profiles": [
+            "https://calcu.local/profiles/ed25519-spki-sha256-test/v1"
+          ],
+          "freshness_profiles": [
+            "https://calcu.local/profiles/status-max-age-test/v1"
+          ],
+          "status_profiles": [
+            "https://calcu.local/profiles/agent-status-test/v1"
+          ],
+          "migration_profiles": [],
+          "max_artifact_bytes": 262144
+        }
+      ]
+    },
+    "auth": {
+      "type": "https://github.com/0al-spec/agent-surface/profiles/host-provisioned-bearer/v1",
+      "credential_profile": "compatibility_bearer"
+    },
+    "agent_api": {
+      "credential_audience": "https://calcu.local/agent-api",
+      "grant_introspection_url": "https://calcu.local/agent-grants/introspect",
+      "grant_revocation_url": "https://calcu.local/agent-grants/revoke",
+      "action_url": "https://calcu.local/agent-actions",
+      "session_control_url": "https://calcu.local/agent-sessions/control",
+      "event_subscription_url": "https://calcu.local/agent-events",
+      "event_delivery": {
+        "profile": "at_least_once",
+        "ack_deadline_seconds": 30,
+        "max_in_flight": 8,
+        "retention_seconds": 300
+      }
+    },
+    "scopes": [
+      {
+        "id": "calculation.propose",
+        "description": "Prepare an application proposal."
+      }
+    ],
+    "data_classes": [
+      {
+        "id": "calculation.content",
+        "classification": "sensitive",
+        "label": "Calculation content",
+        "description": "Operator, operands and computed result, including echoed values."
+      },
+      {
+        "id": "calculation.runtime_context",
+        "classification": "sensitive",
+        "label": "Runtime context",
+        "description": "Binding, correlation, execution and receipt metadata delivered to the runtime."
+      },
+      {
+        "id": "calculation.status",
+        "classification": "private",
+        "label": "Calculation status",
+        "description": "Fixed protocol statuses and action identifiers."
+      }
+    ],
+    "resources": [],
+    "actions": [
+      {
+        "id": "calculation.propose",
+        "scope": "calculation.propose",
+        "risk": "propose",
+        "side_effect": false,
+        "approval": "none",
+        "execution": {
+          "mode": "propose",
+          "operation_id": "calculation.propose.operation",
+          "persisted": false
+        },
+        "input_schema": "https://calcu.local/schemas/calculation.propose.input.json",
+        "input_schema_hash": "sha-256:hBlOPfEMLb7xbIk8EUNQQy5cOo9xZ-aE92TSIp8-YlY",
+        "output_schema": "https://calcu.local/schemas/calculation.propose.output.json",
+        "data_exposure": {
+          "classes": [
+            "calculation.content",
+            "calculation.runtime_context",
+            "calculation.status"
+          ],
+          "redaction": {
+            "mode": "none"
+          },
+          "retention": {
+            "mode": "user_managed"
+          }
+        }
+      }
+    ],
+    "events": [
+      {
+        "id": "grant.revoked",
+        "control": true,
+        "schema": "https://calcu.local/schemas/grant-revoked.event.json",
+        "data_exposure": {
+          "classes": [],
+          "redaction": {
+            "mode": "none"
+          },
+          "retention": {
+            "mode": "transient",
+            "delete_on_grant_end": true
+          }
+        }
+      }
+    ],
+    "audit": {
+      "hash_profile": "asp-jcs-sha-256",
+      "receipt_schema": "https://calcu.local/schemas/action-receipt.json",
+      "required_fields": [
+        "receipt_id",
+        "receipt_type",
+        "receipt_hash",
+        "grant_id",
+        "grant_hash",
+        "session_id",
+        "session_generation",
+        "trace_id",
+        "span_id",
+        "action_id",
+        "app_id",
+        "surface_version",
+        "surface_hash",
+        "runtime",
+        "actor_agent",
+        "subject",
+        "idempotency_key",
+        "input_hash",
+        "execution",
+        "execution_hash",
+        "policy_decision",
+        "policy_decision_hash",
+        "timestamp",
+        "result"
+      ]
+    },
+    "revocation": {
+      "grant_management_url": "https://calcu.local/settings/agent-grants",
+      "grant_revocation_url": "https://calcu.local/agent-grants/revoke",
+      "event": "grant.revoked"
+    },
+    "surface_hash": "sha-256:JbCWzyXu_BiZqOhg_tomfvSI2MZOIyD_yVKR-DlDbaY"
+  },
+  "schema_resources": [
+    {
+      "uri": "https://calcu.local/schemas/calculation.propose.input.json",
+      "schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://calcu.local/schemas/calculation.propose.input.json",
+        "type": "object",
+        "properties": {
+          "operator": {
+            "enum": ["add", "subtract", "multiply", "divide"]
+          },
+          "left": {
+            "type": "number"
+          },
+          "right": {
+            "type": "number"
+          }
+        },
+        "required": ["operator", "left", "right"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "uri": "https://calcu.local/schemas/calculation.propose.output.json",
+      "schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://calcu.local/schemas/calculation.propose.output.json",
+        "type": "object",
+        "properties": {
+          "operator": {
+            "enum": ["add", "subtract", "multiply", "divide"]
+          },
+          "left": {
+            "type": "number"
+          },
+          "right": {
+            "type": "number"
+          },
+          "result": {
+            "type": "number"
+          }
+        },
+        "required": ["operator", "left", "right", "result"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "uri": "https://calcu.local/schemas/grant-revoked.event.json",
+      "schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://calcu.local/schemas/grant-revoked.event.json",
+        "type": "object"
+      }
+    },
+    {
+      "uri": "https://calcu.local/schemas/action-receipt.json",
+      "schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$id": "https://calcu.local/schemas/action-receipt.json",
+        "type": "object",
+        "required": [
+          "receipt_id",
+          "receipt_type",
+          "receipt_hash",
+          "grant_id",
+          "grant_hash",
+          "session_id",
+          "session_generation",
+          "trace_id",
+          "span_id",
+          "action_id",
+          "app_id",
+          "surface_version",
+          "surface_hash",
+          "runtime",
+          "actor_agent",
+          "subject",
+          "idempotency_key",
+          "input_hash",
+          "execution",
+          "execution_hash",
+          "policy_decision",
+          "policy_decision_hash",
+          "timestamp",
+          "result"
+        ],
+        "properties": {
+          "receipt_id": {
+            "type": "string"
+          },
+          "receipt_type": {
+            "enum": ["runtime", "app"]
+          },
+          "receipt_hash": {
+            "type": "string"
+          },
+          "parent_receipt_hash": {
+            "type": "string"
+          },
+          "grant_id": {
+            "type": "string"
+          },
+          "grant_hash": {
+            "type": "string"
+          },
+          "session_id": {
+            "type": "string"
+          },
+          "session_generation": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "trace_id": {
+            "type": "string"
+          },
+          "span_id": {
+            "type": "string"
+          },
+          "action_id": {
+            "type": "string"
+          },
+          "app_id": {
+            "type": "string"
+          },
+          "surface_version": {
+            "type": "string"
+          },
+          "surface_hash": {
+            "type": "string"
+          },
+          "runtime": {
+            "type": "object",
+            "properties": {
+              "runtime_id": {
+                "type": "string"
+              }
+            },
+            "required": ["runtime_id"],
+            "additionalProperties": false
+          },
+          "actor_agent": {
+            "type": "object",
+            "properties": {
+              "agent_id": {
+                "type": "string"
+              },
+              "identity_evidence_hash": {
+                "type": "string"
+              }
+            },
+            "required": ["agent_id", "identity_evidence_hash"],
+            "additionalProperties": false
+          },
+          "subject": {
+            "type": "object",
+            "properties": {
+              "user": {
+                "type": "string"
+              }
+            },
+            "required": ["user"],
+            "additionalProperties": false
+          },
+          "idempotency_key": {
+            "type": "string"
+          },
+          "input_hash": {
+            "type": "string"
+          },
+          "execution": {
+            "type": "object",
+            "properties": {
+              "mode": {
+                "const": "propose"
+              },
+              "execution_id": {
+                "type": "string"
+              }
+            },
+            "required": ["mode", "execution_id"],
+            "additionalProperties": false
+          },
+          "execution_hash": {
+            "type": "string"
+          },
+          "output_hash": {
+            "type": "string"
+          },
+          "policy_decision": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "const": "policy.decision"
+              },
+              "decision_id": {
+                "type": "string"
+              },
+              "enforcer": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "enum": ["runtime", "application"]
+                  },
+                  "id": {
+                    "type": "string"
+                  }
+                },
+                "required": ["type", "id"],
+                "additionalProperties": false
+              },
+              "outcome": {
+                "const": "allow"
+              },
+              "policy": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "version": {
+                    "type": "string"
+                  }
+                },
+                "required": ["id", "version"],
+                "additionalProperties": false
+              },
+              "reason_code": {
+                "type": "string"
+              },
+              "matched_rules": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "safe_to_show": {
+                "type": "string"
+              },
+              "evaluated_at": {
+                "type": "string"
+              },
+              "policy_decision_hash": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "decision_id",
+              "enforcer",
+              "outcome",
+              "policy",
+              "reason_code",
+              "matched_rules",
+              "safe_to_show",
+              "evaluated_at",
+              "policy_decision_hash"
+            ],
+            "additionalProperties": false
+          },
+          "policy_decision_hash": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string"
+          },
+          "result": {
+            "enum": ["authorized_for_forwarding", "success"]
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  ],
+  "identity_advertisement": {
+    "profile": "https://github.com/0al-spec/agent-surface/profiles/agent-identity-evidence/v1",
+    "format_profile": "https://github.com/0al-spec/agent-surface/profiles/agent-passport-minimal/v1",
+    "artifact_digest_profile": "https://github.com/0al-spec/agent-surface/hash/agent-passport-artifact/v1",
+    "verification_profiles": [
+      "https://calcu.local/profiles/agent-passport-ed25519-test/v1"
+    ],
+    "key_binding_profiles": [
+      "https://calcu.local/profiles/ed25519-spki-sha256-test/v1"
+    ],
+    "freshness_profiles": [
+      "https://calcu.local/profiles/status-max-age-test/v1"
+    ],
+    "status_profiles": ["https://calcu.local/profiles/agent-status-test/v1"],
+    "migration_profiles": [],
+    "max_artifact_bytes": 262144
+  }
+}
