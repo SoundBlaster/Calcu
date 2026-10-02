@@ -3,15 +3,16 @@
 ## Recently Completed (not yet archived)
 
 - Public SDK authoring subpath connected to Calcu's offline candidate;
+  merged in [Calcu #16](https://github.com/SoundBlaster/Calcu/pull/16);
   [compatibility and validation report](../../docs/OFFLINE_ACTION_AUTHORING.md).
   No live description or authority migration.
 
 ## Next
 
-- Design a separately reviewed live description migration only after accepting
-  the public offline-consumer evidence above: versioned immutable schema
-  resources, changed live hashes and explicit handling of old authority.
-  No such runtime implementation is selected yet. Historical baseline: the
+- P5-T8 — [Live SDK Manifest Migration plan](P5-T8_Live_SDK_Manifest_Migration.md).
+  Deliver preparation/legacy fixtures first (P5-T8A), then activation and host
+  retirement/restart checks (P5-T8B). Runtime implementation is pending.
+  Historical baseline: the
   [P5-T7 design and acceptance evidence](../ARCHIVE/P5-T7_Offline_Action_Authoring/P5-T7_Offline_Action_Authoring_Design.md);
   see also the [validation report](../ARCHIVE/P5-T7_Offline_Action_Authoring/P5-T7_Validation_Report.md).
 

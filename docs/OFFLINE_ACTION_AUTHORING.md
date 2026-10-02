@@ -84,7 +84,9 @@ The private package is no longer an installation/runtime dependency; its archive
 is retained as historical evidence. The practical outcome is a qualified public
 module and removal of handler coupling, not a demonstrated total host-code saving.
 
-The next separate decision is a live description migration. It must acknowledge
+The next separate task is the
+[P5-T8 live description migration plan](../SPECS/INPROGRESS/P5-T8_Live_SDK_Manifest_Migration.md).
+It must acknowledge
 the already measured difference from the handwritten live surface, version and
 pin immutable schema resources, and explicitly handle old authority: retain its
 exact old snapshot or retire/revoke/fence it. Never reinterpret an old Grant
