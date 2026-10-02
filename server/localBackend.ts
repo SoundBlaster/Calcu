@@ -2,11 +2,10 @@ import { randomBytes, randomUUID } from 'node:crypto';
 import { JsonDocument } from '@0al/agent-surface';
 import { type CalculationResult, exact, validateCalculation } from './calcu';
 import {
-  type Binding,
-  type RuntimeAccess,
-  surface,
-  type Transport,
-} from './executor';
+  CALCULATION_ACTION_ID,
+  CALCULATION_MODE,
+} from './calculation-declaration';
+import type { Binding, RuntimeAccess, Transport } from './executor';
 import { canonicalHash } from './hash';
 import {
   type ActionReceipt,
@@ -52,20 +51,21 @@ export function createLocalBackend(
   const receipts: ActionReceipt[] = [];
   const backend = {
     async calculationPropose(args: unknown, signal?: AbortSignal) {
+      if (signal?.aborted) throw new Error('aborted');
       const input = validateCalculation(args);
       const correlation = {
         ...binding,
-        action_id: surface.action.id,
+        action_id: CALCULATION_ACTION_ID,
         trace_id: randomBytes(16).toString('hex'),
         span_id: randomBytes(8).toString('hex'),
       };
       const execution = {
-        mode: surface.action.execution.mode,
+        mode: CALCULATION_MODE,
         execution_id: randomUUID(),
       } as const;
       const context: CreateReceiptContext = {
         ...binding,
-        action_id: surface.action.id,
+        action_id: CALCULATION_ACTION_ID,
         trace_id: correlation.trace_id,
         span_id: correlation.span_id,
         runtime_id: binding.delegate.runtime,
@@ -95,6 +95,9 @@ export function createLocalBackend(
         },
       });
       const response = await transport(credential, request, signal);
+      // Cancellation after execution does not undo the application action,
+      // but a late response must not become a new successful task result.
+      if (signal?.aborted) throw new Error('aborted');
       if (Buffer.byteLength(response) > 8192)
         throw new Error('invalid_response');
       let decoded: unknown;

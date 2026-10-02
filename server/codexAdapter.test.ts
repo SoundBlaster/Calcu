@@ -1,5 +1,10 @@
 // @vitest-environment node
+
+import { spawn } from 'node:child_process';
+import { EventEmitter } from 'node:events';
+import { access } from 'node:fs/promises';
 import type { AddressInfo } from 'node:net';
+import { PassThrough } from 'node:stream';
 import { fileURLToPath } from 'node:url';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
@@ -63,6 +68,88 @@ function backend() {
 }
 
 describe('CodexTaskAdapter', () => {
+  it('does not spawn a late app-server after cancellation during version verification', async () => {
+    let completeVersion = (_value: string) => {};
+    const version = new Promise<string>((resolve) => {
+      completeVersion = resolve;
+    });
+    const spawnCodex = vi.fn(() => {
+      throw new Error('unexpected_spawn');
+    });
+    const controller = new AbortController();
+    const task = new CodexTaskAdapter({
+      verifyVersion: () => version,
+      spawnCodex,
+    }).run('What is 15% of 240?', backend(), controller.signal, () => {});
+    const cancelled = expect(task).rejects.toThrow('cancelled');
+    controller.abort();
+    completeVersion('codex-cli 0.145.0');
+    await cancelled;
+    expect(spawnCodex).not.toHaveBeenCalled();
+  });
+
+  it('confirms close and group termination after SIGKILL, then removes only the owned task directory', async () => {
+    let child: ReturnType<typeof spawn> | undefined;
+    let directory = '';
+    let closed = false;
+    const controller = new AbortController();
+    const runner = new CodexTaskAdapter({
+      command: process.execPath,
+      appServerArgs: [fakeServer, 'stubborn'],
+      verifyVersion: async () => 'codex-cli 0.145.0',
+      killGraceMs: 20,
+      spawnCodex(command, args, options) {
+        directory = String(options.cwd);
+        const spawned = spawn(command, [...args], {
+          ...options,
+          stdio: ['pipe', 'pipe', 'pipe'],
+        });
+        child = spawned;
+        spawned.once('close', () => {
+          closed = true;
+        });
+        return spawned;
+      },
+    });
+    await expect(
+      runner.run('task', backend(), controller.signal, (event) => {
+        if (event.type === 'progress' && event.phase === 'thinking')
+          controller.abort();
+      }),
+    ).rejects.toThrow('cancelled');
+    expect(closed).toBe(true);
+    expect(child?.signalCode).toBe('SIGKILL');
+    expect(child?.pid).toBeGreaterThan(0);
+    expect(() => process.kill(-(child?.pid ?? 0), 0)).toThrow();
+    await expect(access(directory)).rejects.toThrow();
+  });
+
+  it('rejects cleanup that cannot confirm process close instead of timing into success', async () => {
+    const fakeChild = Object.assign(new EventEmitter(), {
+      stdin: new PassThrough(),
+      stdout: new PassThrough(),
+      stderr: new PassThrough(),
+      pid: undefined,
+      exitCode: null,
+      signalCode: null,
+      kill: vi.fn(() => false),
+    });
+    const runner = new CodexTaskAdapter({
+      verifyVersion: async () => 'codex-cli 0.145.0',
+      spawnCodex: () =>
+        fakeChild as unknown as ReturnType<
+          NonNullable<
+            import('./codexAdapter').CodexTaskAdapterOptions['spawnCodex']
+          >
+        >,
+      timeoutMs: 20,
+      killGraceMs: 20,
+    });
+    await expect(
+      runner.run('task', backend(), new AbortController().signal, () => {}),
+    ).rejects.toThrow('agent_cleanup_failed');
+  });
+
   it('uses one dynamic tool result as the sole success authority', async () => {
     const events: CodexTaskEvent[] = [];
     const localBackend = backend();

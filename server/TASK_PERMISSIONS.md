@@ -36,8 +36,12 @@ Both endpoints require exact Host, Origin, JSON Content-Type and the process
 session cookie; neither enables CORS. Request limits and `no-store` apply. Only
 one task runs at a time. A new offer replaces the old one; there is no unbounded
 pending-offer collection. Offers contain only an opaque random ID, expiration,
-the action and required class labels/classifications/retention. Grant, bearer,
+the action, public `surface_version` from the selected server snapshot, and
+required class labels/classifications/retention. Grant, bearer,
 identity artifacts and internal authority bindings are not sent to the browser.
+Only the permission-offer response gains this metadata; the run request and
+NDJSON event contract are unchanged. The version is an opaque display label,
+not a client-selectable snapshot or an authorization input.
 
 The server compares exact action and class sets: missing, duplicate, extra or
 substituted entries fail before the execution callback. Task text must match
@@ -61,13 +65,23 @@ offers cannot re-enable execution. Expiration is rechecked on submit and at the
 server; the UI displays the remaining time and requires a fresh access request after expiry. No persistent approval
 preferences or “always allow” mode are introduced.
 
+The initially collapsed **ASP details** block shows the reviewed surface version
+and allowed action. Submission preserves those two public fields with that
+task's result; editing the next task does not rewrite the completed result's
+metadata. A fresh review replaces the projection. Editing an unsubmitted offer,
+cancellation or failure removes its details; stale events cannot restore them.
+The block describes the selected surface, not a Grant, approval or proof of
+natural-language intent.
+
 ## Evidence and non-claims
 
-The current broker and executor still select version `0.1.1`. P5-T8A's
-[SDK-authored `0.1.2` candidate](../docs/LIVE_SDK_MANIFEST_PREPARATION.md) is
-prepared only; these offers cannot select its version or schema namespace.
-Rebinding access review and authority to it requires the separate P5-T8B
-activation/retirement transition.
+The current broker and executor share the SDK-authored version `0.1.2`
+snapshot. Browser offers cannot select its version/schema namespace. Retirement
+invalidates both outstanding offers and accepted-but-unclaimed permits, stops
+issuance and cancels active work. A replacement has a fresh cookie and requires
+new access review. Old permission or Grant records are never rebound. The
+[P5-T8B report](../docs/LIVE_SDK_MANIFEST_ACTIVATION.md) records composed HTTPS
+and restart evidence; P5-T8A's static qualification remains historical.
 
 `taskPermissions.test.ts` checks exact selection, expiry, replacement, replay,
 forged permits, changed task/surface and one-time issuance. It also runs a valid

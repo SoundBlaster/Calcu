@@ -104,7 +104,7 @@ type SpawnCodex = (
 export type CodexTaskAdapterOptions = {
   command?: string;
   timeoutMs?: number;
-  verifyVersion?: () => Promise<string>;
+  verifyVersion?: (signal?: AbortSignal) => Promise<string>;
   spawnCodex?: SpawnCodex;
   environment?: NodeJS.ProcessEnv;
   appServerArgs?: readonly string[];
@@ -179,15 +179,18 @@ function appendBoundedMessage(current: string, delta: string) {
 async function defaultVersionCheck(
   command: string,
   environment: NodeJS.ProcessEnv,
+  signal?: AbortSignal,
 ) {
   try {
     const { stdout } = await execFile(command, ['--version'], {
       env: allowlistedEnvironment(environment),
       timeout: 5_000,
       maxBuffer: 16 * 1024,
+      signal,
     });
     return stdout.trim();
   } catch (error) {
+    if (signal?.aborted) throw new Error('cancelled');
     const code = (error as NodeJS.ErrnoException).code;
     throw new Error(
       code === 'ENOENT' ? 'codex_not_found' : 'codex_version_unsupported',
@@ -224,43 +227,60 @@ function createProcessStopper(
   child: ChildProcessWithoutNullStreams,
   killGraceMs: number,
 ) {
+  let closed = false;
+  child.once('close', () => {
+    closed = true;
+  });
   let stopping: Promise<void> | undefined;
   return () => {
     if (stopping) return stopping;
-    stopping = new Promise<void>((resolve) => {
-      if (child.exitCode !== null || child.signalCode !== null) {
-        resolve();
-        return;
-      }
+    stopping = new Promise<void>((resolve, reject) => {
       let settled = false;
-      let killTimer: NodeJS.Timeout | undefined;
-      const finish = () => {
+      const groupGone = () => {
+        if (!child.pid) return true;
+        try {
+          process.kill(-child.pid, 0);
+          return false;
+        } catch (error) {
+          return (error as NodeJS.ErrnoException).code === 'ESRCH';
+        }
+      };
+      const finish = (error?: Error) => {
         if (settled) return;
         settled = true;
-        if (killTimer) clearTimeout(killTimer);
-        child.removeListener('close', finish);
-        resolve();
+        clearTimeout(killTimer);
+        clearTimeout(deadline);
+        clearInterval(probe);
+        child.removeListener('close', confirm);
+        if (error) reject(error);
+        else resolve();
+      };
+      const confirm = () => {
+        if (closed && groupGone()) finish();
       };
       const signalGroup = (signal: NodeJS.Signals) => {
         try {
-          if (process.platform === 'win32') child.kill(signal);
-          else if (child.pid) {
+          if (child.pid) {
             process.kill(-child.pid, signal);
             // Also signal the group leader directly: on macOS a just-spawned
             // detached process may not yet observe the group signal.
-            child.kill(signal);
+            if (!closed) child.kill(signal);
           }
         } catch {
-          if (!child.kill(signal)) finish();
+          if (!closed) child.kill(signal);
         }
       };
-      child.once('close', finish);
-      signalGroup('SIGTERM');
-      killTimer = setTimeout(() => {
-        signalGroup('SIGKILL');
-        setTimeout(finish, 100).unref();
-      }, killGraceMs);
-      killTimer.unref();
+      // A dead leader is insufficient when a descendant retains the group.
+      // These bounded probes observe only this task's owned POSIX group.
+      const probe = setInterval(confirm, 50);
+      const killTimer = setTimeout(() => signalGroup('SIGKILL'), killGraceMs);
+      const deadline = setTimeout(
+        () => finish(new Error('agent_cleanup_failed')),
+        killGraceMs + 2_000,
+      );
+      child.once('close', confirm);
+      if (!closed || !groupGone()) signalGroup('SIGTERM');
+      confirm();
     });
     return stopping;
   };
@@ -269,7 +289,7 @@ function createProcessStopper(
 export class CodexTaskAdapter implements CodexTaskRunner {
   readonly #command: string;
   readonly #timeoutMs: number;
-  readonly #verifyVersion: () => Promise<string>;
+  readonly #verifyVersion: (signal?: AbortSignal) => Promise<string>;
   readonly #spawnCodex: SpawnCodex;
   readonly #environment: NodeJS.ProcessEnv;
   readonly #appServerArgs: readonly string[];
@@ -289,7 +309,8 @@ export class CodexTaskAdapter implements CodexTaskRunner {
     this.#environment = options.environment ?? process.env;
     this.#verifyVersion =
       options.verifyVersion ??
-      (() => defaultVersionCheck(this.#command, this.#environment));
+      ((signal) =>
+        defaultVersionCheck(this.#command, this.#environment, signal));
     this.#spawnCodex =
       options.spawnCodex ??
       ((command, args, spawnOptions) =>
@@ -321,11 +342,13 @@ export class CodexTaskAdapter implements CodexTaskRunner {
     )
       throw new Error('task_invalid');
     if (signal.aborted) throw new Error('cancelled');
-    verifyVersionText(await this.#verifyVersion());
+    verifyVersionText(await this.#verifyVersion(signal));
+    if (signal.aborted) throw new Error('cancelled');
 
     const workingDirectory = await mkdtemp(join(tmpdir(), 'calcu-codex-task-'));
     let child: ChildProcessWithoutNullStreams | undefined;
     try {
+      if (signal.aborted) throw new Error('cancelled');
       const environment = allowlistedEnvironment(this.#environment);
       child = this.#spawnCodex(this.#command, this.#appServerArgs, {
         cwd: workingDirectory,
@@ -351,18 +374,27 @@ export class CodexTaskAdapter implements CodexTaskRunner {
         const cleanup = () => {
           clearTimeout(timeout);
           signal.removeEventListener('abort', abort);
-          child?.stdout.removeAllListeners();
-          child?.stderr.removeAllListeners();
+          // Preserve Node's internal stream-close bookkeeping: removing all
+          // listeners prevents ChildProcess.close from ever being observed.
+          child?.stdout.removeAllListeners('data');
+          child?.stderr.removeAllListeners('data');
+          child?.stdout.resume();
+          child?.stderr.resume();
         };
         const settle = (error?: Error, result?: CodexTaskResult) => {
           if (settled) return;
           settled = true;
           cleanup();
-          void stopProcess().then(() => {
-            if (error) reject(error);
-            else if (result) resolve(result);
-            else reject(new Error('agent_protocol_error'));
-          });
+          void stopProcess()
+            .then(async () => {
+              // Any in-flight tool request must finish as well as the process.
+              // The host closes its owned transport and enforces one deadline.
+              await queue;
+              if (error) reject(error);
+              else if (result) resolve(result);
+              else reject(new Error('agent_protocol_error'));
+            }, reject)
+            .catch(reject);
         };
         const fail = (code: string) => settle(new Error(code));
         const abort = () => fail('cancelled');
@@ -486,6 +518,7 @@ export class CodexTaskAdapter implements CodexTaskRunner {
               params.arguments,
               signal,
             );
+            if (settled || signal.aborted) return;
             const operands: CalculationArguments = {
               operator: result.operator,
               left: result.left,

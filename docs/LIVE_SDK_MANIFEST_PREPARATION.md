@@ -1,8 +1,10 @@
 # P5-T8A — SDK manifest preparation (not activated)
 
-Status: preparation implemented, 2026-10-02 UTC. The demo still selects the
-legacy `0.1.1` manifest. No old Grant/session is migrated and no new live
-conformance claim is made.
+Historical P5-T8A evidence, 2026-10-02 UTC (merged in Calcu #18). At that
+commit the demo selected legacy `0.1.1`. The subsequent
+[P5-T8B activation](LIVE_SDK_MANIFEST_ACTIVATION.md) selects `0.1.2`, retires
+old authority and removes the legacy live builder. This report's captured
+digests and measurements remain historical evidence, not current lifecycle claims.
 
 ## One declaration, explicit host composition
 
@@ -19,10 +21,9 @@ revocation fields. It validates the complete document through
 has version `0.1.2` and action schemas under `<issuer>/schemas/0.1.2/`.
 The version is fixed by the trusted factory, not a caller-provided option.
 
-The private shared builder retains the handwritten legacy action/schema branch
-for `prepareCalcuSurface()`. That factory remains the default in the demo,
-permission broker and executor until P5-T8B. Preparing either description does
-not issue authority, authenticate identity or execute a calculation.
+P5-T8A retained the handwritten legacy branch in `prepareCalcuSurface()` until
+P5-T8B. Preparing a description does not issue authority, authenticate identity
+or execute a calculation.
 
 ## Immutable legacy baseline and exact delta
 
@@ -31,8 +32,9 @@ The [local](../server/fixtures/legacy-surface-0.1.1.local.json) and
 captured from Calcu `7f837fd1eaad4dec78b3c7f612e52a8fa7a870a4` before changing
 the builder. They retain the full manifest, all four schema resources and the
 identity advertisement. Tests pin fixture/manifest/resource JCS digests and the
-original constructed JSON byte digests. They also compare the still-selected
-legacy factory's serialization to the captured artifacts.
+original constructed JSON byte digests. P5-T8A also compared the then-selected
+legacy factory's serialization to the captured artifacts; P5-T8B preserves the
+fixture oracles and compares the current factory with the new qualified goldens.
 
 The historical offline comparison now reads these fixtures instead of calling
 the evolving live factory. Its previously accepted prototype goldens remain
@@ -86,11 +88,9 @@ historical wrapper now occupy 442 (376 + 55 + 11). This preparatory slice adds
 are evidence, not live authoring duplication. P5-T8B will remove the handwritten
 live branch and measure the resulting composition footprint again.
 
-Next: [P5-T8B](../SPECS/INPROGRESS/P5-T8_Live_SDK_Manifest_Migration.md), selecting
-the new snapshot consistently across permissions, issuance, admission and
-receipts, with explicit authority retirement and bounded host restart. Until
-that transition is implemented, neither new authority issuance nor new-version
-live behavior is established by these tests.
+The subsequent [P5-T8B report](LIVE_SDK_MANIFEST_ACTIVATION.md) records selection
+across permissions, issuance, admission and receipts, plus retirement/restart.
+The static P5-T8A tests alone establish neither issuance nor live behavior.
 
 ## Validation
 

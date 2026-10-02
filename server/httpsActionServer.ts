@@ -1,6 +1,7 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { createServer, type Server } from 'node:https';
 import type { createCalcuExecutor } from './executor';
+import { ownedServerLifecycle } from './serverLifecycle';
 
 const MAX_BODY_BYTES = 8192;
 const MAX_RESPONSE_BYTES = 8192;
@@ -41,6 +42,7 @@ function writeError(
   statusCode: number,
   code: string,
 ) {
+  if (response.destroyed || response.writableEnded) return;
   const body = JSON.stringify({ type: 'action.error', error: { code } });
   response.statusCode = statusCode;
   response.setHeader('content-type', 'application/json');
@@ -74,6 +76,10 @@ function handler(
   expectedHosts: readonly string[],
   invokeDelayMs = 0,
 ) {
+  const controller = new AbortController();
+  response.once('close', () => {
+    if (!response.writableEnded) controller.abort();
+  });
   response.setHeader('cache-control', 'no-store');
   response.setHeader('x-content-type-options', 'nosniff');
   if (request.method !== 'POST' || request.url !== '/agent-actions') {
@@ -107,7 +113,11 @@ function handler(
             return;
           }
           setTimeout(() => {
-            if (request.destroyed || response.destroyed) {
+            if (
+              request.aborted ||
+              response.destroyed ||
+              controller.signal.aborted
+            ) {
               reject(new Error('transport_error'));
               return;
             }
@@ -115,8 +125,13 @@ function handler(
           }, invokeDelayMs);
         }),
     )
-    .then((body) => executor.invoke(credential, body))
     .then((body) => {
+      if (request.aborted || response.destroyed || controller.signal.aborted)
+        throw new Error('aborted');
+      return executor.invoke(credential, body, controller.signal);
+    })
+    .then((body) => {
+      if (response.destroyed || controller.signal.aborted) return;
       if (Buffer.byteLength(body) > MAX_RESPONSE_BYTES) {
         writeError(response, 500, 'response_too_large');
         return;
@@ -161,8 +176,11 @@ export function createActionHttpsServer(
       );
     },
   );
+  const lifecycle = ownedServerLifecycle(server);
   return {
     server,
+    close: () => lifecycle.close(),
+    destroyConnections: () => lifecycle.destroyConnections(),
     listen: () =>
       new Promise<Server>((resolve, reject) => {
         server.once('error', reject);

@@ -167,6 +167,15 @@ only during the test and removed afterwards.
 
 ## Mediated Proposal mapping
 
+The live manifest now uses the SDK-authored `0.1.2` snapshot with immutable
+versioned action schema URIs. `demoHost.ts` passes the same prepared snapshot to
+the permission broker and executor; LocalBackend uses the issuer's binding, not
+an independently selected global version. Stop/restart retires all executor
+authority, closes partial requests and waits for owned agent cleanup within
+one five-second deadline. Failure exits unsuccessfully; there is no automatic
+replacement or cross-generation retry. See
+[P5-T8B activation evidence](../docs/LIVE_SDK_MANIFEST_ACTIVATION.md).
+
 The current executable coverage and its deliberate limits are recorded in
 [`CONFORMANCE.md`](./CONFORMANCE.md). In short:
 
@@ -199,8 +208,9 @@ HTTPS executor integration, task-host security/error cases, UI stream/cancel/
 retry cases, and positive HTTPS round trips plus negative cases for
 credential, identity, grant/session binding, action/mode/input, host/path/
 method/content-type, TLS, redirect, size, timeout, abort, quota and correlated
-response failures. Rejection paths assert that the current request does not
-reach the engine.
+response failures. Admission-time rejection paths assert no new engine call.
+A rejected or cancelled response after execution is different: the action
+already happened; the test asserts no successful presentation, not an undo.
 
 For setup instructions, measured responsive-layout evidence, implementation
 cost, and the adoption conclusion, see the

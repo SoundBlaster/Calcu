@@ -12,6 +12,7 @@ type Approval = {
   surfaceHash: string;
   expiresAt: number;
   claimed: boolean;
+  lifecycle: { retired: boolean };
 };
 const approvals = new WeakMap<ApprovedTaskPermission, Approval>();
 
@@ -39,6 +40,7 @@ export function claimTaskPermission(
   if (
     !record ||
     record.claimed ||
+    record.lifecycle.retired ||
     record.task !== task ||
     record.surfaceHash !== surface.surface_hash ||
     now >= record.expiresAt
@@ -74,12 +76,19 @@ export function createTaskPermissionBroker(
     };
   });
   let outstanding: { task: string; offer: TaskPermissionOffer } | undefined;
+  const lifecycle = { retired: false };
   return {
+    retire() {
+      lifecycle.retired = true;
+      outstanding = undefined;
+    },
     offer(task: string): TaskPermissionOffer {
+      if (lifecycle.retired) throw new Error('permission_invalid');
       const offer: TaskPermissionOffer = {
         offer_id: randomBytes(32).toString('hex'),
         expires_at: now() + 60_000,
         action_id: 'calculation.propose',
+        surface_version: prepared.surface.surface_version,
         data_classes: structuredClone(classes),
         retention: 'user_managed',
       };
@@ -87,6 +96,7 @@ export function createTaskPermissionBroker(
       return offer;
     },
     accept(task: string, selection: unknown): ApprovedTaskPermission {
+      if (lifecycle.retired) throw new Error('permission_invalid');
       const record = outstanding;
       let value: Record<string, unknown>;
       try {
@@ -120,6 +130,7 @@ export function createTaskPermissionBroker(
         surfaceHash: prepared.surface.surface_hash,
         expiresAt: record.offer.expires_at,
         claimed: false,
+        lifecycle,
       });
       return permission;
     },

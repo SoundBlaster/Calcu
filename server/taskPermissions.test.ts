@@ -37,6 +37,27 @@ function fixture() {
 }
 
 describe('trusted one-task permission selection', () => {
+  it('projects public metadata from the selected snapshot, not a UI constant', () => {
+    const prepared = prepareCalcuSurface(
+      'calcu.example',
+      'https://calcu.example.test',
+    );
+    const broker = createTaskPermissionBroker(prepared, () => start);
+    const offer = broker.offer(task);
+    expect(offer.surface_version).toBe(prepared.surface.surface_version);
+    expect(offer.action_id).toBe(prepared.surface.action.id);
+    expect(JSON.stringify(offer)).not.toMatch(
+      /credential|grant_hash|passport|identity_evidence|receipt|surface_hash/i,
+    );
+    expect(Object.keys(offer).sort()).toEqual([
+      'action_id',
+      'data_classes',
+      'expires_at',
+      'offer_id',
+      'retention',
+      'surface_version',
+    ]);
+  });
   it('does not reach issuance for a forged selection and executes only after valid selection', async () => {
     const current = fixture();
     const identity = createTestIdentityFixture(start);
@@ -104,6 +125,8 @@ describe('trusted one-task permission selection', () => {
   it('binds exact action/data selection to the task and surface before issuance', () => {
     const { broker, selection, prepared, offer } = fixture();
     expect(offer.retention).toBe('user_managed');
+    expect(offer.surface_version).toBe(prepared.surface.surface_version);
+    expect(offer.action_id).toBe(prepared.surface.action.id);
     const permission = broker.accept(task, selection);
     expect(() =>
       claimTaskPermission(permission, task, prepared.surface, start),

@@ -8,6 +8,7 @@ import {
 } from 'node:http';
 import { extname, join, normalize, resolve } from 'node:path';
 import type { CodexTaskEvent, CodexTaskResult } from './codexAdapter';
+import { ownedServerLifecycle } from './serverLifecycle';
 import type {
   ApprovedTaskPermission,
   createTaskPermissionBroker,
@@ -60,6 +61,8 @@ export type TaskHostOptions = {
   executeTask: TaskExecution;
   permissions: ReturnType<typeof createTaskPermissionBroker>;
   sessionToken?: string;
+  /** Trusted host fails closed if owned agent cleanup cannot be confirmed. */
+  onUnsafeCleanup?: () => void;
 };
 
 type BrowserEvent =
@@ -86,6 +89,7 @@ function writeJson(
   statusCode: number,
   body: unknown,
 ) {
+  if (response.destroyed || response.writableEnded) return;
   response.statusCode = statusCode;
   response.setHeader('content-type', 'application/json; charset=utf-8');
   response.setHeader('cache-control', 'no-store');
@@ -207,9 +211,22 @@ async function serveStatic(
 export function createTaskHttpServer(options: TaskHostOptions) {
   const sessionToken =
     options.sessionToken ?? randomBytes(32).toString('base64url');
-  let activeTask: { taskId: string; controller: AbortController } | undefined;
+  let retired = false;
+  let cleanupFailure = false;
+  let activeTask:
+    | {
+        taskId: string;
+        controller: AbortController;
+        request: IncomingMessage;
+        done: Promise<void>;
+      }
+    | undefined;
 
   const server = createServer(async (request, response) => {
+    if (retired) {
+      writeJson(response, 503, { error: { code: 'backend_unavailable' } });
+      return;
+    }
     const address = server.address();
     const expectedHost =
       address && typeof address !== 'string'
@@ -248,87 +265,123 @@ export function createTaskHttpServer(options: TaskHostOptions) {
     }
     const taskId = randomUUID();
     const controller = new AbortController();
-    activeTask = { taskId, controller };
-    let task: string;
-    let permission: ApprovedTaskPermission;
-    try {
-      const parsed = await readTask(request, preview);
-      task = parsed.task;
-      if (response.destroyed) throw new Error('cancelled');
-      if (preview) {
-        writeJson(response, 200, options.permissions.offer(task));
-        if (activeTask?.taskId === taskId) activeTask = undefined;
-        return;
-      }
-      permission = options.permissions.accept(task, parsed.selection);
-    } catch {
-      if (activeTask?.taskId === taskId) activeTask = undefined;
-      writeJson(response, 400, { error: { code: 'task_invalid' } });
-      return;
-    }
+    let finish = () => {};
+    const done = new Promise<void>((resolveDone) => {
+      finish = resolveDone;
+    });
+    activeTask = { taskId, controller, request, done };
     let terminal = false;
-    response.statusCode = 200;
-    response.setHeader('content-type', 'application/x-ndjson; charset=utf-8');
-    response.setHeader('cache-control', 'no-store');
-    response.setHeader('connection', 'keep-alive');
-    applySecurityHeaders(response);
-    const send = (event: BrowserEvent) => {
-      if (!response.destroyed && !response.writableEnded)
-        response.write(`${JSON.stringify(event)}\n`);
-    };
+    // Install before reading: a partial body can otherwise outlive shutdown.
     response.once('close', () => {
       if (!terminal && !response.writableEnded) controller.abort();
     });
-    send({ type: 'task.accepted', task_id: taskId });
-
     try {
-      const result = await options.executeTask(
-        task,
-        controller.signal,
-        (event) => {
-          if (event.type === 'progress') {
-            send({
-              type: 'task.progress',
-              task_id: taskId,
-              phase: event.phase,
-            });
-          } else {
-            send({
-              type: 'task.tool_result',
-              task_id: taskId,
-              application_result: event.result,
-              trace: event.trace,
-            });
-          }
-        },
-        permission,
-      );
-      terminal = true;
-      send({
-        type: 'task.completed',
-        task_id: taskId,
-        application_result: result.application_result,
-        ...(result.agent_message
-          ? { agent_message: result.agent_message }
-          : {}),
-        trace: result.trace,
-      });
-      response.end();
-    } catch (error) {
-      terminal = true;
-      const code = safeErrorCode(error);
-      if (code === 'cancelled')
-        send({ type: 'task.cancelled', task_id: taskId });
-      else send({ type: 'task.failed', task_id: taskId, error: { code } });
-      response.end();
+      let task: string;
+      let permission: ApprovedTaskPermission;
+      try {
+        const parsed = await readTask(request, preview);
+        task = parsed.task;
+        if (retired || controller.signal.aborted || response.destroyed)
+          throw new Error('cancelled');
+        if (preview) {
+          writeJson(response, 200, options.permissions.offer(task));
+          return;
+        }
+        permission = options.permissions.accept(task, parsed.selection);
+      } catch {
+        writeJson(response, 400, { error: { code: 'task_invalid' } });
+        return;
+      }
+      response.statusCode = 200;
+      response.setHeader('content-type', 'application/x-ndjson; charset=utf-8');
+      response.setHeader('cache-control', 'no-store');
+      response.setHeader('connection', 'keep-alive');
+      applySecurityHeaders(response);
+      const send = (event: BrowserEvent) => {
+        if (
+          !retired &&
+          !controller.signal.aborted &&
+          !response.destroyed &&
+          !response.writableEnded
+        )
+          response.write(`${JSON.stringify(event)}\n`);
+      };
+      send({ type: 'task.accepted', task_id: taskId });
+
+      try {
+        const result = await options.executeTask(
+          task,
+          controller.signal,
+          (event) => {
+            if (event.type === 'progress') {
+              send({
+                type: 'task.progress',
+                task_id: taskId,
+                phase: event.phase,
+              });
+            } else {
+              send({
+                type: 'task.tool_result',
+                task_id: taskId,
+                application_result: event.result,
+                trace: event.trace,
+              });
+            }
+          },
+          permission,
+        );
+        if (retired || controller.signal.aborted) throw new Error('cancelled');
+        terminal = true;
+        send({
+          type: 'task.completed',
+          task_id: taskId,
+          application_result: result.application_result,
+          ...(result.agent_message
+            ? { agent_message: result.agent_message }
+            : {}),
+          trace: result.trace,
+        });
+        response.end();
+      } catch (error) {
+        if (
+          error instanceof Error &&
+          error.message === 'agent_cleanup_failed'
+        ) {
+          cleanupFailure = true;
+          retired = true;
+          options.permissions.retire();
+          options.onUnsafeCleanup?.();
+        }
+        terminal = true;
+        const code = safeErrorCode(error);
+        if (code === 'cancelled')
+          send({ type: 'task.cancelled', task_id: taskId });
+        else send({ type: 'task.failed', task_id: taskId, error: { code } });
+        response.end();
+      }
     } finally {
       if (activeTask?.taskId === taskId) activeTask = undefined;
+      finish();
     }
   });
+  const lifecycle = ownedServerLifecycle(server);
 
   return {
     server,
     sessionToken,
+    retire() {
+      retired = true;
+      options.permissions.retire();
+      activeTask?.controller.abort();
+      if (activeTask && !activeTask.request.complete)
+        activeTask.request.destroy();
+    },
+    async waitForIdle() {
+      await activeTask?.done;
+      if (cleanupFailure) throw new Error('agent_cleanup_failed');
+    },
+    close: () => lifecycle.close(),
+    destroyConnections: () => lifecycle.destroyConnections(),
     listen: () =>
       new Promise<Server>((resolvePromise, rejectPromise) => {
         server.once('error', rejectPromise);
@@ -339,6 +392,8 @@ export function createTaskHttpServer(options: TaskHostOptions) {
       }),
     cancelActiveTask() {
       activeTask?.controller.abort();
+      if (activeTask && !activeTask.request.complete)
+        activeTask.request.destroy();
     },
   };
 }

@@ -10,6 +10,9 @@ import {
 import { Type } from '@sinclair/typebox';
 import { calculationDataClasses, calculationDataExposure } from './exposure';
 
+export const CALCULATION_ACTION_ID = 'calculation.propose';
+export const CALCULATION_MODE = 'propose';
+
 const fields = {
   operator: Type.Union([
     Type.Literal('add'),
@@ -33,13 +36,13 @@ export type CalculationActionOutput = ActionOutput<CalculationDeclaration>;
 export function calculationActionInventory(): OfflineActionInventory {
   const declaration = {
     action: {
-      id: 'calculation.propose',
-      scope: 'calculation.propose',
+      id: CALCULATION_ACTION_ID,
+      scope: CALCULATION_ACTION_ID,
       risk: 'propose',
       side_effect: false,
       approval: 'none',
       execution: {
-        mode: 'propose',
+        mode: CALCULATION_MODE,
         operation_id: 'calculation.propose.operation',
         persisted: false,
       },

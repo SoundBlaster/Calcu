@@ -35,14 +35,20 @@ It also keeps the immutable submitted task separate from the exact admitted
 action and labels model prose as unverified. This provenance presentation does
 not establish semantic equivalence between the request and the action.
 
-## SDK manifest preparation (not live)
+## SDK-authored live snapshot and host retirement
 
-P5-T8A statically qualifies a complete SDK-authored version `0.1.2` candidate,
-including immutable legacy fixtures and exact two-namespace resource digests.
-The demo/issuer/executor still use the old `0.1.1` selection. The
-[preparation tests/report](../docs/LIVE_SDK_MANIFEST_PREPARATION.md) do not
-establish new-version admission, host replacement, portable interoperability
-or a conformance promotion. Those live transition checks remain P5-T8B.
+P5-T8A preserved immutable legacy fixtures and qualified exact two-namespace
+digests. P5-T8B now selects that `0.1.2` snapshot for permissions, issuance,
+independent admission and server-only receipts. The deterministic composed
+test runs browser permission endpoints → fake Codex process → real HTTPS →
+Calcu, returns `36` and verifies both receipt tuples against that snapshot.
+Retirement tests reject retained old issuer/executor references, stale
+credentials/bindings and old offers/cookies. Valid pre-admission barriers show
+zero additional engine calls; post-execution cancellation instead rejects
+presentation without pretending to undo the action. Partial-body shutdown,
+confirmed process-group exit, unconfirmed cleanup and shared deadline failure
+are tested. See [activation evidence](../docs/LIVE_SDK_MANIFEST_ACTIVATION.md).
+These checks do not promote portable interoperability or production conformance.
 
 ## Manual live evidence
 
@@ -55,7 +61,7 @@ CI evidence, independent interoperability, or production conformance.
 ## Explicit non-claims
 
 The slice does not provide production identity trust, durable user consent,
-Proof-Bound DPoP/mTLS, signed or portable receipts, recovery, replay protection beyond
+Proof-Bound DPoP/mTLS, signed or portable receipts, durable recovery, replay protection beyond
 the local correlation contract, remote networking, CORS integration, or a
 general-purpose ASP SDK. It does not parse natural-language intent or prove that
 an admitted action fully represents a user's task. The ASP repository and

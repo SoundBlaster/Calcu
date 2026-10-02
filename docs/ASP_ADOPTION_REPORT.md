@@ -17,6 +17,14 @@ packages before this is a practical onboarding path for ordinary applications.
 This is a **Compatibility Bearer development profile**, not production ASP
 certification or independent interoperability evidence.
 
+P5-T8B now activates the SDK-authored `0.1.2` manifest with versioned action
+schema identifiers and one snapshot across access review, Grant issuance,
+admission and receipts. Stop/restart retires old authority and requires fresh
+access review; it never migrates old Grants or automatically retries a task.
+See the [activation report](LIVE_SDK_MANIFEST_ACTIVATION.md) for measured code
+cost and deterministic lifecycle evidence. The historical manual CLI evidence
+below does not prove this new snapshot's live-provider behavior.
+
 ## What runs
 
 ```text
