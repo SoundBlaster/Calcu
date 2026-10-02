@@ -53,6 +53,14 @@ then `SIGKILL` after one second.
 
 ## Closed application contract
 
+The selected live snapshot remains version `0.1.1`. P5-T8A adds
+`prepareSdkCalcuSurface()` to qualify an SDK-authored `0.1.2` candidate from the
+shared application declaration; it does not select that candidate in the demo,
+permission broker or executor. The complete legacy fixtures and new resource
+digests are recorded in [preparation evidence](../docs/LIVE_SDK_MANIFEST_PREPARATION.md).
+TypeBox is an explicit server dependency. Activation and authority retirement
+remain P5-T8B; schema preparation is not Grant issuance or live admission.
+
 `createCalcuExecutor({ now, identityVerifier })` owns the authoritative
 control-plane state. The only exported surface is a proposal-only action:
 

@@ -2,6 +2,10 @@
 
 ## Recently Completed (not yet archived)
 
+- P5-T8A — SDK-authored `0.1.2` candidate and immutable `0.1.1` fixtures;
+  [preparation evidence](../../docs/LIVE_SDK_MANIFEST_PREPARATION.md).
+  The live selection and authority remain on `0.1.1`.
+
 - Public SDK authoring subpath connected to Calcu's offline candidate;
   merged in [Calcu #16](https://github.com/SoundBlaster/Calcu/pull/16);
   [compatibility and validation report](../../docs/OFFLINE_ACTION_AUTHORING.md).
@@ -10,8 +14,8 @@
 ## Next
 
 - P5-T8 — [Live SDK Manifest Migration plan](P5-T8_Live_SDK_Manifest_Migration.md).
-  Deliver preparation/legacy fixtures first (P5-T8A), then activation and host
-  retirement/restart checks (P5-T8B). Runtime implementation is pending.
+  P5-T8A preparation/legacy fixtures are implemented. Next is P5-T8B activation
+  and host retirement/restart checks; live transition is pending.
   Historical baseline: the
   [P5-T7 design and acceptance evidence](../ARCHIVE/P5-T7_Offline_Action_Authoring/P5-T7_Offline_Action_Authoring_Design.md);
   see also the [validation report](../ARCHIVE/P5-T7_Offline_Action_Authoring/P5-T7_Validation_Report.md).

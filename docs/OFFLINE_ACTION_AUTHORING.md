@@ -3,6 +3,11 @@
 Status: public SDK offline-consumer migration, 2026-10-02 UTC. Not a live
 description migration or conformance promotion.
 
+This report records the accepted Calcu #16 migration. The subsequent
+[P5-T8A extraction and versioned preparation](LIVE_SDK_MANIFEST_PREPARATION.md)
+shares its declaration with the new server snapshot factory and retains fixed
+legacy fixtures. The selected live `0.1.1` snapshot is still unchanged.
+
 The [candidate](../server/action-authoring-candidate.ts) describes Calcu's
 existing four-operation proposal using `@0al/agent-surface/authoring` from
 [SDK PR #32](https://github.com/0al-spec/agent-surface-js/pull/32).
@@ -60,16 +65,18 @@ and malformed JSON reject without a parse/stringify round trip.
 
 The base SDK archive was updated to obtain its new public subpath. Its existing
 validator implementations and spec-lock are byte-identical to the old archive;
-see [package comparison](../vendor/README.md). The authoritative
+see [package comparison](../vendor/README.md). At Calcu #16,
 `server/manifest.ts`, runtime issuer, Grant/session lifecycle, executor,
-transport and UI are unchanged. The candidate is imported only by its
-offline test. Schema inference does not replace `validateCalculation` or its
+transport and UI were unchanged. The historical candidate wrapper is still
+imported only by its offline test; P5-T8A now imports the shared declaration
+in the server manifest factory without activating its new snapshot.
+Schema inference does not replace `validateCalculation` or its
 finite-number/negative-zero business checks, and says nothing about interpreting
 natural-language tasks correctly.
 
 ## Cost and remaining work
 
-The candidate is 55 physical lines, versus 56 before migration, including imports,
+At Calcu #16, the candidate was 55 physical lines, versus 56 before migration, including imports,
 inferred types and explicit policy. Replacing the two private lifecycle objects
 with one public inventory removes handler wiring; the one-line reduction is not
 evidence of a meaningful total integration-cost saving.

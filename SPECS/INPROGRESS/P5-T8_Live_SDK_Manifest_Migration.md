@@ -1,6 +1,9 @@
 # P5-T8 — Migrate the live manifest to SDK authoring
 
 Status: implementation plan, 2026-10-02 UTC. Runtime activation is pending.
+P5-T8A preparation is implemented; see
+[snapshot/fixture evidence](../../docs/LIVE_SDK_MANIFEST_PREPARATION.md).
+P5-T8B remains pending.
 Priority: P1. Complexity: high; reasoning effort: high.
 Dependencies: P5-T5/P5-T7 evidence, merged
 [SDK #32](https://github.com/0al-spec/agent-surface-js/pull/32) and

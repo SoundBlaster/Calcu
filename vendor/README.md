@@ -47,10 +47,12 @@ add only the `OfflineRequestGrantComposition` export; its implementation and
 the authoring files are additions. Calcu does not adopt the composition export
 in this slice. No dependency version used by the old base validators changes.
 
-The base package is a runtime dependency, but the new authoring subpath is used
-only by the offline candidate/tests. TypeBox `0.34.52` remains an explicit
-development dependency, satisfying the SDK's optional peer. Neither authoring
-nor TypeBox is imported into the browser/live execution path.
+The base package and TypeBox `0.34.52` are runtime dependencies, satisfying the
+SDK's optional authoring peer explicitly. The server manifest module now imports
+the shared application declaration and can prepare the versioned SDK candidate.
+The live factory still selects the legacy `0.1.1` description; activation is a
+separate task. Neither authoring nor TypeBox is imported into the browser.
+See [P5-T8A preparation evidence](../docs/LIVE_SDK_MANIFEST_PREPARATION.md).
 
 ## Historical private offline authoring experiment
 

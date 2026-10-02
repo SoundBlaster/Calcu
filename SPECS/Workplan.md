@@ -15,7 +15,7 @@ session contract and tested loopback HTTPS boundary. See [boundary status](../se
 | P5-T3 | Implemented: ephemeral Codex adapter, local task host and task UI | P5-T2 |
 | P5-T4 | Implemented: regression/conformance evidence and adoption report | P5-T3 |
 | P5-T5 | Complete: SDK-validated manifest/request/Grant values and server-only unsigned Runtime/App Receipts | P5-T4; SDK PRs #12 and #13 |
-| P5-T8 | Planned: SDK-authored live manifest with versioned resources and retirement/restart qualification | P5-T5; accepted P5-T7 follow-up; SDK #32 and Calcu #16 |
+| P5-T8 | In progress: SDK-authored candidate/legacy fixtures prepared (A); live activation and retirement/restart pending (B) | P5-T5; accepted P5-T7 follow-up; SDK #32 and Calcu #16 |
 
 The P5 demo implementation is complete through **P5-T5**; the P5-T6
 second-consumer comparison is complete and recorded below. This section does not
@@ -119,9 +119,10 @@ mark a production ASP deployment or change the existing keypad requirements.
 
 #### ⏳ P5-T8: Migrate the live manifest to SDK authoring
 
-- **Status:** Planned in
+- **Status:** P5-T8A preparation implemented; P5-T8B pending. Plan in
   [P5-T8 Live SDK Manifest Migration](INPROGRESS/P5-T8_Live_SDK_Manifest_Migration.md).
   Runtime activation remains pending; Calcu #16 supplied accepted offline evidence.
+  See [P5-T8A preparation evidence](../docs/LIVE_SDK_MANIFEST_PREPARATION.md).
 - **Priority:** P1. **Dependencies:** P5-T5/P5-T7 evidence, SDK #32 and Calcu #16.
   **Parallelizable:** no for activation; preparation precedes lifecycle tests.
 - **Description:** Replace repeated live action/schema fields with the qualified
