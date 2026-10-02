@@ -3,8 +3,10 @@
 Status: implemented for review, 2026-10-02 UTC. The default live selection is
 `0.1.2`; P5-T8A was merged in [Calcu #18](https://github.com/SoundBlaster/Calcu/pull/18).
 This is still the Compatibility Bearer loopback-HTTPS development profile.
-ASP normative text, SDK package/source lock, tool surface and browser API are
-unchanged. No production certification or natural-language intent claim is made.
+ASP normative text, SDK package/source lock and tool surface are unchanged.
+The UI follow-up adds public `surface_version` to the permission-offer response;
+the run request and NDJSON event contract remain unchanged. No production
+certification or natural-language intent claim is made.
 
 ## What changes for a user
 
@@ -14,6 +16,13 @@ the exact admitted `multiply(240, 0.15)` before returning `36`. The task panel
 still separates the requested task, verified application action and unverified
 agent prose. It does not infer that the agent understood every natural-language
 request or add `sqrt`.
+
+The initially collapsed **ASP details** block displays the server-selected
+surface version and existing allowed action. Its version is validated as a
+bounded opaque label, not hardcoded in the UI. These public fields remain with
+the submitted task's result and are replaced on fresh review; failure or
+cancellation hides them. Grant, credentials and identity artifacts remain
+server-only. This projection does not itself authorize execution.
 
 If the demo stops between Review and Run, that access selection ends. A fresh
 host has a new identity, TLS material, cookie, offers, Grants and sessions. The
@@ -107,7 +116,8 @@ Codex provider inference or independent implementation interoperability.
 ## Measured authoring and host cost
 
 Physical lines, including comments/blank lines, compared with merged P5-T8A
-`d9cdc363e0bd5f9a8e2e2b444f14ead047251108`:
+`d9cdc363e0bd5f9a8e2e2b444f14ead047251108`, measured at activation baseline
+`b7d45160328c9ca35e0f71003c8d7c0a555fbf08` before the UI follow-up:
 
 | Scope | Before | After | Change |
 | --- | ---: | ---: | ---: |
@@ -127,7 +137,9 @@ Restart requires a new browser connection and access review.
 
 ## Validation
 
-Local results, 2026-10-02 UTC, Node 26.5.0 (CI uses Node 22):
+### Activation baseline
+
+Local results at `b7d4516`, 2026-10-02 UTC, Node 26.5.0 (CI uses Node 22):
 
 - `npm run check`: format, lint, typecheck, 266 Vitest tests in 28 files,
   6 preflight and 13 bundle-guard tests passed.
@@ -142,6 +154,31 @@ Local results, 2026-10-02 UTC, Node 26.5.0 (CI uses Node 22):
 No dependency changes require another installation in this slice. Pushed-head
 CI remains separate evidence. No authenticated Codex inference was performed;
 an optional live task smoke is not a prerequisite for the deterministic gate.
+
+### ASP details UI follow-up
+
+Local results, 2026-10-02 UTC:
+
+- 60 targeted panel, permission-parser, broker and task-host tests passed.
+  They cover server-derived metadata, a closed public response, immutable
+  submitted metadata, replacement, cancellation and failed-result hiding.
+- `npm run build` passed, including browser/server bundle isolation.
+- `npm run check`: formatting, lint and typecheck passed; 282 of 283 Vitest
+  tests passed. The remaining HTTPS integration test could not create its
+  temporary TLS directory because the disk was full (`ENOSPC`). Subsequent
+  preflight and bundle-guard stages were not reached by this run.
+- `npm run test:coverage`: all 283 tests in 29 files passed and computed line
+  coverage was 88.43%, but writing the HTML coverage report failed with
+  `ENOSPC`; the command exited unsuccessfully, so this is not a passed gate.
+- `git diff --check` passed.
+- Wide/compact visual audit is **unverified**: the existing Playwright browser
+  was owned by another session, and the fallback in-app browser could not
+  initialize its assets because the disk was full. No screenshots or DOM
+  measurements were obtained. The audit-owned demo listener was stopped and
+  confirmed closed; no model task was sent and unrelated caches were untouched.
+
+CI must run the full gate on the new pushed head. Visual verification remains
+a separate follow-up once local disk space is available.
 
 Next: review this activation/lifecycle change and CI, then merge separately.
 After merge/synchronization, optionally smoke the authenticated local demo;

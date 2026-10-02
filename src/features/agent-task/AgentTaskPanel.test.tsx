@@ -49,7 +49,7 @@ const completed = {
   trace,
 };
 
-function mockTaskFetch() {
+function mockTaskFetch(surfaceVersion = '0.1.2') {
   const run = vi.fn<typeof fetch>();
   vi.spyOn(globalThis, 'fetch').mockImplementation((url, options) => {
     if (url === '/api/tasks/permissions') {
@@ -59,6 +59,7 @@ function mockTaskFetch() {
             offer_id: 'a'.repeat(64),
             expires_at: Date.now() + 60_000,
             action_id: 'calculation.propose',
+            surface_version: surfaceVersion,
             retention: 'user_managed',
             data_classes: [
               {
@@ -132,6 +133,52 @@ describe('AgentTaskPanel', () => {
     container.remove();
     vi.restoreAllMocks();
     vi.useRealTimers();
+  });
+
+  function aspDetails() {
+    return Array.from(container.querySelectorAll('details')).find(
+      (details) =>
+        details.querySelector('summary')?.textContent === 'ASP details',
+    );
+  }
+
+  it('shows collapsed public ASP details from the server without granting access', async () => {
+    const run = mockTaskFetch('opaque-draft/next');
+    render();
+    expect(aspDetails()).toBeUndefined();
+    await reviewAccess();
+    expect(aspDetails()?.open).toBe(false);
+    expect(aspDetails()?.textContent).toContain('Surface version');
+    expect(aspDetails()?.textContent).toContain('opaque-draft/next');
+    expect(aspDetails()?.textContent).toContain('Allowed action');
+    expect(aspDetails()?.textContent).toContain('calculation.propose');
+    expect(aspDetails()?.textContent).not.toMatch(
+      /grant|credential|passport|receipt|identity/i,
+    );
+    expect(run).not.toHaveBeenCalled();
+    changeTask('A new task');
+    expect(aspDetails()).toBeUndefined();
+  });
+
+  it('keeps submitted ASP metadata with its result and replaces it on a fresh review', async () => {
+    mockTaskFetch('reviewed-version').mockResolvedValue(
+      response([accepted, toolResult, completed]),
+    );
+    render();
+    await runTask();
+    expect(container.querySelector('fieldset')).toBeNull();
+    expect(aspDetails()?.textContent).toContain('reviewed-version');
+    changeTask('A new task');
+    expect(aspDetails()?.textContent).toContain('reviewed-version');
+    mockTaskFetch('replacement-version').mockResolvedValue(
+      response([accepted, toolResult, completed]),
+    );
+    await reviewAccess();
+    expect(aspDetails()?.textContent).toContain('replacement-version');
+    expect(aspDetails()?.textContent).not.toContain('reviewed-version');
+    await act(async () => button('Allow and run with Codex').click());
+    expect(aspDetails()?.textContent).toContain('replacement-version');
+    expect(container.textContent).toContain('Application action completed.');
   });
 
   it('expires the visible offer and requests fresh unchecked permissions', async () => {
@@ -387,6 +434,7 @@ describe('AgentTaskPanel', () => {
     render();
     await runTask();
     expect(container.textContent).toContain('Task failed: unverified_result');
+    expect(aspDetails()).toBeUndefined();
 
     await runTask();
     expect(fetchMock).toHaveBeenCalledTimes(2);
@@ -431,5 +479,6 @@ describe('AgentTaskPanel', () => {
     expect(container.textContent).toContain('Task cancelled.');
     expect(container.textContent).not.toContain('240 × 0.15 = 36');
     expect(container.textContent).not.toContain('Verified application action');
+    expect(aspDetails()).toBeUndefined();
   });
 });

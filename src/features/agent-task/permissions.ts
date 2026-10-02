@@ -2,6 +2,8 @@ export type TaskPermissionOffer = {
   offer_id: string;
   expires_at: number;
   action_id: 'calculation.propose';
+  /** Public description metadata, not a Grant or execution authorization. */
+  surface_version: string;
   data_classes: {
     id: string;
     label: string;
@@ -21,6 +23,7 @@ export function readPermissionOffer(value: unknown): TaskPermissionOffer {
     'offer_id',
     'expires_at',
     'action_id',
+    'surface_version',
     'data_classes',
     'retention',
   ];
@@ -32,6 +35,13 @@ export function readPermissionOffer(value: unknown): TaskPermissionOffer {
     !Number.isSafeInteger(record.expires_at) ||
     record.expires_at <= Date.now() ||
     record.action_id !== 'calculation.propose' ||
+    typeof record.surface_version !== 'string' ||
+    record.surface_version.trim().length === 0 ||
+    record.surface_version.length > 128 ||
+    Array.from(record.surface_version).some(
+      (character) =>
+        character.charCodeAt(0) < 32 || character.charCodeAt(0) === 127,
+    ) ||
     record.retention !== 'user_managed' ||
     !Array.isArray(record.data_classes) ||
     record.data_classes.length !== 3

@@ -34,6 +34,8 @@ export function AgentTaskPanel() {
   const [state, setState] = useState<PanelState>('idle');
   const [phase, setPhase] = useState('');
   const [submittedTask, setSubmittedTask] = useState('');
+  const [submittedDetails, setSubmittedDetails] =
+    useState<Pick<TaskPermissionOffer, 'surface_version' | 'action_id'>>();
   const [result, setResult] = useState<CalculationResult>();
   const [trace, setTrace] = useState<SafeTaskTrace>();
   const [agentMessage, setAgentMessage] = useState('');
@@ -70,6 +72,7 @@ export function AgentTaskPanel() {
   };
 
   const clearOutput = () => {
+    setSubmittedDetails(undefined);
     setResult(undefined);
     setTrace(undefined);
     setAgentMessage('');
@@ -105,6 +108,10 @@ export function AgentTaskPanel() {
     activeController.current = controller;
     clearOutput();
     setSubmittedTask(taskSnapshot);
+    setSubmittedDetails({
+      surface_version: offer.surface_version,
+      action_id: offer.action_id,
+    });
     setState('running');
     let streamTaskId: string | undefined;
     let toolSeen = false;
@@ -239,7 +246,12 @@ export function AgentTaskPanel() {
     setOffer(undefined);
     setAllowAction(false);
     setAllowData(false);
+    setSubmittedDetails(undefined);
   };
+
+  const aspDetails =
+    offer ??
+    (state === 'running' || state === 'success' ? submittedDetails : undefined);
 
   return (
     <section className={styles.panel} aria-labelledby="agent-task-title">
@@ -416,6 +428,17 @@ export function AgentTaskPanel() {
           </button>
         ) : null}
       </div>
+      {aspDetails ? (
+        <details className={styles.trace}>
+          <summary>ASP details</summary>
+          <dl>
+            <dt>Surface version</dt>
+            <dd>{aspDetails.surface_version}</dd>
+            <dt>Allowed action</dt>
+            <dd>{aspDetails.action_id}</dd>
+          </dl>
+        </details>
+      ) : null}
       <p className={styles.footer}>
         <PanelGlyph name="shield" />
         Your data. Your choice. Permissions apply only to this task.

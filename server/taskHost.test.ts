@@ -207,6 +207,16 @@ describe('local task HTTP host', () => {
       body: JSON.stringify({ task: 'calculate' }),
     });
     const offer = JSON.parse(preview.body);
+    expect(offer.surface_version).toBe('0.1.2');
+    expect(offer.action_id).toBe('calculation.propose');
+    expect(Object.keys(offer).sort()).toEqual([
+      'action_id',
+      'data_classes',
+      'expires_at',
+      'offer_id',
+      'retention',
+      'surface_version',
+    ]);
     expect(preview.headers['cache-control']).toBe('no-store');
     expect(preview.body).not.toMatch(
       /credential|grant_hash|identity_evidence|Passport/,

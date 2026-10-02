@@ -88,6 +88,7 @@ export function createTaskPermissionBroker(
         offer_id: randomBytes(32).toString('hex'),
         expires_at: now() + 60_000,
         action_id: 'calculation.propose',
+        surface_version: prepared.surface.surface_version,
         data_classes: structuredClone(classes),
         retention: 'user_managed',
       };
