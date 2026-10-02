@@ -2,8 +2,9 @@
 
 Status: P5-T9A private qualification completed, 2026-10-02 UTC; no-go for public
 extraction/live adoption. See the [characterization report](../../docs/HANDLER_BINDING_CHARACTERIZATION.md).
-P5-T9A-F dispatch deadline and mediator snapshot correction is next; production
-behavior is unchanged in this stage. P5-T9B/C remain gated.
+P5-T9A-F dispatch deadline and mediator snapshot correction is implemented in
+a separate dependent PR, pending review/CI/merge; see the
+[repair report](../../docs/DISPATCH_INPUT_REPAIR.md). P5-T9B/C remain gated.
 Priority: P1. Complexity: high; reasoning effort: high.
 Baseline: P5-T8B merged in [Calcu #19](https://github.com/SoundBlaster/Calcu/pull/19)
 as `ee4681f1df73a75611a9c348162714a5b750c7cb` with successful verify/coverage CI.

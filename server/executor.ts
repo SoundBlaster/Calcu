@@ -442,7 +442,11 @@ export function createCalcuExecutor({
       record.verifiedIdentity.identity_evidence_hash
     )
       throw new Error('identity_evidence_invalid');
-    if (currentIdentity.status_valid_until <= currentTime)
+    const identityValidUntil = currentIdentity.status_valid_until;
+    if (
+      !Number.isFinite(identityValidUntil) ||
+      identityValidUntil <= currentTime
+    )
       throw new Error('identity_evidence_expired');
     if (grantHash(record.grantHashInput) !== record.grant.grant_hash)
       throw new Error('integrity_mismatch');
@@ -550,8 +554,26 @@ export function createCalcuExecutor({
     );
     if (payload.parent_receipt_hash !== runtimeReceipt.receipt_hash)
       throw new Error('integrity_mismatch');
+    // The clock and verifier are trusted callbacks, but can advance time or
+    // re-enter lifecycle operations. Read time last, then fence current state
+    // before the synchronous quota claim and engine entry. Do not re-verify in
+    // a loop or let the initially captured time extend either deadline.
+    const dispatchTime = now();
     if (retired || !record.active || record.session.state !== 'active')
       throw new Error('unauthorized');
+    if (!Number.isFinite(dispatchTime) || dispatchTime >= record.expiresAt) {
+      if (dispatchTime >= record.expiresAt) {
+        record.active = false;
+        record.session.state = 'expired';
+      }
+      throw new Error('unauthorized');
+    }
+    if (
+      record.session.session_generation !== expectedBinding.session_generation
+    )
+      throw new Error('binding_mismatch');
+    if (dispatchTime >= identityValidUntil)
+      throw new Error('identity_evidence_expired');
     if (signal?.aborted) throw new Error('aborted');
     if (record.remaining <= 0) throw new Error('quota_exceeded');
     record.remaining--;
@@ -566,7 +588,7 @@ export function createCalcuExecutor({
       throw new Error('invalid_result');
     }
     const appSpanId = randomBytes(8).toString('hex');
-    const timestamp = new Date(currentTime).toISOString();
+    const timestamp = new Date(dispatchTime).toISOString();
     const receiptContext: ReceiptContext & { issuerId: string; now: string } = {
       grant_id: record.grant.grant_id,
       grant_hash: record.grant.grant_hash,

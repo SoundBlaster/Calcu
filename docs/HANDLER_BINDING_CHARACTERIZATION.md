@@ -1,7 +1,9 @@
 # P5-T9A — Admission to native function characterization
 
 Date: 2026-10-02 UTC. Baseline: Calcu #19 merge
-`ee4681f1df73a75611a9c348162714a5b750c7cb`. Production source is unchanged.
+`ee4681f1df73a75611a9c348162714a5b750c7cb`. Production source was unchanged
+during that stage. This document preserves those historical observations;
+the subsequent [P5-T9A-F repair](DISPATCH_INPUT_REPAIR.md) changes current behavior.
 The [task](../SPECS/INPROGRESS/P5-T9_Admitting_Handler_Binding.md) and
 [SDK qualification report](https://github.com/0al-spec/agent-surface-js/blob/codex/admitting-handler-binding-plan/docs/reports/admitting-handler-binding-qualification.md)
 scope a private experiment, not a consumer migration or conformance promotion.
@@ -26,8 +28,8 @@ existing cases that first capture a successful request legitimately start at 1.
 
 ## New observations
 
-[11 characterization tests](../server/handlerBindingCharacterization.test.ts)
-exercise the unmodified executor and LocalBackend:
+[11 characterization tests at commit 6199f3d](https://github.com/SoundBlaster/Calcu/blob/6199f3df64a1c0bfdcc175d3ad7945a40e1a225a/server/handlerBindingCharacterization.test.ts)
+exercised the unmodified executor and LocalBackend:
 
 1. Re-entrant revoke, session rotation, retirement and cancellation inside the
    identity verifier reject with **zero** engine calls.
@@ -48,9 +50,9 @@ exercise the unmodified executor and LocalBackend:
 7. Invalid mathematical output consumes quota; cancelled delivery after entry
    does not become successful presentation or undo the call.
 
-The two known-gap tests deliberately assert observed baseline success and are
-labelled as such. They must be replaced by zero-entry regression expectations
-with the correction; green characterization does not mean the gaps are fixed.
+The two known-gap tests deliberately asserted observed baseline success and were
+labelled as such. The subsequent repair replaces them with zero-entry regression
+expectations; green characterization alone did not mean the gaps were fixed.
 
 ## Decision / follow-up
 
@@ -73,6 +75,8 @@ Next is **P5-T9A-F — dispatch deadline and mediator snapshot repair**:
 - Replace the known-gap tests, add mutation after transport suspension and clock
   callback re-entry vectors, rerun real HTTPS/boundary/lifecycle checks.
 
-That correction is explicitly **not implemented in this characterization PR**.
+That correction was not implemented in the characterization PR; it is now
+implemented in a separate dependent layer, described in the
+[repair report](DISPATCH_INPUT_REPAIR.md). Public SDK extraction remains gated.
 No production identity, async/durable effects, natural-language intent proof,
 ADP status or RFC maturity claim is made.

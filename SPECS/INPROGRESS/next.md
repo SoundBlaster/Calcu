@@ -18,12 +18,14 @@
 
 ## Next
 
-- P5-T9A-F — Dispatch deadline and mediator snapshot correction, scoped in the
-  [characterization report](../../docs/HANDLER_BINDING_CHARACTERIZATION.md).
-  P5-T9A completed with no-go for public extraction/live adoption: a Grant or
-  identity deadline can elapse inside verification before function entry, and
-  mutable caller input can invalidate an otherwise correct response. Fix those
-  bounded consumer gaps before selecting any public dispatch interface.
+- Review/land P5-T9A characterization and the dependent P5-T9A-F dispatch
+  deadline/input repair in order; [repair evidence](../../docs/DISPATCH_INPUT_REPAIR.md).
+  P5-T9A completed with no-go for public extraction/live adoption: at its baseline,
+  a Grant or identity deadline could elapse inside verification before function
+  entry, and mutable caller input could invalidate an otherwise correct response.
+  Those bounded consumer gaps are now corrected in the dependent layer, pending
+  review/CI/merge. Next scope the host-owned dispatch contract and measure real
+  integration cost before selecting any public dispatch interface.
   See the [binding task](P5-T9_Admitting_Handler_Binding.md).
   P5-T8A/B are merged. An optional authenticated CLI smoke remains separate from
   the deterministic fake-agent/HTTPS gate; retry must review access again.
