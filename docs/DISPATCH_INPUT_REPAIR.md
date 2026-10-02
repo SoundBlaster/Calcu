@@ -79,8 +79,11 @@ changes. Previously captured receipts remain historical; a new valid action
 uses its actual dispatch time. This is not production certification or proof of
 natural-language intent.
 
-P5-T9A-F is implemented and locally verified, pending PR review/CI/merge.
+P5-T9A-F merged in Calcu #21 as `3ae557dfbf5bf5973601155261c4f060ec3ee46e`
+after successful verify/coverage CI and no unresolved threads.
 P5-T9B/C still require an explicit go decision: these corrections do not prove
 a real integration saving or a general host-owned dispatch adapter. Next,
-review/land the characterization and repair in order, then design that bounded
-host contract and cost comparison before expanding SDK exports.
+use the [private real-host comparison plan](../SPECS/INPROGRESS/P5-T9A-H_Private_Host_Comparison.md)
+and merged SDK #34 host contract before expanding SDK exports. Deadline tests
+establish eligibility at the returned dispatch-time sample, not a physical
+no-start-after-wall-clock-expiry guarantee.

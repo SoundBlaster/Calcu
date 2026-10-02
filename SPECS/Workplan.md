@@ -16,11 +16,11 @@ session contract and tested loopback HTTPS boundary. See [boundary status](../se
 | P5-T4 | Implemented: regression/conformance evidence and adoption report | P5-T3 |
 | P5-T5 | Complete: SDK-validated manifest/request/Grant values and server-only unsigned Runtime/App Receipts | P5-T4; SDK PRs #12 and #13 |
 | P5-T8 | Complete: preparation #18 and live selection/retirement #19 merged | P5-T5; accepted P5-T7 follow-up; SDK #32 and Calcu #16 |
-| P5-T9 | P5-T9A complete; P5-T9A-F deadline/input repair implemented pending review/CI/merge; extraction gated | P5-T8; SDK companion report |
+| P5-T9 | P5-T9A complete; P5-T9A-F repair merged #21; P5-T9A-H private real-host comparison selected; extraction gated | P5-T8; SDK companion report |
 
 The bounded P5 demo and SDK consumer work are complete through **P5-T8**;
-P5-T9A completed the private qualification; P5-T9A-F is implemented pending
-review/CI/merge in a dependent layer. The P5-T6
+P5-T9A completed the private qualification; P5-T9A-F merged in Calcu #21.
+P5-T9A-H selects a private real-host comparison, not public execution. The P5-T6
 second-consumer comparison is complete and recorded below. This section does not
 mark a production ASP deployment or change the existing keypad requirements.
 
@@ -145,7 +145,8 @@ mark a production ASP deployment or change the existing keypad requirements.
 #### ⏳ P5-T9: Qualify an admitting executor to handler binding
 
 - **Status:** P5-T9A private qualification complete, no-go for public extraction;
-  P5-T9A-F dispatch deadlines/input correction implemented pending review/CI/merge.
+  P5-T9A-F dispatch deadlines/input correction merged in #21; P5-T9A-H selected.
+  See the [private comparison plan](INPROGRESS/P5-T9A-H_Private_Host_Comparison.md).
   See the [repair](../docs/DISPATCH_INPUT_REPAIR.md),
   [report](../docs/HANDLER_BINDING_CHARACTERIZATION.md) and
   [qualification plan](INPROGRESS/P5-T9_Admitting_Handler_Binding.md).

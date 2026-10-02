@@ -2,14 +2,15 @@
 
 Status: P5-T9A private qualification completed, 2026-10-02 UTC; no-go for public
 extraction/live adoption. See the [characterization report](../../docs/HANDLER_BINDING_CHARACTERIZATION.md).
-P5-T9A-F dispatch deadline and mediator snapshot correction is implemented in
-a separate dependent PR, pending review/CI/merge; see the
+P5-T9A-F dispatch deadline and mediator snapshot correction merged in Calcu #21
+as `3ae557dfbf5bf5973601155261c4f060ec3ee46e`; see the
 [repair report](../../docs/DISPATCH_INPUT_REPAIR.md). P5-T9B/C remain gated.
+Selected follow-up: [private real-host comparison](P5-T9A-H_Private_Host_Comparison.md).
 Priority: P1. Complexity: high; reasoning effort: high.
 Baseline: P5-T8B merged in [Calcu #19](https://github.com/SoundBlaster/Calcu/pull/19)
 as `ee4681f1df73a75611a9c348162714a5b750c7cb` with successful verify/coverage CI.
 
-The companion [SDK design](https://github.com/0al-spec/agent-surface-js/blob/codex/admitting-handler-binding-plan/docs/plans/admitting-handler-binding.md)
+The companion [SDK design](https://github.com/0al-spec/agent-surface-js/blob/e67c834e5850c8b88f65964e0c1dafc70df93e30/docs/plans/host-owned-proposal-dispatch.md)
 owns the proposed mechanism and qualification matrix. Calcu's workplan owns
 consumer sequencing; the [ASP adoption backlog](https://github.com/0al-spec/agent-surface/blob/main/review/adoption-delivery-backlog.md)
 owns canonical ADP status. This task does not unblock or complete those ADP tasks.
