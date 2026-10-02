@@ -7,7 +7,9 @@
   Merged in [Calcu #18](https://github.com/SoundBlaster/Calcu/pull/18).
 
 - P5-T8B — SDK-authored `0.1.2` live selection and bounded host retirement;
-  implemented for review, see [activation evidence](../../docs/LIVE_SDK_MANIFEST_ACTIVATION.md).
+  merged in [Calcu #19](https://github.com/SoundBlaster/Calcu/pull/19) as
+  `ee4681f1df73a75611a9c348162714a5b750c7cb` with green verify/coverage CI;
+  see [activation evidence](../../docs/LIVE_SDK_MANIFEST_ACTIVATION.md).
 
 - Public SDK authoring subpath connected to Calcu's offline candidate;
   merged in [Calcu #16](https://github.com/SoundBlaster/Calcu/pull/16);
@@ -16,9 +18,11 @@
 
 ## Next
 
-- P5-T8 — [Live SDK Manifest Migration plan](P5-T8_Live_SDK_Manifest_Migration.md).
-  P5-T8A is merged. Review P5-T8B activation/lifecycle evidence and its CI,
-  then merge separately. An optional authenticated CLI smoke is separate from
+- P5-T9A — [Admitting handler binding qualification](P5-T9_Admitting_Handler_Binding.md).
+  Characterize the current admission-to-function boundary, then qualify a
+  private SDK seam with a second proposal fixture and measured integration cost.
+  Public extraction and Calcu adoption follow only a passing go/no-go decision.
+  P5-T8A/B are merged. An optional authenticated CLI smoke remains separate from
   the deterministic fake-agent/HTTPS gate; retry must review access again.
   Historical baseline: the
   [P5-T7 design and acceptance evidence](../ARCHIVE/P5-T7_Offline_Action_Authoring/P5-T7_Offline_Action_Authoring_Design.md);
