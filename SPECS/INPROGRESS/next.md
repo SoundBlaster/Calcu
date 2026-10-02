@@ -18,10 +18,13 @@
 
 ## Next
 
-- P5-T9A — [Admitting handler binding qualification](P5-T9_Admitting_Handler_Binding.md).
-  Characterize the current admission-to-function boundary, then qualify a
-  private SDK seam with a second proposal fixture and measured integration cost.
-  Public extraction and Calcu adoption follow only a passing go/no-go decision.
+- P5-T9A-F — Dispatch deadline and mediator snapshot correction, scoped in the
+  [characterization report](../../docs/HANDLER_BINDING_CHARACTERIZATION.md).
+  P5-T9A completed with no-go for public extraction/live adoption: a Grant or
+  identity deadline can elapse inside verification before function entry, and
+  mutable caller input can invalidate an otherwise correct response. Fix those
+  bounded consumer gaps before selecting any public dispatch interface.
+  See the [binding task](P5-T9_Admitting_Handler_Binding.md).
   P5-T8A/B are merged. An optional authenticated CLI smoke remains separate from
   the deterministic fake-agent/HTTPS gate; retry must review access again.
   Historical baseline: the

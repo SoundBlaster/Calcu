@@ -1,8 +1,9 @@
 # P5-T9 — Qualify an admitting executor to handler binding
 
-Status: design selected and initial source mapping recorded, 2026-10-02 UTC;
-executable qualification is next. The SDK companion maps current check owners
-and distinguishes initial clock checks from the final dispatch block.
+Status: P5-T9A private qualification completed, 2026-10-02 UTC; no-go for public
+extraction/live adoption. See the [characterization report](../../docs/HANDLER_BINDING_CHARACTERIZATION.md).
+P5-T9A-F dispatch deadline and mediator snapshot correction is next; production
+behavior is unchanged in this stage. P5-T9B/C remain gated.
 Priority: P1. Complexity: high; reasoning effort: high.
 Baseline: P5-T8B merged in [Calcu #19](https://github.com/SoundBlaster/Calcu/pull/19)
 as `ee4681f1df73a75611a9c348162714a5b750c7cb` with successful verify/coverage CI.

@@ -16,10 +16,10 @@ session contract and tested loopback HTTPS boundary. See [boundary status](../se
 | P5-T4 | Implemented: regression/conformance evidence and adoption report | P5-T3 |
 | P5-T5 | Complete: SDK-validated manifest/request/Grant values and server-only unsigned Runtime/App Receipts | P5-T4; SDK PRs #12 and #13 |
 | P5-T8 | Complete: preparation #18 and live selection/retirement #19 merged | P5-T5; accepted P5-T7 follow-up; SDK #32 and Calcu #16 |
-| P5-T9 | Design selected: qualify an admitting executor-to-handler binding; public extraction/adoption gated on evidence | P5-T8; SDK companion design |
+| P5-T9 | P5-T9A private qualification complete; no-go for extraction; P5-T9A-F deadline/input repair next | P5-T8; SDK companion report |
 
 The bounded P5 demo and SDK consumer work are complete through **P5-T8**;
-P5-T9 starts the next qualification. The P5-T6
+P5-T9A completed the private qualification; P5-T9A-F is next. The P5-T6
 second-consumer comparison is complete and recorded below. This section does not
 mark a production ASP deployment or change the existing keypad requirements.
 
@@ -143,7 +143,9 @@ mark a production ASP deployment or change the existing keypad requirements.
 
 #### ⏳ P5-T9: Qualify an admitting executor to handler binding
 
-- **Status:** Design selected; P5-T9A characterization is next. See the
+- **Status:** P5-T9A private qualification complete, no-go for public extraction;
+  P5-T9A-F dispatch deadlines/input snapshot correction is next. See the
+  [report](../docs/HANDLER_BINDING_CHARACTERIZATION.md) and
   [qualification plan](INPROGRESS/P5-T9_Admitting_Handler_Binding.md).
 - **Dependencies:** Merged P5-T8A/B and the companion SDK design.
 - **Outputs:** Current dispatch obligation map, private contract fixture,
