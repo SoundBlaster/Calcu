@@ -25,9 +25,12 @@
   entry, and mutable caller input could invalidate an otherwise correct response.
   Those bounded consumer gaps are corrected at merged `3ae557d`. SDK #34 merged
   the host-owned dispatch design. Selected next:
-  [P5-T9A-H private real-host comparison](P5-T9A-H_Private_Host_Comparison.md),
-  with paired actual HTTPS paths and measured binding cost before selecting
-  any public dispatch interface.
+  [P5-T9A-H private real-host comparison](P5-T9A-H_Private_Host_Comparison.md)
+  is implemented and locally verified, pending PR/CI/merge. Its
+  [report](../../docs/PRIVATE_HOST_BINDING_COMPARISON.md) keeps this wrapper
+  private: paired real HTTPS behavior passes, but it removes no production glue.
+  Next select a concrete repeated request/result or validation burden and map
+  reusable checks before proposing any public dispatch interface.
   See the [binding task](P5-T9_Admitting_Handler_Binding.md).
   P5-T8A/B are merged. An optional authenticated CLI smoke remains separate from
   the deterministic fake-agent/HTTPS gate; retry must review access again.

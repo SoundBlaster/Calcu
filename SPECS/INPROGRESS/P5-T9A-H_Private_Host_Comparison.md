@@ -1,6 +1,9 @@
 # P5-T9A-H — Private real-host binding comparison
 
-Status: selected, 2026-10-02 UTC. Complexity: high; reasoning effort: high.
+Status: implemented and locally verified, 2026-10-02 UTC; pending PR/CI/merge.
+Complexity: high; reasoning effort: high.
+The [comparison report](../../docs/PRIVATE_HOST_BINDING_COMPARISON.md) records
+32 paired/preparation cases and no-go for this public wrapper; P5-T9B/C remain gated.
 Baseline: merged Calcu #20/#21, `3ae557dfbf5bf5973601155261c4f060ec3ee46e`.
 The [SDK host-owned dispatch design](https://github.com/0al-spec/agent-surface-js/blob/e67c834e5850c8b88f65964e0c1dafc70df93e30/docs/plans/host-owned-proposal-dispatch.md)
 defines the intended ordering and sampled-time limitations. P5-T9B/C remain gated.
