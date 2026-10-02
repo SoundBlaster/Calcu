@@ -52,7 +52,9 @@ export function createLocalBackend(
   const backend = {
     async calculationPropose(args: unknown, signal?: AbortSignal) {
       if (signal?.aborted) throw new Error('aborted');
-      const input = validateCalculation(args);
+      // Flat, validated domain values get an owned snapshot before any trusted
+      // clock callback or transport await. Never freeze the caller's object.
+      const input = Object.freeze({ ...validateCalculation(args) });
       const correlation = {
         ...binding,
         action_id: CALCULATION_ACTION_ID,

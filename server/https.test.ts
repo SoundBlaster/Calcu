@@ -15,6 +15,7 @@ import { createActionHttpsServer } from './httpsActionServer';
 import {
   createTestIdentityFixture,
   createTestIdentityVerifier,
+  type VerifiedIdentity,
 } from './identity';
 import { createLocalBackend } from './localBackend';
 import {
@@ -92,10 +93,16 @@ async function createTlsMaterial(): Promise<TlsMaterial> {
 
 async function openFixture(options: { delayMs?: number } = {}) {
   let now = START;
+  let onVerified = (verified: VerifiedIdentity) => verified;
   const identity = createTestIdentityFixture(START);
+  const verifier = createTestIdentityVerifier(identity);
   const executor = createCalcuExecutor({
     now: () => now,
-    identityVerifier: createTestIdentityVerifier(identity),
+    identityVerifier: {
+      verify(value, time) {
+        return onVerified(verifier.verify(value, time));
+      },
+    },
   });
   const access = executor.issue({
     subject: { user: 'calcu-user-local' },
@@ -132,7 +139,15 @@ async function openFixture(options: { delayMs?: number } = {}) {
     setNow(value: number) {
       now = value;
     },
-  } satisfies Fixture & { setNow(value: number): void };
+    duringVerification(callback: typeof onVerified) {
+      onVerified = callback;
+    },
+  } satisfies Fixture & {
+    setNow(value: number): void;
+    duringVerification(
+      callback: (verified: VerifiedIdentity) => VerifiedIdentity,
+    ): void;
+  };
 }
 
 function rawRequest(
@@ -203,6 +218,28 @@ describe('ASP compatibility bearer over loopback HTTPS', () => {
       result: 36,
     });
     expect(fixture.executor.engineCalls).toBe(1);
+  });
+
+  it.each([
+    'Grant',
+    'identity',
+  ] as const)('rejects %s deadline elapsed during verification over the real HTTPS boundary', async (kind) => {
+    const fixture = await openFixture();
+    fixture.duringVerification((verified) => {
+      fixture.setNow(START + (kind === 'Grant' ? 60_000 : 20));
+      return kind === 'Grant'
+        ? verified
+        : { ...verified, status_valid_until: START + 10 };
+    });
+    const backend = createLocalBackend(
+      fixture.access,
+      transportFor(fixture),
+      () => START,
+    );
+    await expect(backend.calculationPropose(input)).rejects.toThrow(
+      kind === 'Grant' ? 'unauthorized' : 'identity_evidence_expired',
+    );
+    expect(fixture.executor.engineCalls).toBe(0);
   });
 
   it('uses closed, non-cacheable error envelopes and rejects body credentials', async () => {
