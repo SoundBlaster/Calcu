@@ -24,11 +24,15 @@ jobs:
         run: npm ci
 
       - name: Run coverage
+        id: coverage_run
         run: npm run test:coverage
 
       - name: Upload coverage report
+        # Diagnostics survive a failed test run; a successful producer must
+        # still provide its report. Upload does not turn failed tests green.
+        if: ${{ !cancelled() && steps.coverage_run.outcome != 'skipped' }}
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: coverage
-          if-no-files-found: error
+          if-no-files-found: ${{ steps.coverage_run.outcome == 'success' && 'error' || 'warn' }}

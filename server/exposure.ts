@@ -31,8 +31,8 @@ export function calculationDataClasses() {
 export function calculationDataExposure() {
   return {
     classes: [content, context, status],
-    redaction: { mode: 'none' },
-    retention: { mode: 'user_managed' },
+    redaction: { mode: 'none' as const },
+    retention: { mode: 'user_managed' as const },
   };
 }
 
