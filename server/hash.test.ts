@@ -139,13 +139,22 @@ describe('ASP hash profiles', () => {
   it('pins the installed SDK package artifact and ASP evidence revision', () => {
     const tarball = readFileSync(
       new URL(
-        '../vendor/0al-agent-surface-0.1.0-experimental.0-4cd3397.tgz',
+        '../vendor/0al-agent-surface-0.1.0-experimental.0-c8908ab.tgz',
         import.meta.url,
       ),
     );
     const lock = JSON.parse(
       readFileSync(new URL('../package-lock.json', import.meta.url), 'utf8'),
     );
+    expect(createHash('sha256').update(tarball).digest('hex')).toBe(
+      '3425336616ed71128635aa66dea69dbd5abf430fd8b9d0550e991b734334a54c',
+    );
+    expect(lock.packages['node_modules/@0al/agent-surface'].resolved).toBe(
+      'file:vendor/0al-agent-surface-0.1.0-experimental.0-c8908ab.tgz',
+    );
+    expect(
+      lock.packages['node_modules/@0al/offline-action-authoring-prototype'],
+    ).toBeUndefined();
     expect(lock.packages['node_modules/@0al/agent-surface'].integrity).toBe(
       `sha512-${createHash('sha512').update(tarball).digest('base64')}`,
     );

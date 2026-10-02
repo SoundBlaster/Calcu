@@ -2,10 +2,12 @@
 
 import { JsonDocument } from '@0al/agent-surface';
 import {
-  OfflineActionCatalog,
-  OfflineActionDefinition,
-} from '@0al/offline-action-authoring-prototype';
-import { type Static, Type } from '@sinclair/typebox';
+  type ActionDeclaration,
+  type ActionInput,
+  type ActionOutput,
+  OfflineActionInventory,
+} from '@0al/agent-surface/authoring';
+import { Type } from '@sinclair/typebox';
 import { calculationDataClasses, calculationDataExposure } from './exposure';
 
 const fields = {
@@ -24,14 +26,12 @@ const output = Type.Object(
   { additionalProperties: false },
 );
 
-export type CandidateInput = Static<typeof input>;
-export type CandidateOutput = Static<typeof output>;
+type CandidateDeclaration = ActionDeclaration<typeof input, typeof output>;
+export type CandidateInput = ActionInput<CandidateDeclaration>;
+export type CandidateOutput = ActionOutput<CandidateDeclaration>;
 
-export function prepareCalcuActionCandidate(
-  handler: (input: CandidateInput) => CandidateOutput,
-  issuer = 'https://calcu.local',
-) {
-  const definition = new OfflineActionDefinition({
+export function prepareCalcuActionCandidate(issuer = 'https://calcu.local') {
+  const declaration = {
     action: {
       id: 'calculation.propose',
       scope: 'calculation.propose',
@@ -47,10 +47,9 @@ export function prepareCalcuActionCandidate(
     },
     input,
     output,
-    handler,
-  });
-  return new OfflineActionCatalog(
+  } satisfies CandidateDeclaration;
+  return new OfflineActionInventory(
     new JsonDocument(JSON.stringify(calculationDataClasses())),
-    [definition],
+    [declaration],
   ).prepare(`${issuer}/schemas/`);
 }
