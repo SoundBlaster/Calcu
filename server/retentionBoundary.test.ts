@@ -48,6 +48,7 @@ describe('Calcu-owned retention boundaries (fake Codex only)', () => {
   ])('contains asynchronous stdin failure (cancelled=%s)', async (cancelled) => {
     let stdin: Writable | undefined;
     let cwd = '';
+    let checkWrites = () => {};
     const backend = { calculationPropose: vi.fn(async () => result) };
     const controller = new AbortController();
     const adapter = new CodexTaskAdapter({
@@ -59,6 +60,9 @@ describe('Calcu-owned retention boundaries (fake Codex only)', () => {
         cwd = String(options.cwd);
         const child = spawn(command, args, { ...options, stdio: 'pipe' });
         stdin = child.stdin;
+        const writes = vi.spyOn(child.stdin, 'write');
+        checkWrites = () =>
+          expect(writes).toHaveBeenCalledTimes(cancelled ? 0 : 1);
         return child;
       },
     });
@@ -76,6 +80,7 @@ describe('Calcu-owned retention boundaries (fake Codex only)', () => {
         );
       }),
     ).rejects.toThrow(cancelled ? 'cancelled' : 'agent_process_exited');
+    checkWrites();
     expect(backend.calculationPropose).not.toHaveBeenCalled();
     expect(cwd).not.toBe('');
     expect(existsSync(cwd)).toBe(false);

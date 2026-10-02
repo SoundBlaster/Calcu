@@ -66,3 +66,7 @@ checks. A subsequent `npm ci` followed by the dedicated spike also passed all
 3 authoring tests without a sibling checkout. No live Codex task was run.
 `npm ci` reported 7 dependency advisories; this experiment does not address
 the repository's broader dependency audit.
+
+The subsequent CI failure and bounded lifecycle/diagnostic fixes are recorded
+in [the cancellation retrospective](CI_CANCELLATION_RETRO.md). They do not
+change the selected ASP contract or activate the offline candidate.
