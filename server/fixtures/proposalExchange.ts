@@ -1,6 +1,7 @@
 // Private selected-envelope experiment. No production module imports this file.
 // This owns representation/correlation only, never authority or receipt policy.
 import { CanonicalObjectHash, JsonDocument } from '@0al/agent-surface';
+import canonicalize from 'canonicalize';
 
 type ProposalBinding = {
   session_id: string;
@@ -271,9 +272,9 @@ class PreparedProposalExchange<Action extends string> {
       'execution',
       'execution_hash',
     ]) {
-      // Preserve Calcu's existing nested-object order behavior in this comparison.
-      // This is not a generic ASP JSON-equivalence rule.
-      if (JSON.stringify(payload[key]) !== JSON.stringify(expected[key]))
+      // Both values already passed strict JSON parsing. JCS ignores only object
+      // member order, not array order, missing fields or Unicode differences.
+      if (canonicalize(payload[key]) !== canonicalize(expected[key]))
         throw new Error('invalid_response');
     }
     if (payload.result !== 'success') throw new Error('invalid_response');

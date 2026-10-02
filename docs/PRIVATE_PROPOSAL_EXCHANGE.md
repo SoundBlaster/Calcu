@@ -4,6 +4,12 @@ Status: private prototype and all local gates passed, 2026-10-02 UTC;
 pending PR review/CI/merge. Tracked in
 [P5-T10A](../SPECS/INPROGRESS/P5-T10A_Private_Proposal_Exchange.md).
 
+Historical evidence: behavior, counts and costs below describe commit
+`61da8f2fdda8c1865747e8cfb8ab5ccad47fcf51` in Calcu #23. The subsequent
+[P5-T10B qualification](GREETING_EXCHANGE_QUALIFICATION.md) adds a second consumer
+and intentionally changes private nested-object comparison. Current source links
+may include that follow-up; do not treat the original parity claim as current.
+
 ## Question and selected contract
 
 Can reusable request/result behavior reduce the Calcu integrator's work while

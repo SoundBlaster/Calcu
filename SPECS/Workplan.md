@@ -17,7 +17,8 @@ session contract and tested loopback HTTPS boundary. See [boundary status](../se
 | P5-T5 | Complete: SDK-validated manifest/request/Grant values and server-only unsigned Runtime/App Receipts | P5-T4; SDK PRs #12 and #13 |
 | P5-T8 | Complete: preparation #18 and live selection/retirement #19 merged | P5-T5; accepted P5-T7 follow-up; SDK #32 and Calcu #16 |
 | P5-T9 | P5-T9A complete; P5-T9A-F repair merged #21; P5-T9A-H comparison implemented pending PR/CI/merge, wrapper no-go; extraction gated | P5-T8; SDK companion report |
-| P5-T10A | Private prototype locally verified; 169 → 82 facade lines; pending PR/CI/merge, public extraction gated | P5-T9A-H evidence; current SDK JSON/hash primitives |
+| P5-T10A | Private prototype; #23 CI green, no review threads on 2026-10-02 UTC, pending merge; public extraction gated | P5-T9A-H evidence; current SDK JSON/hash primitives |
+| P5-T10B | Second consumer and JSON comparison locally verified; pending PR/CI/merge, public extraction gated | P5-T10A / Calcu #23 |
 
 The bounded P5 demo and SDK consumer work are complete through **P5-T8**;
 P5-T9A completed the private qualification; P5-T9A-F merged in Calcu #21.
@@ -168,11 +169,13 @@ mark a production ASP deployment or change the existing keypad requirements.
 
 #### ⏳ P5-T10A: Qualify a private request/result exchange
 
-- **Status:** Implemented and locally verified; pending PR/CI/merge. See the
+- **Status:** Implemented; #23 CI green and no review threads on 2026-10-02 UTC;
+  pending merge. See the
   [proposal exchange plan](INPROGRESS/P5-T10A_Private_Proposal_Exchange.md).
 - **Evidence:** [Contract and measured comparison](../docs/PRIVATE_PROPOSAL_EXCHANGE.md);
   126 targeted cases, 469 total Vitest tests and local build/coverage gates pass.
-  Continue to portable-contract/independent-consumer qualification before public API.
+  These baseline counts are frozen at `61da8f2`; P5-T10B qualifies JSON comparison
+  and a second consumer while the portable envelope/public API remain gated.
 - **Outputs:** Exact selected wire contract, immutable private request/result
   mechanism, test-only Calcu facade, real-HTTPS parity and measured cost.
 - **Boundary:** Executor admission and current authority stay application-owned.
@@ -181,6 +184,20 @@ mark a production ASP deployment or change the existing keypad requirements.
 - **Acceptance:** Request/hash compatibility, independent expected-context
   validation, input custody, negative result cases, lifecycle/quota parity and
   separate accounting of engine entry versus accepted presentation.
+
+#### ⏳ P5-T10B: Qualify a second request/result consumer
+
+- **Status:** Implemented and locally verified; pending PR/CI/merge. See the
+  [plan](INPROGRESS/P5-T10B_Greeting_Exchange.md) and
+  [evidence/compatibility report](../docs/GREETING_EXCHANGE_QUALIFICATION.md).
+- **Outputs:** Native Greeting app, consumer-owned nested schemas/evidence,
+  separate HTTPS test host, canonical object-value comparison and negative vectors.
+- **Acceptance:** 169 targeted cases; all 512 Vitest tests and local gates pass.
+  Same mechanism, no Calcu-domain branches; array/string differences stay distinct.
+- **Boundary:** Synthetic Greeting lease/evidence does not establish independent
+  ASP conformance. Production Calcu, public SDK, RFC and source lock are unchanged.
+- **Next:** Decide the selected envelope and declared inline-receipt extension
+  before packed SDK extraction. No public API or live adoption decision yet.
 
 ## 1. Overview
 

@@ -18,12 +18,21 @@
 
 ## Next
 
+- [P5-T10B Greeting/JSON qualification](P5-T10B_Greeting_Exchange.md) is
+  implemented and locally verified, pending PR/CI/merge. The
+  [report](../../docs/GREETING_EXCHANGE_QUALIFICATION.md) demonstrates private
+  representation reuse with a separate native app and records the intentional
+  JSON-property-order compatibility correction. Next settle the selected envelope
+  and inline-receipt extension contract before public/packed SDK API work. The
+  Greeting test lease/evidence is synthetic, not independent ASP conformance.
+
 - [P5-T10A private request/result exchange](P5-T10A_Private_Proposal_Exchange.md)
-  is implemented and locally verified, pending PR/CI/merge. The
+  is implemented; #23 CI is green with no review threads as checked on
+  2026-10-02 UTC, pending merge. The
   [comparison](../../docs/PRIVATE_PROPOSAL_EXCHANGE.md) records a smaller facade
   with retained host receipt policy and independent executor admission through
-  real HTTPS. Next qualify a portable envelope/JSON-equivalence contract and a
-  non-Calcu consumer before selecting public SDK API or migrating the live host.
+  real HTTPS. P5-T10B follows up the JSON-equivalence and second-consumer questions;
+  portable envelope/public API and live migration remain gated.
 
 - P5-T9A characterization and P5-T9A-F dispatch deadline/input repair merged in
   Calcu #20/#21; [repair evidence](../../docs/DISPATCH_INPUT_REPAIR.md).

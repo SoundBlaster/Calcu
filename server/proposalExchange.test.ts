@@ -303,7 +303,8 @@ describe('private proposal exchange representation', () => {
     'malformed',
     'duplicate',
     'oversized',
-    'nested-order',
+    'nested-extra',
+    'nested-value',
   ])('rejects %s results before the host reader', (kind) => {
     const prepared = exchange().prepare(receipt);
     const reply = response(prepared.request());
@@ -311,8 +312,8 @@ describe('private proposal exchange representation', () => {
     if (kind === 'extra-envelope') Object.assign(reply, { extra: true });
     if (kind === 'extra-payload') reply.payload.extra = true;
     if (kind === 'oversized') reply.payload.output.greeting = '💬'.repeat(4096);
-    if (kind === 'nested-order')
-      reply.payload.delegate = { agent: 'agent', runtime: 'runtime' };
+    if (kind === 'nested-extra') reply.payload.delegate.extra = true;
+    if (kind === 'nested-value') reply.payload.delegate.agent = 'another';
     let raw = JSON.stringify(reply);
     if (kind === 'malformed') raw = '{';
     if (kind === 'duplicate')
@@ -320,6 +321,67 @@ describe('private proposal exchange representation', () => {
     const reader = vi.fn();
     expect(() => prepared.readResult(raw, reader)).toThrow();
     expect(reader).not.toHaveBeenCalled();
+  });
+
+  it('accepts reordered object members without changing saved expectations', () => {
+    const prepared = exchange().prepare(receipt);
+    const reply = response(prepared.request());
+    reply.payload.delegate = { agent: 'agent', runtime: 'runtime' };
+    reply.payload.execution = { execution_id: 'execution', mode: 'propose' };
+    const reader = vi.fn(() => 'accepted');
+    expect(prepared.readResult(JSON.stringify(reply), reader)).toBe('accepted');
+    expect(reader).toHaveBeenCalledOnce();
+  });
+
+  it.each([
+    'unicode',
+    'missing',
+    'case',
+  ])('does not normalize %s binding values', (kind) => {
+    const draft = seed();
+    draft.binding.delegate.agent = 'caf\u00e9';
+    const prepared = exchange(draft).prepare(receipt);
+    const reply = response(prepared.request());
+    if (kind === 'unicode') reply.payload.delegate.agent = 'cafe\u0301';
+    if (kind === 'missing') delete reply.payload.execution.mode;
+    if (kind === 'case')
+      reply.payload.audience = 'https://127.0.0.1/AGENT-ACTIONS';
+    const reader = vi.fn();
+    expect(() => prepared.readResult(JSON.stringify(reply), reader)).toThrow(
+      'invalid_response',
+    );
+    expect(reader).not.toHaveBeenCalled();
+  });
+
+  it('hashes input values without reordering arrays, normalizing strings or inserting defaults', () => {
+    const inputHash = (input: unknown) => {
+      const draft = { ...seed(), input };
+      const prepared = new ProposalExchange(
+        'greeting.propose',
+        document(draft),
+        limits,
+      ).prepare(receipt);
+      return JSON.parse(prepared.request()).payload.input_hash;
+    };
+    const input = {
+      names: ['Ada', 'caf\u00e9'],
+      style: { prefix: 'Hello', punctuation: '!' },
+    };
+    expect(inputHash(input)).toBe(
+      inputHash({
+        style: { punctuation: '!', prefix: 'Hello' },
+        names: input.names,
+      }),
+    );
+    expect(inputHash(input)).not.toBe(
+      inputHash({ ...input, names: [...input.names].reverse() }),
+    );
+    expect(inputHash(input)).not.toBe(
+      inputHash({ ...input, names: ['Ada', 'cafe\u0301'] }),
+    );
+    expect(inputHash(input)).not.toBe(
+      inputHash({ ...input, style: { prefix: 'Hello' } }),
+    );
   });
 
   it('requires the explicit host reader and propagates its rejection', () => {

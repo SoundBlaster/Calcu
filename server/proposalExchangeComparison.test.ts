@@ -299,6 +299,24 @@ describe.each([
     expect(state.executor.engineCalls).toBe(3);
   });
 
+  it('records the intentional object-order compatibility difference', async () => {
+    const state = await fixture(candidate);
+    const backend = state.backend(async (credential, body, signal) => {
+      const reply = JSON.parse(await state.transport(credential, body, signal));
+      const { agent, runtime } = reply.payload.delegate;
+      reply.payload.delegate = { agent, runtime };
+      const { execution_id, mode } = reply.payload.execution;
+      reply.payload.execution = { execution_id, mode };
+      return JSON.stringify(reply);
+    });
+    const result = backend.calculationPropose(input);
+    if (candidate)
+      await expect(result).resolves.toEqual({ ...input, result: 36 });
+    else await expect(result).rejects.toThrow('invalid_response');
+    expect(state.executor.engineCalls).toBe(1);
+    expect(state.history(backend)).toHaveLength(candidate ? 2 : 1);
+  });
+
   it('snapshots arguments and host binding across clock and transport callbacks', async () => {
     const state = await fixture(candidate);
     const mutable: Calculation = { ...input };
