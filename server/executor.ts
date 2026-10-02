@@ -5,6 +5,7 @@ import {
   OfflineSemanticGrantRequest,
   type PreparedOfflineSelectedGrant,
   type PreparedOfflineSemanticGrantRequest,
+  SurfaceSnapshot,
 } from '@0al/agent-surface';
 import { calculate, exact, validateCalculation } from './calcu';
 import { serializeCalculationResponse } from './exposure';
@@ -21,7 +22,11 @@ const GRANT_HASH_DOMAIN =
 const SEMANTIC_REQUEST_HASH_DOMAIN =
   'https://github.com/0al-spec/agent-surface/hash/grant-request/v1';
 
-import { prepareCalcuSurface } from './manifest';
+import {
+  preparedSurface as defaultPreparedSurface,
+  type PreparedCalcuSurface,
+  prepareCalcuSurface,
+} from './manifest';
 import {
   createApplicationReceipt,
   type ReceiptContext,
@@ -107,6 +112,8 @@ export type ExecutorOptions = {
   identityVerifier: IdentityEvidenceVerifier;
   app_id?: string;
   issuer?: string;
+  /** Trusted composition input, never selected by an action caller. */
+  preparedSurface?: PreparedCalcuSurface;
 };
 
 type GrantRecord = {
@@ -189,24 +196,49 @@ function grantHash(input: Omit<GrantObject, 'grant_hash'>) {
 export function createCalcuExecutor({
   now = Date.now,
   identityVerifier,
-  app_id = 'calcu.local',
-  issuer = 'https://calcu.local',
+  app_id,
+  issuer,
+  preparedSurface: selected,
 }: ExecutorOptions) {
-  const configuredAppId = requiredIdentifier(app_id);
-  const configuredIssuer = requiredIdentifier(issuer);
-  const preparedSurface = prepareCalcuSurface(
-    configuredAppId,
-    configuredIssuer,
-  );
+  const preparedSurface =
+    selected ??
+    (app_id === undefined && issuer === undefined
+      ? defaultPreparedSurface
+      : prepareCalcuSurface(app_id, issuer));
+  const document = preparedSurface.document.parse() as {
+    app_id: string;
+    issuer: string;
+    surface_version: string;
+    surface_hash: string;
+    agent_api: { credential_audience: string; action_url: string };
+  };
+  const configuredAppId = requiredIdentifier(document.app_id);
+  const configuredIssuer = requiredIdentifier(document.issuer);
+  if (
+    (app_id !== undefined && app_id !== configuredAppId) ||
+    (issuer !== undefined && issuer !== configuredIssuer) ||
+    preparedSurface.surface.surface_version !== document.surface_version ||
+    preparedSurface.surface.surface_hash !== document.surface_hash ||
+    preparedSurface.surface.surface_hash !==
+      preparedSurface.manifest.surfaceHash ||
+    preparedSurface.surface.surface_hash !==
+      new SurfaceSnapshot(preparedSurface.document).hash() ||
+    preparedSurface.surface.credential_audience !==
+      document.agent_api.credential_audience ||
+    preparedSurface.surface.surface_url !== document.agent_api.action_url
+  )
+    throw new Error('binding_mismatch');
   const appSurface = preparedSurface.surface;
   if (!identityVerifier || typeof identityVerifier.verify !== 'function')
     throw new Error('identity_evidence_unavailable');
   const grants = new Map<string, GrantRecord>();
   let engineCalls = 0;
+  let retired = false;
 
   // Issuance is a trusted application control-plane operation. The caller must
   // provide a validated identity input; no default user/agent is synthesized.
   function issue(request: GrantRequest): RuntimeAccess {
+    if (retired) throw new Error('unauthorized');
     const trustedRequest = normalizeGrantRequest(request);
     const currentTime = now();
     if (!Number.isFinite(currentTime)) throw new Error('clock_unavailable');
@@ -352,11 +384,15 @@ export function createCalcuExecutor({
       active: true,
       remaining: 3,
     };
+    // Trusted callbacks (clock/verifier) can re-enter lifecycle operations.
+    if (retired) throw new Error('unauthorized');
     grants.set(record.credentialHash, record);
     return { credential, binding: cloneBinding(binding) };
   }
 
-  const invoke: Transport = async (credential, body) => {
+  const invoke: Transport = async (credential, body, signal) => {
+    if (retired) throw new Error('unauthorized');
+    if (signal?.aborted) throw new Error('aborted');
     if (typeof credential !== 'string' || credential.length !== 43)
       throw new Error('unauthorized');
     const record = grants.get(credentialHash(credential));
@@ -514,6 +550,9 @@ export function createCalcuExecutor({
     );
     if (payload.parent_receipt_hash !== runtimeReceipt.receipt_hash)
       throw new Error('integrity_mismatch');
+    if (retired || !record.active || record.session.state !== 'active')
+      throw new Error('unauthorized');
+    if (signal?.aborted) throw new Error('aborted');
     if (record.remaining <= 0) throw new Error('quota_exceeded');
     record.remaining--;
     engineCalls++;
@@ -590,8 +629,16 @@ export function createCalcuExecutor({
   }
 
   return {
+    surface: appSurface,
     invoke,
     issue,
+    retire() {
+      retired = true;
+      for (const record of grants.values()) {
+        record.active = false;
+        record.session.state = 'revoked';
+      }
+    },
     revoke(value: string) {
       const record = findRecord(value);
       if (record) {

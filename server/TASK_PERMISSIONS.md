@@ -63,11 +63,13 @@ preferences or “always allow” mode are introduced.
 
 ## Evidence and non-claims
 
-The current broker and executor still select version `0.1.1`. P5-T8A's
-[SDK-authored `0.1.2` candidate](../docs/LIVE_SDK_MANIFEST_PREPARATION.md) is
-prepared only; these offers cannot select its version or schema namespace.
-Rebinding access review and authority to it requires the separate P5-T8B
-activation/retirement transition.
+The current broker and executor share the SDK-authored version `0.1.2`
+snapshot. Browser offers cannot select its version/schema namespace. Retirement
+invalidates both outstanding offers and accepted-but-unclaimed permits, stops
+issuance and cancels active work. A replacement has a fresh cookie and requires
+new access review. Old permission or Grant records are never rebound. The
+[P5-T8B report](../docs/LIVE_SDK_MANIFEST_ACTIVATION.md) records composed HTTPS
+and restart evidence; P5-T8A's static qualification remains historical.
 
 `taskPermissions.test.ts` checks exact selection, expiry, replacement, replay,
 forged permits, changed task/surface and one-time issuance. It also runs a valid

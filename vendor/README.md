@@ -50,9 +50,11 @@ in this slice. No dependency version used by the old base validators changes.
 The base package and TypeBox `0.34.52` are runtime dependencies, satisfying the
 SDK's optional authoring peer explicitly. The server manifest module now imports
 the shared application declaration and can prepare the versioned SDK candidate.
-The live factory still selects the legacy `0.1.1` description; activation is a
-separate task. Neither authoring nor TypeBox is imported into the browser.
-See [P5-T8A preparation evidence](../docs/LIVE_SDK_MANIFEST_PREPARATION.md).
+The live factory selects the qualified SDK-authored `0.1.2` description.
+Neither authoring nor TypeBox is imported into the browser. The archive,
+source lock and dependency versions are unchanged by activation. See
+[P5-T8A preparation evidence](../docs/LIVE_SDK_MANIFEST_PREPARATION.md) and
+[P5-T8B activation](../docs/LIVE_SDK_MANIFEST_ACTIVATION.md).
 
 ## Historical private offline authoring experiment
 

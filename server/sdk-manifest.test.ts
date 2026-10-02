@@ -86,7 +86,7 @@ const goldens = [
   },
 ];
 
-describe('prepared SDK live candidate (not activated)', () => {
+describe('SDK-authored live selection and immutable legacy artifacts', () => {
   it('infers the application types without accepting an execution handle', () => {
     expectTypeOf<CalculationActionInput>().toEqualTypeOf<calcu.Calculation>();
     expectTypeOf<CalculationActionOutput>().toExtend<calcu.CalculationResult>();
@@ -98,7 +98,7 @@ describe('prepared SDK live candidate (not activated)', () => {
 
   it.each(
     goldens,
-  )('preserves the legacy live artifacts at $issuer', (golden) => {
+  )('preserves the historical legacy artifacts at $issuer', (golden) => {
     const baseline = loadLegacyCalcuSurface(golden.issuer);
     expect(digest(baseline.fixture)).toBe(golden.legacyFixture);
     expect(digest(baseline.fixture.manifest)).toBe(golden.legacyManifest);
@@ -118,11 +118,9 @@ describe('prepared SDK live candidate (not activated)', () => {
       '7f837fd1eaad4dec78b3c7f612e52a8fa7a870a4',
     );
     const live = prepareCalcuSurface('calcu.local', golden.issuer);
-    expect(live.surface.surface_version).toBe('0.1.1');
-    expect(digest(live.document.parse())).toBe(golden.legacyManifest);
-    expect(JSON.stringify(live.document.parse())).toBe(
-      JSON.stringify(baseline.fixture.manifest),
-    );
+    expect(live.surface.surface_version).toBe('0.1.2');
+    expect(digest(live.document.parse())).toBe(golden.manifest);
+    expect(live.surface.surface_hash).toBe(golden.surface);
     expect(
       digest(
         live.schemaResources.map(({ uri, document }) => ({
@@ -130,15 +128,7 @@ describe('prepared SDK live candidate (not activated)', () => {
           schema: document.parse(),
         })),
       ),
-    ).toBe(golden.legacyResources);
-    expect(
-      jsonDigest(
-        live.schemaResources.map(({ uri, document }) => ({
-          uri,
-          schema: document.parse(),
-        })),
-      ),
-    ).toBe(golden.legacyResourcesJson);
+    ).toBe(golden.resources);
     expect(live.identityAdvertisement.parse()).toEqual(
       baseline.identityAdvertisement.parse(),
     );
@@ -235,7 +225,7 @@ describe('prepared SDK live candidate (not activated)', () => {
     ).toEqual(value);
   });
 
-  it('validates all four operations without calling business logic or changing live selection', () => {
+  it('selects the qualified SDK snapshot without calling business logic', () => {
     const engine = vi.spyOn(calcu, 'calculate');
     try {
       const next = prepareSdkCalcuSurface();
@@ -252,10 +242,8 @@ describe('prepared SDK live candidate (not activated)', () => {
         );
       }
       expect(engine).not.toHaveBeenCalled();
-      expect(preparedSurface.surface.surface_version).toBe('0.1.1');
-      expect(preparedSurface.surface.surface_hash).toBe(
-        goldens[0].legacySurface,
-      );
+      expect(preparedSurface.surface.surface_version).toBe('0.1.2');
+      expect(preparedSurface.surface.surface_hash).toBe(goldens[0].surface);
     } finally {
       engine.mockRestore();
     }

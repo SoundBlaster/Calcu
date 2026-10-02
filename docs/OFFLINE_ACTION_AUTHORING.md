@@ -103,6 +103,11 @@ consumer update, and independent executor validation remains mandatory.
 
 ## Public-module migration evidence (2026-10-02 UTC)
 
+The migration discussion above is historical offline evidence. Subsequent
+[P5-T8B activation](LIVE_SDK_MANIFEST_ACTIVATION.md) selects the new versioned
+manifest for live issuance/admission and explicitly retires authority at restart.
+The prototype comparison and its immutable baseline stay unchanged.
+
 - Clean `npm ci --no-audit --no-fund` followed by the dedicated offline check:
   all 3 authoring tests passed using only the installed vendored package.
 - `npm run check`: 237 Vitest tests, 6 preflight tests and 13 bundle tests passed.

@@ -1,5 +1,4 @@
 import {
-  CanonicalObjectHash,
   JsonDocument,
   OfflineProposalManifest,
   type OfflineSchemaResource,
@@ -8,7 +7,7 @@ import {
 } from '@0al/agent-surface';
 import type { PreparedActionInventory } from '@0al/agent-surface/authoring';
 import { calculationActionInventory } from './calculation-declaration';
-import { calculationDataClasses, calculationDataExposure } from './exposure';
+import { calculationDataClasses } from './exposure';
 import {
   TEST_FRESHNESS_PROFILE,
   TEST_KEY_BINDING_PROFILE,
@@ -18,7 +17,6 @@ import {
 
 const ASP = 'https://github.com/0al-spec/agent-surface/';
 const DIALECT = 'https://json-schema.org/draft/2020-12/schema';
-const INPUT_SCHEMA_HASH_DOMAIN = `${ASP}hash/action-input-schema/v1`;
 const IDENTITY_PROFILE = `${ASP}profiles/agent-identity-evidence/v1`;
 const FORMAT_PROFILE = `${ASP}profiles/agent-passport-minimal/v1`;
 const DIGEST_PROFILE = `${ASP}hash/agent-passport-artifact/v1`;
@@ -91,13 +89,11 @@ function prepareCalcuManifest(
   appId: string,
   issuer: string,
   surfaceVersion: string,
-  inventory?: PreparedActionInventory,
+  inventory: PreparedActionInventory,
 ): PreparedCalcuSurface {
   const actionId = 'calculation.propose';
   const scopeId = actionId;
   const actionUrl = `${issuer}/agent-actions`;
-  const inputUri = `${issuer}/schemas/${actionId}.input.json`;
-  const outputUri = `${issuer}/schemas/${actionId}.output.json`;
   const eventUri = `${issuer}/schemas/grant-revoked.event.json`;
   const receiptUri = `${issuer}/schemas/action-receipt.json`;
   const identityAdvertisementValue = {
@@ -112,32 +108,8 @@ function prepareCalcuManifest(
     max_artifact_bytes: 262_144,
   };
   const identityAdvertisement = json(identityAdvertisementValue);
-  // Retain the legacy live schema bytes until the separate activation slice.
-  const actionSchemas = inventory?.schemaResources ?? [
-    schemaResource(inputUri, {
-      type: 'object',
-      properties: {
-        operator: { enum: ['add', 'subtract', 'multiply', 'divide'] },
-        left: { type: 'number' },
-        right: { type: 'number' },
-      },
-      required: ['operator', 'left', 'right'],
-      additionalProperties: false,
-    }),
-    schemaResource(outputUri, {
-      type: 'object',
-      properties: {
-        operator: { enum: ['add', 'subtract', 'multiply', 'divide'] },
-        left: { type: 'number' },
-        right: { type: 'number' },
-        result: { type: 'number' },
-      },
-      required: ['operator', 'left', 'right', 'result'],
-      additionalProperties: false,
-    }),
-  ];
   const resources: OfflineSchemaResource[] = [
-    ...actionSchemas,
+    ...inventory.schemaResources,
     schemaResource(eventUri, { type: 'object' }),
     schemaResource(receiptUri, {
       type: 'object',
@@ -242,7 +214,6 @@ function prepareCalcuManifest(
       additionalProperties: false,
     }),
   ];
-  const actionExposure = calculationDataExposure();
   const controlExposure = {
     classes: [],
     redaction: { mode: 'none' },
@@ -281,26 +252,7 @@ function prepareCalcuManifest(
     scopes: [{ id: scopeId, description: 'Prepare an application proposal.' }],
     data_classes: calculationDataClasses(),
     resources: [],
-    actions: inventory?.actionDocuments.map((document) => document.parse()) ?? [
-      {
-        id: actionId,
-        scope: scopeId,
-        risk: 'propose',
-        side_effect: false,
-        approval: 'none',
-        execution: {
-          mode: 'propose',
-          operation_id: `${actionId}.operation`,
-          persisted: false,
-        },
-        input_schema: inputUri,
-        input_schema_hash: new CanonicalObjectHash(
-          INPUT_SCHEMA_HASH_DOMAIN,
-        ).digest(actionSchemas[0].document),
-        output_schema: outputUri,
-        data_exposure: actionExposure,
-      },
-    ],
+    actions: inventory.actionDocuments.map((document) => document.parse()),
     events: [
       {
         id: 'grant.revoked',
@@ -344,24 +296,24 @@ function prepareCalcuManifest(
     }),
     surface_hash: prepared.surfaceHash,
   });
-  return {
+  return Object.freeze({
     surface,
     document,
     identityAdvertisement,
     schemaResources,
     manifest: prepared,
-  };
+  });
 }
 
-/** Legacy live selection; activation is explicitly deferred to P5-T8B. */
+/** The only live selection. Historical 0.1.1 bytes exist in test fixtures only. */
 export function prepareCalcuSurface(
   appId = 'calcu.local',
   issuer = 'https://calcu.local',
 ): PreparedCalcuSurface {
-  return prepareCalcuManifest(appId, issuer, '0.1.1');
+  return prepareSdkCalcuSurface(appId, issuer);
 }
 
-/** Qualified server-only candidate, not the demo's selected live surface. */
+/** SDK-authored full manifest; preparation grants no execution authority. */
 export function prepareSdkCalcuSurface(
   appId = 'calcu.local',
   issuer = 'https://calcu.local',

@@ -1,9 +1,10 @@
 # P5-T8 — Migrate the live manifest to SDK authoring
 
-Status: implementation plan, 2026-10-02 UTC. Runtime activation is pending.
+Status: P5-T8A merged and P5-T8B implemented for review, 2026-10-02 UTC.
 P5-T8A preparation is implemented; see
 [snapshot/fixture evidence](../../docs/LIVE_SDK_MANIFEST_PREPARATION.md).
-P5-T8B remains pending.
+P5-T8B selects the SDK snapshot; see
+[activation and lifecycle evidence](../../docs/LIVE_SDK_MANIFEST_ACTIVATION.md).
 Priority: P1. Complexity: high; reasoning effort: high.
 Dependencies: P5-T5/P5-T7 evidence, merged
 [SDK #32](https://github.com/0al-spec/agent-surface-js/pull/32) and
@@ -47,7 +48,7 @@ process-session cookie, per-task Grants valid for at most 60 seconds, and
 revocation in the task's `finally` block. Supporting simultaneous old/new live
 snapshots would add a second lifecycle without a current consumer requirement.
 
-| Binding | Existing live value | Planned new live value |
+| Binding | Historical live value | Selected live value |
 | --- | --- | --- |
 | `surface_version` | `0.1.1` | `0.1.2` (new opaque label) |
 | Action schema namespace | `<issuer>/schemas/` | `<issuer>/schemas/0.1.2/` |
@@ -202,4 +203,5 @@ The SDK source lock, ASP normative text, four-operation tool surface and
 Compatibility Bearer development profile remain the selected contract. Durable
 state, dual live snapshots, schema-serving endpoints, signed receipts, Human
 Approval, Proof-Bound transport and general SDK executor/store extraction are
-separate follow-ups. This plan changes no runtime code.
+separate follow-ups. The plan itself granted no authority. P5-T8B implements the
+bounded transition; its report separates fixture evidence from provider smoke.

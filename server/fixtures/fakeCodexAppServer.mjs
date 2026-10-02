@@ -1,6 +1,7 @@
 import readline from 'node:readline';
 
 const scenario = process.argv[2] ?? 'success';
+if (scenario === 'stubborn') process.on('SIGTERM', () => {});
 const threadId = 'thread-calcu';
 const turnId = 'turn-calcu';
 const send = (value) => process.stdout.write(`${JSON.stringify(value)}\n`);
@@ -66,7 +67,7 @@ input.on('line', (line) => {
       });
       return;
     }
-    if (scenario === 'timeout') return;
+    if (scenario === 'timeout' || scenario === 'stubborn') return;
     if (scenario === 'malformed') {
       process.stdout.write('{broken json\n');
       return;
