@@ -15,6 +15,7 @@ session contract and tested loopback HTTPS boundary. See [boundary status](../se
 | P5-T3 | Implemented: ephemeral Codex adapter, local task host and task UI | P5-T2 |
 | P5-T4 | Implemented: regression/conformance evidence and adoption report | P5-T3 |
 | P5-T5 | Complete: SDK-validated manifest/request/Grant values and server-only unsigned Runtime/App Receipts | P5-T4; SDK PRs #12 and #13 |
+| P5-T8 | Planned: SDK-authored live manifest with versioned resources and retirement/restart qualification | P5-T5; accepted P5-T7 follow-up; SDK #32 and Calcu #16 |
 
 The P5 demo implementation is complete through **P5-T5**; the P5-T6
 second-consumer comparison is complete and recorded below. This section does not
@@ -115,6 +116,26 @@ mark a production ASP deployment or change the existing keypad requirements.
   boundary is unchanged; no live execution, ASP normative text or canonical
   adoption status changes follow. A live description migration still requires
   a separate version/resource/old-authority transition plan.
+
+#### ⏳ P5-T8: Migrate the live manifest to SDK authoring
+
+- **Status:** Planned in
+  [P5-T8 Live SDK Manifest Migration](INPROGRESS/P5-T8_Live_SDK_Manifest_Migration.md).
+  Runtime activation remains pending; Calcu #16 supplied accepted offline evidence.
+- **Priority:** P1. **Dependencies:** P5-T5/P5-T7 evidence, SDK #32 and Calcu #16.
+  **Parallelizable:** no for activation; preparation precedes lifecycle tests.
+- **Description:** Replace repeated live action/schema fields with the qualified
+  application-owned declaration. Allocate version `0.1.2` and immutable versioned
+  action schema URIs; retire old authority through a controlled demo-host restart.
+- **Outputs:** P5-T8A snapshot/legacy fixtures and P5-T8B live composition,
+  retirement/restart qualification, updated adoption/conformance evidence.
+- **Acceptance:** Whole new manifest and hashes qualify at both namespaces;
+  permission/Grant/executor/receipt paths agree on the selected snapshot; stale
+  authority fails before a new engine call; fake Codex through HTTPS returns `36`;
+  shutdown terminates the owned agent process and requires fresh access review.
+- **Boundary:** Application identity/consent/issuance/admission stay explicit.
+  One proposal action and Compatibility Bearer development profile remain;
+  general SDK runtime extraction and dual live-snapshot support are later work.
 
 ## 1. Overview
 
