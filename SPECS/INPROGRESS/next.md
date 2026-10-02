@@ -18,6 +18,13 @@
 
 ## Next
 
+- [P5-T10A private request/result exchange](P5-T10A_Private_Proposal_Exchange.md)
+  is implemented and locally verified, pending PR/CI/merge. The
+  [comparison](../../docs/PRIVATE_PROPOSAL_EXCHANGE.md) records a smaller facade
+  with retained host receipt policy and independent executor admission through
+  real HTTPS. Next qualify a portable envelope/JSON-equivalence contract and a
+  non-Calcu consumer before selecting public SDK API or migrating the live host.
+
 - P5-T9A characterization and P5-T9A-F dispatch deadline/input repair merged in
   Calcu #20/#21; [repair evidence](../../docs/DISPATCH_INPUT_REPAIR.md).
   P5-T9A completed with no-go for public extraction/live adoption: at its baseline,
