@@ -429,13 +429,17 @@ export function AgentTaskPanel() {
         ) : null}
       </div>
       {aspDetails ? (
-        <details className={styles.trace}>
+        <details className={styles.aspDetails}>
           <summary>ASP details</summary>
           <dl>
-            <dt>Surface version</dt>
-            <dd>{aspDetails.surface_version}</dd>
-            <dt>Allowed action</dt>
-            <dd>{aspDetails.action_id}</dd>
+            <div>
+              <dt>Surface version</dt>
+              <dd>{aspDetails.surface_version}</dd>
+            </div>
+            <div>
+              <dt>Allowed action</dt>
+              <dd>{aspDetails.action_id}</dd>
+            </div>
           </dl>
         </details>
       ) : null}

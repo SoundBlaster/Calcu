@@ -177,8 +177,19 @@ Local results, 2026-10-02 UTC:
   measurements were obtained. The audit-owned demo listener was stopped and
   confirmed closed; no model task was sent and unrelated caches were untouched.
 
-CI must run the full gate on the new pushed head. Visual verification remains
-a separate follow-up once local disk space is available.
+These limitations describe the initial UI follow-up. After disk space became
+available, the ASP details presentation was refined into a separate disclosure
+card with a right-aligned chevron, subtle row separators and monospace values.
+At narrow widths, each value moves below its label.
+
+The styling follow-up passed Biome checks, TypeScript checks, the production
+build with bundle isolation, all 15 panel tests and `git diff --check`. Chrome
+screenshots and DOM measurements at 960 × 858 and 390 × 844 verified that both
+metadata rows fit without overflow; the narrow page had no horizontal overflow.
+Both permissions remained unchecked and no model task was sent. The temporary
+viewport override was reset and the audit-owned listener was confirmed closed.
+This verifies these two widths, not an exhaustive browser/device matrix. CI
+must still run the full gate on the new pushed head.
 
 Next: review this activation/lifecycle change and CI, then merge separately.
 After merge/synchronization, optionally smoke the authenticated local demo;
