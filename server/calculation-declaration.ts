@@ -12,6 +12,7 @@ import { calculationDataClasses, calculationDataExposure } from './exposure';
 
 export const CALCULATION_ACTION_ID = 'calculation.propose';
 export const CALCULATION_MODE = 'propose';
+export const CALCULATION_INPUT_HASH_PROFILE = 'asp-jcs-sha-256';
 
 const fields = {
   operator: Type.Union([
@@ -41,6 +42,7 @@ export function calculationActionInventory(): OfflineActionInventory {
       risk: 'propose',
       side_effect: false,
       approval: 'none',
+      input_hash_profile: CALCULATION_INPUT_HASH_PROFILE,
       execution: {
         mode: CALCULATION_MODE,
         operation_id: 'calculation.propose.operation',

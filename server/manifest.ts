@@ -6,7 +6,10 @@ import {
   SurfaceSnapshot,
 } from '@0al/agent-surface';
 import type { PreparedActionInventory } from '@0al/agent-surface/authoring';
-import { calculationActionInventory } from './calculation-declaration';
+import {
+  CALCULATION_INPUT_HASH_PROFILE,
+  calculationActionInventory,
+} from './calculation-declaration';
 import { calculationDataClasses } from './exposure';
 import {
   TEST_FRESHNESS_PROFILE,
@@ -61,6 +64,7 @@ export type CalcuSurface = {
     id: 'calculation.propose';
     execution: { mode: 'propose' };
     side_effect: false;
+    input_hash_profile: 'asp-jcs-sha-256';
   };
   surface_hash: string;
 };
@@ -293,6 +297,7 @@ function prepareCalcuManifest(
       id: actionId,
       execution: Object.freeze({ mode: 'propose' as const }),
       side_effect: false as const,
+      input_hash_profile: CALCULATION_INPUT_HASH_PROFILE,
     }),
     surface_hash: prepared.surfaceHash,
   });
@@ -319,9 +324,9 @@ export function prepareSdkCalcuSurface(
   issuer = 'https://calcu.local',
 ): PreparedCalcuSurface {
   const inventory = calculationActionInventory().prepare(
-    `${issuer}/schemas/0.1.2/`,
+    `${issuer}/schemas/0.1.3/`,
   );
-  return prepareCalcuManifest(appId, issuer, '0.1.2', inventory);
+  return prepareCalcuManifest(appId, issuer, '0.1.3', inventory);
 }
 
 export const preparedSurface = prepareCalcuSurface();

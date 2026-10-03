@@ -24,7 +24,7 @@
     "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit"
   },
   "dependencies": {
-    "@0al/agent-surface": "file:vendor/0al-agent-surface-0.1.0-experimental.0-c8908ab.tgz",
+    "@0al/agent-surface": "file:vendor/0al-agent-surface-0.1.0-experimental.0-e5321de.tgz",
     "@sinclair/typebox": "0.34.52",
     "canonicalize": "^4.0.0",
     "react": "^19.2.4",

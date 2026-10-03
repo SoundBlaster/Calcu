@@ -1,5 +1,20 @@
 # ASP SDK package snapshots
 
+## Current input-profile candidate
+
+The installed archive is `0al-agent-surface-0.1.0-experimental.0-e5321de.tgz`,
+built from exact SDK candidate commit
+`e5321deab9231782cb375cd7dc4851daad625124`
+([SDK PR #39](https://github.com/0al-spec/agent-surface-js/pull/39)).
+It is not yet a merged SDK release. SHA-256:
+`a94816c7a180822667108aadcc22c149050f4e3bc1be62fdc8a2af368ee4773b`.
+The lockfile pins its integrity; the embedded ASP source lock and MIT license
+are unchanged. It adds explicit `input_hash_profile` support. Calcu selects
+surface `0.1.3`; see [alignment evidence](../docs/RECEIPT_INPUT_PROFILE_ALIGNMENT.md).
+Reproduce using the clean exact candidate commit and the commands below.
+
+## Historical public-authoring snapshot
+
 `0al-agent-surface-0.1.0-experimental.0-c8908ab.tgz` is an unpublished npm
 package built from [agent-surface-js](https://github.com/0al-spec/agent-surface-js)
 merge commit `c8908ab865e698b9e92bc8f70b85be359d0e12a0` (SDK PR #32), licensed
@@ -7,7 +22,7 @@ MIT (LICENSE is in the archive). This snapshot adds the optional public
 `@0al/agent-surface/authoring` entry point. The earlier commit-named `4cd3397`
 and unqualified archives remain unchanged as historical snapshots.
 
-Current snapshot SHA-256:
+Historical snapshot SHA-256:
 `3425336616ed71128635aa66dea69dbd5abf430fd8b9d0550e991b734334a54c`.
 The lockfile pins its SHA-512 integrity. Ordinary `npm ci` uses this
 repository-local archive: no sibling checkout, npm publication or GitHub branch
@@ -50,7 +65,7 @@ in this slice. No dependency version used by the old base validators changes.
 The base package and TypeBox `0.34.52` are runtime dependencies, satisfying the
 SDK's optional authoring peer explicitly. The server manifest module now imports
 the shared application declaration and can prepare the versioned SDK candidate.
-The live factory selects the qualified SDK-authored `0.1.2` description.
+That activation selected the qualified SDK-authored `0.1.2` description.
 Neither authoring nor TypeBox is imported into the browser. The archive,
 source lock and dependency versions are unchanged by activation. See
 [P5-T8A preparation evidence](../docs/LIVE_SDK_MANIFEST_PREPARATION.md) and

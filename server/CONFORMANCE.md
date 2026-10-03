@@ -38,7 +38,7 @@ not establish semantic equivalence between the request and the action.
 ## SDK-authored live snapshot and host retirement
 
 P5-T8A preserved immutable legacy fixtures and qualified exact two-namespace
-digests. P5-T8B now selects that `0.1.2` snapshot for permissions, issuance,
+digests. P5-T8B originally selected that `0.1.2` snapshot for permissions, issuance,
 independent admission and server-only receipts. The deterministic composed
 test runs browser permission endpoints → fake Codex process → real HTTPS →
 Calcu, returns `36` and verifies both receipt tuples against that snapshot.
@@ -49,6 +49,10 @@ presentation without pretending to undo the action. Partial-body shutdown,
 confirmed process-group exit, unconfirmed cleanup and shared deadline failure
 are tested. See [activation evidence](../docs/LIVE_SDK_MANIFEST_ACTIVATION.md).
 These checks do not promote portable interoperability or production conformance.
+
+The current `0.1.3` selection additionally declares the action input hash profile
+and requires `policy_allowed` in both local receipt decisions. See
+[receipt/input-profile alignment](../docs/RECEIPT_INPUT_PROFILE_ALIGNMENT.md).
 
 ## Manual live evidence
 

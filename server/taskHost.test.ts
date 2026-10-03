@@ -207,7 +207,7 @@ describe('local task HTTP host', () => {
       body: JSON.stringify({ task: 'calculate' }),
     });
     const offer = JSON.parse(preview.body);
-    expect(offer.surface_version).toBe('0.1.2');
+    expect(offer.surface_version).toBe('0.1.3');
     expect(offer.action_id).toBe('calculation.propose');
     expect(Object.keys(offer).sort()).toEqual([
       'action_id',
