@@ -18,14 +18,26 @@
 
 ## Next
 
-- Review/land P5-T9A characterization and the dependent P5-T9A-F dispatch
-  deadline/input repair in order; [repair evidence](../../docs/DISPATCH_INPUT_REPAIR.md).
+- [P5-T10A private request/result exchange](P5-T10A_Private_Proposal_Exchange.md)
+  is implemented and locally verified, pending PR/CI/merge. The
+  [comparison](../../docs/PRIVATE_PROPOSAL_EXCHANGE.md) records a smaller facade
+  with retained host receipt policy and independent executor admission through
+  real HTTPS. Next qualify a portable envelope/JSON-equivalence contract and a
+  non-Calcu consumer before selecting public SDK API or migrating the live host.
+
+- P5-T9A characterization and P5-T9A-F dispatch deadline/input repair merged in
+  Calcu #20/#21; [repair evidence](../../docs/DISPATCH_INPUT_REPAIR.md).
   P5-T9A completed with no-go for public extraction/live adoption: at its baseline,
   a Grant or identity deadline could elapse inside verification before function
   entry, and mutable caller input could invalidate an otherwise correct response.
-  Those bounded consumer gaps are now corrected in the dependent layer, pending
-  review/CI/merge. Next scope the host-owned dispatch contract and measure real
-  integration cost before selecting any public dispatch interface.
+  Those bounded consumer gaps are corrected at merged `3ae557d`. SDK #34 merged
+  the host-owned dispatch design. Selected next:
+  [P5-T9A-H private real-host comparison](P5-T9A-H_Private_Host_Comparison.md)
+  is implemented and locally verified, pending PR/CI/merge. Its
+  [report](../../docs/PRIVATE_HOST_BINDING_COMPARISON.md) keeps this wrapper
+  private: paired real HTTPS behavior passes, but it removes no production glue.
+  Next select a concrete repeated request/result or validation burden and map
+  reusable checks before proposing any public dispatch interface.
   See the [binding task](P5-T9_Admitting_Handler_Binding.md).
   P5-T8A/B are merged. An optional authenticated CLI smoke remains separate from
   the deterministic fake-agent/HTTPS gate; retry must review access again.
