@@ -370,6 +370,37 @@ describe('ASP compatibility bearer over loopback HTTPS', () => {
     expect(fixture.executor.engineCalls).toBe(0);
   });
 
+  it.each([
+    undefined,
+    'private',
+    'no-store, public',
+  ])('rejects successful HTTP without exact no-store: %s', async (cache) => {
+    const fixture = await openFixture();
+    const server = createHttpsServer(
+      { key: fixture.tls.key, cert: fixture.tls.cert },
+      (_request, response) => {
+        response.setHeader('content-type', 'application/json');
+        if (cache !== undefined) response.setHeader('cache-control', cache);
+        response.end('{}');
+      },
+    );
+    await new Promise<void>((resolve) =>
+      server.listen(0, '127.0.0.1', resolve),
+    );
+    try {
+      const address = server.address() as AddressInfo;
+      await expect(
+        createAuthenticatedHttpsTransport({
+          endpoint: `https://127.0.0.1:${address.port}/agent-actions`,
+          ca: fixture.tls.cert,
+        })(fixture.access.credential, '{}'),
+      ).rejects.toThrow('invalid_response');
+      expect(fixture.executor.engineCalls).toBe(0);
+    } finally {
+      await new Promise<void>((resolve) => server.close(() => resolve()));
+    }
+  });
+
   it('supports timeout and AbortSignal without invoking the engine', async () => {
     const fixture = await openFixture({ delayMs: 50 });
     await expect(

@@ -17,6 +17,7 @@ import {
   TEST_STATUS_PROFILE,
   TEST_VERIFICATION_PROFILE,
 } from './identity';
+import { INLINE_PROFILE } from './inlineReceiptWire';
 
 const ASP = 'https://github.com/0al-spec/agent-surface/';
 const DIALECT = 'https://json-schema.org/draft/2020-12/schema';
@@ -94,6 +95,7 @@ function prepareCalcuManifest(
   issuer: string,
   surfaceVersion: string,
   inventory: PreparedActionInventory,
+  inline = false,
 ): PreparedCalcuSurface {
   const actionId = 'calculation.propose';
   const scopeId = actionId;
@@ -240,6 +242,14 @@ function prepareCalcuManifest(
       credential_profile: 'compatibility_bearer',
     },
     agent_api: {
+      ...(inline
+        ? {
+            receipt_delivery: {
+              profile: INLINE_PROFILE,
+              action_ids: [actionId],
+            },
+          }
+        : {}),
       credential_audience: `${issuer}/agent-api`,
       grant_introspection_url: `${issuer}/agent-grants/introspect`,
       grant_revocation_url: `${issuer}/agent-grants/revoke`,
@@ -331,3 +341,19 @@ export function prepareSdkCalcuSurface(
 
 export const preparedSurface = prepareCalcuSurface();
 export const surface = preparedSurface.surface;
+
+/** Opt-in pilot only; does not change the default live surface. */
+export function prepareInlineCalcuSurface(
+  appId = 'calcu.local',
+  issuer = 'https://calcu.local',
+): PreparedCalcuSurface {
+  return prepareCalcuManifest(
+    appId,
+    issuer,
+    '0.1.4-inline-pilot',
+    calculationActionInventory().prepare(
+      `${issuer}/schemas/0.1.4-inline-pilot/`,
+    ),
+    true,
+  );
+}

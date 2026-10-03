@@ -126,7 +126,8 @@ export function createAuthenticatedHttpsTransport(
           }
           if (
             response.headers['content-type']?.split(';')[0].toLowerCase() !==
-            'application/json'
+              'application/json' ||
+            response.headers['cache-control'] !== 'no-store'
           ) {
             rejectCode('invalid_response');
             return;

@@ -16,6 +16,11 @@ import type {
   IdentityInput,
   VerifiedIdentity,
 } from './identity';
+import {
+  expandInlineRequest,
+  INLINE_PROFILE,
+  inlineResult,
+} from './inlineReceiptWire';
 
 const GRANT_HASH_DOMAIN =
   'https://github.com/0al-spec/agent-surface/hash/grant/v1';
@@ -210,7 +215,11 @@ export function createCalcuExecutor({
     issuer: string;
     surface_version: string;
     surface_hash: string;
-    agent_api: { credential_audience: string; action_url: string };
+    agent_api: {
+      credential_audience: string;
+      action_url: string;
+      receipt_delivery?: { profile: string; action_ids: string[] };
+    };
   };
   const configuredAppId = requiredIdentifier(document.app_id);
   const configuredIssuer = requiredIdentifier(document.issuer);
@@ -229,6 +238,20 @@ export function createCalcuExecutor({
   )
     throw new Error('binding_mismatch');
   const appSurface = preparedSurface.surface;
+  const inline = Object.hasOwn(document.agent_api, 'receipt_delivery');
+  if (inline) {
+    const delivery = exact(document.agent_api.receipt_delivery, [
+      'profile',
+      'action_ids',
+    ]);
+    if (
+      delivery.profile !== INLINE_PROFILE ||
+      !Array.isArray(delivery.action_ids) ||
+      delivery.action_ids.length !== 1 ||
+      delivery.action_ids[0] !== appSurface.action.id
+    )
+      throw new Error('binding_mismatch');
+  }
   if (!identityVerifier || typeof identityVerifier.verify !== 'function')
     throw new Error('identity_evidence_unavailable');
   const grants = new Map<string, GrantRecord>();
@@ -418,6 +441,7 @@ export function createCalcuExecutor({
     } catch {
       throw new Error('schema_invalid');
     }
+    if (inline) decoded = expandInlineRequest(decoded, record.binding);
     const envelope = exact(decoded, ['type', 'payload']);
     if (envelope.type !== 'action.request') throw new Error('schema_invalid');
     const payload = exact(envelope.payload, [
@@ -622,7 +646,7 @@ export function createCalcuExecutor({
         output,
       ),
     );
-    return serializeCalculationResponse({
+    const response = {
       type: 'action.result',
       payload: {
         ...expectedBinding,
@@ -638,7 +662,13 @@ export function createCalcuExecutor({
         output,
         receipt: appReceipt,
       },
-    });
+    };
+    if (inline) {
+      // Coverage of the local producer value precedes the explicit wire projection.
+      serializeCalculationResponse(response);
+      return serializeCalculationResponse(inlineResult(response), true);
+    }
+    return serializeCalculationResponse(response);
   };
 
   function findRecord(value: string) {
@@ -654,6 +684,13 @@ export function createCalcuExecutor({
     surface: appSurface,
     invoke,
     issue,
+    /** Trusted host snapshot; never exposed through HTTP/tools/browser. */
+    selectedGrant(credential: string): PreparedOfflineSelectedGrant {
+      const record = grants.get(credentialHash(credential));
+      if (!record) throw new Error('unauthorized');
+      record.selectedGrant.validate();
+      return record.selectedGrant;
+    },
     retire() {
       retired = true;
       for (const record of grants.values()) {

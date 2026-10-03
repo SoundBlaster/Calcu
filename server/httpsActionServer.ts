@@ -22,7 +22,7 @@ const ERROR_CODES = new Set([
   'data_exposure_violation',
 ]);
 
-type Executor = ReturnType<typeof createCalcuExecutor>;
+type Executor = Pick<ReturnType<typeof createCalcuExecutor>, 'invoke'>;
 
 export type ActionHttpsServerOptions = {
   key: string | Buffer;
