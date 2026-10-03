@@ -139,7 +139,7 @@ describe('ASP hash profiles', () => {
   it('pins the installed SDK package artifact and ASP evidence revision', () => {
     const tarball = readFileSync(
       new URL(
-        '../vendor/0al-agent-surface-0.1.0-experimental.0-5f044d5.tgz',
+        '../vendor/0al-agent-surface-0.1.0-experimental.0-920f85c.tgz',
         import.meta.url,
       ),
     );
@@ -147,10 +147,10 @@ describe('ASP hash profiles', () => {
       readFileSync(new URL('../package-lock.json', import.meta.url), 'utf8'),
     );
     expect(createHash('sha256').update(tarball).digest('hex')).toBe(
-      '43707d67175925ddccf58edd1107f3984e855436f6dcc462114d63620c15754d',
+      '1e697f9b88c66e246fc5d46361ce1ace91624fe72123701c6ee36f6a7375e2d2',
     );
     expect(lock.packages['node_modules/@0al/agent-surface'].resolved).toBe(
-      'file:vendor/0al-agent-surface-0.1.0-experimental.0-5f044d5.tgz',
+      'file:vendor/0al-agent-surface-0.1.0-experimental.0-920f85c.tgz',
     );
     expect(
       lock.packages['node_modules/@0al/offline-action-authoring-prototype'],
@@ -177,18 +177,18 @@ describe('ASP hash profiles', () => {
     ]);
     const privateArtifact = readFileSync(
       new URL(
-        '../vendor/0al-offline-proposal-exchange-experiment-0.0.0-experiment-5f044d5.tgz',
+        '../vendor/0al-offline-proposal-exchange-experiment-0.0.0-experiment-920f85c.tgz',
         import.meta.url,
       ),
     );
     expect(createHash('sha256').update(privateArtifact).digest('hex')).toBe(
-      '218597978b5b9d1c33c0d3246fe84d2d4a3e558b122de968a9c5a540fb53d60d',
+      'e2bc8c5d96872f4765ddd1860626adc036d5adc7e3e4dc739073fe881b3cd997',
     );
     const privateLock =
       lock.packages['node_modules/@0al/offline-proposal-exchange-experiment'];
     expect(privateLock.dev).toBe(true);
     expect(privateLock.resolved).toBe(
-      'file:vendor/0al-offline-proposal-exchange-experiment-0.0.0-experiment-5f044d5.tgz',
+      'file:vendor/0al-offline-proposal-exchange-experiment-0.0.0-experiment-920f85c.tgz',
     );
     expect(privateLock.integrity).toBe(
       `sha512-${createHash('sha512').update(privateArtifact).digest('base64')}`,

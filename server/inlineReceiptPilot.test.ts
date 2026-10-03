@@ -176,6 +176,39 @@ function rehashAppReceipt(
 }
 
 describe('opt-in HTTP inline receipt pilot over loopback HTTPS', () => {
+  it('rejects real independently valid Grant/manifest cross-mixing before transport', async () => {
+    const a = await openPilot();
+    const b = await openPilot();
+    a.selectedGrant.validateFor(a.prepared.manifest);
+    b.selectedGrant.validateFor(b.prepared.manifest);
+    expect(a.prepared.manifest.hash()).not.toBe(b.prepared.manifest.hash());
+    const mixedAccess = {
+      ...b.access,
+      binding: {
+        ...b.access.binding,
+        grant_id: a.access.binding.grant_id,
+        grant_hash: a.access.binding.grant_hash,
+      },
+    };
+    let sends = 0;
+    const backend = createInlineProposalBackend(
+      mixedAccess,
+      b.prepared,
+      a.selectedGrant,
+      async () => {
+        sends += 1;
+        throw new Error('unexpected_transport');
+      },
+      () => START,
+    );
+    await expect(backend.calculationPropose(INPUT)).rejects.toThrow(
+      /^grant_manifest_binding_mismatch$/,
+    );
+    expect(sends).toBe(0);
+    expect(a.executor.engineCalls).toBe(0);
+    expect(b.executor.engineCalls).toBe(0);
+  });
+
   it.each([
     [[]],
     [['other.action']],

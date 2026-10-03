@@ -25,7 +25,7 @@
     "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit"
   },
   "dependencies": {
-    "@0al/agent-surface": "file:vendor/0al-agent-surface-0.1.0-experimental.0-5f044d5.tgz",
+    "@0al/agent-surface": "file:vendor/0al-agent-surface-0.1.0-experimental.0-920f85c.tgz",
     "@sinclair/typebox": "0.34.52",
     "canonicalize": "^4.0.0",
     "react": "^19.2.4",
@@ -33,7 +33,7 @@
     "yaml": "^2.9.0"
   },
   "devDependencies": {
-    "@0al/offline-proposal-exchange-experiment": "file:vendor/0al-offline-proposal-exchange-experiment-0.0.0-experiment-5f044d5.tgz",
+    "@0al/offline-proposal-exchange-experiment": "file:vendor/0al-offline-proposal-exchange-experiment-0.0.0-experiment-920f85c.tgz",
     "@biomejs/biome": "^2.4.8",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.2",

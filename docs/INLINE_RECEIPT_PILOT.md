@@ -2,7 +2,7 @@
 
 2026-10-03 UTC. SDK [PR #40](https://github.com/0al-spec/agent-surface-js/pull/40)
 is deliberately left unmerged. Calcu installs immutable archive snapshots from
-its exact commit `5f044d5ca918e8438777a7594bf6c9c57e9bdbd4`, not a branch URL
+its exact commit `920f85cedda7ab7f5e1da4511577aefb9b3613c2`, not a branch URL
 or `npm link`. [Provenance and digests](../vendor/README.md) are repository-local.
 
 ## Scope
@@ -68,10 +68,16 @@ must show zero engine calls. Result tampering, late abort or missing delivery af
 admission must show one engine call: failure does not undo execution or refund quota.
 The existing HTTPS and default-manifest regressions remain in the normal suite.
 
+The Grant/manifest composition regression prepares two independently valid real
+issuer snapshots and checks each matching pair. It then combines Grant A with
+manifest B, with the request/context consistently using A's Grant and B's surface.
+The SDK rejects the mismatch before transport: zero sends and zero engine calls.
+This establishes representation binding, not a new live-authority guarantee.
+
 Run `npm run check`, `npm run build`, `npm run test:coverage`, `git diff --check`.
 For a focused reproduction: `npm run test:inline-receipt-pilot`.
 
-Local results: 39 pilot scenarios and all 515 Vitest tests passed; the 6 preflight
+Local results: 40 pilot scenarios and all 516 Vitest tests passed; the 6 preflight
 and 13 bundle-guard tests also passed. Formatting, lint, TypeScript, production
 build/browser isolation and `git diff --check` passed. Coverage passed the existing
 gate at 89.68% lines overall (90.65% for `server`). CI status is reported separately

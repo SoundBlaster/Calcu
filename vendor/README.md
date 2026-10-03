@@ -2,15 +2,18 @@
 
 ## Current inline receipt pilot candidate
 
-Installed base: `0al-agent-surface-0.1.0-experimental.0-5f044d5.tgz`.
-Test-only dev dependency: `0al-offline-proposal-exchange-experiment-0.0.0-experiment-5f044d5.tgz`.
-Both come from exact SDK commit `5f044d5ca918e8438777a7594bf6c9c57e9bdbd4`
+Installed base: `0al-agent-surface-0.1.0-experimental.0-920f85c.tgz`.
+Test-only dev dependency: `0al-offline-proposal-exchange-experiment-0.0.0-experiment-920f85c.tgz`.
+Both come from exact SDK commit `920f85cedda7ab7f5e1da4511577aefb9b3613c2`
 ([SDK PR #40](https://github.com/0al-spec/agent-surface-js/pull/40)), deliberately
 not merged or published. The base's embedded source lock pins merged ASP commit
 `814084f4d7d06ac85be358ba84533d0718607746`. Archive SHA-256 values:
 
-- Base: `43707d67175925ddccf58edd1107f3984e855436f6dcc462114d63620c15754d`.
-- Private experiment: `218597978b5b9d1c33c0d3246fe84d2d4a3e558b122de968a9c5a540fb53d60d`.
+- Base: `1e697f9b88c66e246fc5d46361ce1ace91624fe72123701c6ee36f6a7375e2d2`.
+- Private experiment: `e2bc8c5d96872f4765ddd1860626adc036d5adc7e3e4dc739073fe881b3cd997`.
+
+The superseded `5f044d5` archives remain unchanged as historical pilot inputs.
+The current snapshot rejects a valid Grant paired with another prepared surface.
 
 The private experiment is Node-only and used only by the test fixture; no
 browser or live demo import is added. Its MIT notice is retained in
