@@ -5,7 +5,6 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { createDevelopmentTlsMaterial } from './developmentTls';
 import type { Transport } from './executor';
 import { createCalcuExecutor, surface as defaultSurface } from './executor';
-import { createInlineProposalBackend } from './fixtures/inlineProposalBackend';
 import { canonicalHash } from './hash';
 import { createActionHttpsServer } from './httpsActionServer';
 import {
@@ -13,6 +12,7 @@ import {
   createTestIdentityVerifier,
   type VerifiedIdentity,
 } from './identity';
+import { createInlineProposalBackend } from './inlineProposalBackend';
 import { INLINE_EXTENSION, INLINE_PROFILE } from './inlineReceiptWire';
 import { localReceiptHistory } from './localBackend';
 import {

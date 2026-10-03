@@ -8,8 +8,12 @@ import {
   createDevelopmentIdentityVerifier,
   createEphemeralDevelopmentIdentity,
 } from './identity';
+import { createInlineProposalBackend } from './inlineProposalBackend';
 import { createLocalBackend } from './localBackend';
-import { type PreparedCalcuSurface, preparedSurface } from './manifest';
+import {
+  type PreparedCalcuSurface,
+  prepareInlineCalcuSurface,
+} from './manifest';
 import { createTaskHttpServer } from './taskHost';
 import {
   createTaskPermissionBroker,
@@ -37,7 +41,9 @@ export async function startCalcuDemo(options: DemoHostOptions = {}) {
   )
     throw new Error('demo_start_failed');
   // Validate the entire selection before TLS material, listeners or issuance.
-  const selected = (options.prepareSurface ?? (() => preparedSurface))();
+  const selected = (
+    options.prepareSurface ?? (() => prepareInlineCalcuSurface())
+  )();
   const permissions = createTaskPermissionBroker(selected);
   const identity = createEphemeralDevelopmentIdentity();
   const executor = createCalcuExecutor({
@@ -93,12 +99,23 @@ export async function startCalcuDemo(options: DemoHostOptions = {}) {
           ca: tls.cert,
           timeoutMs: 5_000,
         });
-        return await adapter.run(
-          task,
-          createLocalBackend(access, transport),
-          signal,
-          onEvent,
-        );
+        const selectedGrant = executor.selectedGrant(access.credential);
+        const selectedDocument = selected.document.parse() as {
+          agent_api: { receipt_delivery?: unknown };
+        };
+        const backend = Object.hasOwn(
+          selectedDocument.agent_api,
+          'receipt_delivery',
+        )
+          ? createInlineProposalBackend(
+              access,
+              selected,
+              selectedGrant,
+              transport,
+              Date.now,
+            )
+          : createLocalBackend(access, transport);
+        return await adapter.run(task, backend, signal, onEvent);
       } finally {
         executor.revoke(access.binding.grant_id);
       }

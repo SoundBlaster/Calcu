@@ -342,7 +342,7 @@ export function prepareSdkCalcuSurface(
 export const preparedSurface = prepareCalcuSurface();
 export const surface = preparedSurface.surface;
 
-/** Opt-in pilot only; does not change the default live surface. */
+/** Prepares the versioned surface that selects inline receipt delivery. */
 export function prepareInlineCalcuSurface(
   appId = 'calcu.local',
   issuer = 'https://calcu.local',

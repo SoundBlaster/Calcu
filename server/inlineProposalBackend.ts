@@ -3,16 +3,16 @@ import {
   type PreparedOfflineSelectedGrant,
 } from '@0al/agent-surface';
 import { OfflineInlineProposalExchange } from '@0al/offline-proposal-exchange-experiment';
-import type { RuntimeAccess, Transport } from '../executor';
+import type { RuntimeAccess, Transport } from './executor';
 import {
   INLINE_COMMON,
   INLINE_EXTENSION,
   INLINE_PROFILE,
-} from '../inlineReceiptWire';
-import { createLocalBackend } from '../localBackend';
-import type { PreparedCalcuSurface } from '../manifest';
+} from './inlineReceiptWire';
+import { createLocalBackend } from './localBackend';
+import type { PreparedCalcuSurface } from './manifest';
 
-/** Test-only integration pilot. Native host policy/acceptance remains independent. */
+/** Server-only adapter for the manifest-selected inline receipt wire. */
 export function createInlineProposalBackend(
   access: RuntimeAccess,
   prepared: PreparedCalcuSurface,
