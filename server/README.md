@@ -53,13 +53,12 @@ then `SIGKILL` after one second.
 
 ## Closed application contract
 
-The selected live snapshot remains version `0.1.1`. P5-T8A adds
-`prepareSdkCalcuSurface()` to qualify an SDK-authored `0.1.2` candidate from the
-shared application declaration; it does not select that candidate in the demo,
-permission broker or executor. The complete legacy fixtures and new resource
-digests are recorded in [preparation evidence](../docs/LIVE_SDK_MANIFEST_PREPARATION.md).
-TypeBox is an explicit server dependency. Activation and authority retirement
-remain P5-T8B; schema preparation is not Grant issuance or live admission.
+The selected live snapshot is SDK-authored version `0.1.3`, including the
+explicit action input hash profile. See [alignment evidence](../docs/RECEIPT_INPUT_PROFILE_ALIGNMENT.md).
+The complete historical fixtures and preparation digests remain in
+[preparation evidence](../docs/LIVE_SDK_MANIFEST_PREPARATION.md).
+TypeBox is an explicit server dependency. Schema preparation is not Grant
+issuance or live admission.
 
 `createCalcuExecutor({ now, identityVerifier })` owns the authoritative
 control-plane state. The only exported surface is a proposal-only action:
@@ -167,7 +166,7 @@ only during the test and removed afterwards.
 
 ## Mediated Proposal mapping
 
-The live manifest now uses the SDK-authored `0.1.2` snapshot with immutable
+The live manifest now uses the SDK-authored `0.1.3` snapshot with immutable
 versioned action schema URIs. `demoHost.ts` passes the same prepared snapshot to
 the permission broker and executor; LocalBackend uses the issuer's binding, not
 an independently selected global version. Stop/restart retires all executor

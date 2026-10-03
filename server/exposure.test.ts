@@ -113,7 +113,7 @@ describe('application-owned Calcu exposure policy', () => {
       actions: { data_exposure: unknown }[];
       events: { data_exposure: unknown }[];
     };
-    expect(value.surface_version).toBe('0.1.2');
+    expect(value.surface_version).toBe('0.1.3');
     expect(
       value.data_classes.map(({ id, classification }) => [id, classification]),
     ).toEqual([

@@ -45,15 +45,15 @@ const goldens = [
     legacyResourcesJson:
       'e3a774b0e7c00d970886ea576737d6d9db7696f9ebf66c49a0a31209351269ed',
     legacySurface: 'sha-256:JbCWzyXu_BiZqOhg_tomfvSI2MZOIyD_yVKR-DlDbaY',
-    surface: 'sha-256:htv_7BJWC1m1In23qz09pAVnBpAtqP1G2AADxACsy1I',
-    input: 'sha-256:qrE98zTK6reOyfYvqgT56niz2RUNSsslLyW7xhUxFRI',
+    surface: 'sha-256:lwnYCjj4ajf2hbPwQ8KDe1XGg6g9Bf8NfXTzc9VAKT0',
+    input: 'sha-256:O73QlZQxtTdmeWfsCY8Dl3ce5fzhuLxyUGIVJw8srMk',
     manifest:
-      '7f8b55c54ff6d0669de69d17ef78b720650dfeaf89d2bab4a74bb0b5ce205520',
+      '07b04cfbd6b907b5b5847a57e79248eb288625be2dd05657404d43a7e41490ea',
     resources:
-      '60741c732a99cc16140436f91c94670fd9c84986090753353bba537e64ff2fdd',
+      'a2efb3d4acc46ab95d8ede1c3e17d06355185f7b09141d8e89cff329ecec27ba',
     schemas: [
-      '7449a5ebfadf8ea841a81ab8b029c43a5a5f4c9bf8d430094026f94039cb083a',
-      'e69f89a7e649cdc35328ddb98f0255bbc1a6d757392364234d2af535b7446578',
+      '3403eb7fd21948cc8f7a6e1b39cbf6a82aa8caacf5ec87fd74bfc43149d41546',
+      '0c34957f44c6a5d096cb3f92219531ba1ed68ffca536f270b44354cad68aa7c9',
       'd2f4edc22799953355b7e7d89f67983562f89a75d2ac35a2f1faf21ae45fa5f0',
       'ca5afc3ef1d65df4b1af685b56709b8012f8b3450dd4eb9ffdd3f16c379032e1',
     ],
@@ -71,15 +71,15 @@ const goldens = [
     legacyResourcesJson:
       'b7dfcf0eb75af7bdd8d8968bddeff2db91459c39c95d292d0130507f58f041a5',
     legacySurface: 'sha-256:E4HAtpWx1TmEpgeqacO_XTAUc-AbpGZpuqR1AC0nnMc',
-    surface: 'sha-256:b68eUcnsKNPp6T7GjWZNpSfo5Yp-FiDKVC70iIt9Vrg',
-    input: 'sha-256:FvMBrfhj_ioR9YM3IktP6ksAu9AtQFIOZMEIHZJxW2I',
+    surface: 'sha-256:s4Fr7QKIfAbSkelKWwDUVl5NgLpEwtLp5YsgYWMP-YY',
+    input: 'sha-256:36Kx--PsNioYBff7Xfno2Fn0c-_1TEStbF-dE2g2Aw0',
     manifest:
-      'a9ec95beb1768312252f53ec53c5777f56e319d76cf28aaf2bbedfec25119605',
+      '8132f398e5fe7346c22d2838d6bc5a6fe8241152581fe0ba61bbb5a8487173d3',
     resources:
-      '4a751ae1f6190d509f9634cfdb806c3921277f36b66ac6b25e7b9e4e0cfc7b27',
+      'f2c1c3cd1554a57f234d3c71a8288bc29e3d6ab32a68d8429606e295f4336043',
     schemas: [
-      '7dc47a14efcd17923f12e0ede08a51883ab010d1e6a7fca790060a208824753e',
-      '318146135cc5bacca7171af429ac589ab422d7478daddecaf189e5b456de3844',
+      '1ccee1f2aec72aad7e98bfed6daa81888a79e7a45208d0622ca76c6fc1533a5b',
+      '6ad1384f7d6bac7c179e9d93effedbe3ba0efcf21860daa04b628bc00048dd37',
       'd154171e01c336a7fb294d69a7ee7df795429b940a8c67af30d44a02ba450083',
       '29118afc6ccca06908bdf080c43634f57e3660656e77013788c7560545e336c2',
     ],
@@ -118,7 +118,7 @@ describe('SDK-authored live selection and immutable legacy artifacts', () => {
       '7f837fd1eaad4dec78b3c7f612e52a8fa7a870a4',
     );
     const live = prepareCalcuSurface('calcu.local', golden.issuer);
-    expect(live.surface.surface_version).toBe('0.1.2');
+    expect(live.surface.surface_version).toBe('0.1.3');
     expect(digest(live.document.parse())).toBe(golden.manifest);
     expect(live.surface.surface_hash).toBe(golden.surface);
     expect(
@@ -166,17 +166,20 @@ describe('SDK-authored live selection and immutable legacy artifacts', () => {
       input_schema: _input,
       output_schema: _output,
       input_schema_hash: _inputHash,
+      input_hash_profile: _inputHashProfile,
       ...nextPolicy
     } = action;
     expect(nextPolicy).toEqual(oldPolicy);
+    expect(action.input_hash_profile).toBe('asp-jcs-sha-256');
+    expect(next.surface.action.input_hash_profile).toBe('asp-jcs-sha-256');
     expect(action.input_schema).toBe(
-      `${golden.issuer}/schemas/0.1.2/${actionId}.input.json`,
+      `${golden.issuer}/schemas/0.1.3/${actionId}.input.json`,
     );
     expect(action.output_schema).toBe(
-      `${golden.issuer}/schemas/0.1.2/${actionId}.output.json`,
+      `${golden.issuer}/schemas/0.1.3/${actionId}.output.json`,
     );
     expect(action.input_schema_hash).toBe(golden.input);
-    expect(next.surface.surface_version).toBe('0.1.2');
+    expect(next.surface.surface_version).toBe('0.1.3');
     expect(next.surface.surface_hash).toBe(golden.surface);
     expect(next.manifest.surfaceHash).toBe(golden.surface);
     expect(new SurfaceSnapshot(next.document).hash()).toBe(golden.surface);
@@ -242,7 +245,7 @@ describe('SDK-authored live selection and immutable legacy artifacts', () => {
         );
       }
       expect(engine).not.toHaveBeenCalled();
-      expect(preparedSurface.surface.surface_version).toBe('0.1.2');
+      expect(preparedSurface.surface.surface_version).toBe('0.1.3');
       expect(preparedSurface.surface.surface_hash).toBe(goldens[0].surface);
     } finally {
       engine.mockRestore();

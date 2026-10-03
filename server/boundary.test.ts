@@ -7,9 +7,39 @@ import {
   createTestIdentityVerifier,
 } from './identity';
 import { createLocalBackend, localReceiptHistory } from './localBackend';
+import type { ActionReceipt } from './receipts';
 
 const START = Date.parse('2026-09-05T00:00:00Z');
 const input = { operator: 'multiply', left: 240, right: 0.15 } as const;
+
+function receiptWithReason(
+  receipt: ActionReceipt,
+  reason: string,
+): ActionReceipt {
+  const { policy_decision_hash: _decisionHash, ...originalDecision } =
+    receipt.policy_decision;
+  const decision = { ...originalDecision, reason_code: reason };
+  const policyDecision = {
+    ...decision,
+    policy_decision_hash: canonicalHash(
+      'https://github.com/0al-spec/agent-surface/hash/policy-decision/v1',
+      decision,
+    ),
+  };
+  const { receipt_hash: _receiptHash, ...originalReceipt } = receipt;
+  const value = {
+    ...originalReceipt,
+    policy_decision: policyDecision,
+    policy_decision_hash: policyDecision.policy_decision_hash,
+  };
+  return {
+    ...value,
+    receipt_hash: canonicalHash(
+      'https://github.com/0al-spec/agent-surface/hash/receipt/v1',
+      value,
+    ),
+  };
+}
 
 function setup() {
   let time = START;
@@ -159,6 +189,8 @@ describe('LocalBackend → ASP Grant/session-bound Calcu executor', () => {
     );
     expect(runtimeReceipt.result).toBe('authorized_for_forwarding');
     expect(appReceipt.result).toBe('success');
+    expect(runtimeReceipt.policy_decision.reason_code).toBe('policy_allowed');
+    expect(appReceipt.policy_decision.reason_code).toBe('policy_allowed');
     expect(runtimeReceipt.policy_decision.safe_to_show).toContain(
       'application admission is separate',
     );
@@ -173,6 +205,46 @@ describe('LocalBackend → ASP Grant/session-bound Calcu executor', () => {
     expect(state.app.engineCalls).toBe(0);
     expect(
       localReceiptHistory(state.backend).map((r) => r.receipt_type),
+    ).toEqual(['runtime']);
+  });
+
+  it.each([
+    ['runtime', 'local_forwarding_policy_allowed'],
+    ['app', 'proposal_action_within_active_grant'],
+    ['runtime', 'https://calcu.local/policy/custom-allow'],
+    ['app', 'https://calcu.local/policy/custom-allow'],
+  ])('rejects a fully rehashed unselected %s reason %s', async (role, reason) => {
+    const state = setup();
+    const backend = createLocalBackend(
+      state.access,
+      async (credential, body, signal) => {
+        const request = JSON.parse(body);
+        if (role === 'runtime') {
+          request.payload.runtime_receipt = receiptWithReason(
+            request.payload.runtime_receipt,
+            reason,
+          );
+          request.payload.parent_receipt_hash =
+            request.payload.runtime_receipt.receipt_hash;
+        }
+        const response = JSON.parse(
+          await state.app.invoke(credential, JSON.stringify(request), signal),
+        );
+        if (role === 'app')
+          response.payload.receipt = receiptWithReason(
+            response.payload.receipt,
+            reason,
+          );
+        return JSON.stringify(response);
+      },
+      state.now,
+    );
+    await expect(backend.calculationPropose(input)).rejects.toThrow(
+      'invalid_receipt',
+    );
+    expect(state.app.engineCalls).toBe(role === 'runtime' ? 0 : 1);
+    expect(
+      localReceiptHistory(backend).map((receipt) => receipt.receipt_type),
     ).toEqual(['runtime']);
   });
 

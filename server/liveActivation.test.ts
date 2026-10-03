@@ -184,7 +184,7 @@ describe('P5-T8B SDK live activation and retirement', () => {
       'app',
     ]);
     for (const receipt of receipts) {
-      expect(receipt.surface_version).toBe('0.1.2');
+      expect(receipt.surface_version).toBe('0.1.3');
       expect(receipt.surface_hash).toBe(selected.surface.surface_hash);
       expect(receipt.app_id).toBe('calcu.example');
     }

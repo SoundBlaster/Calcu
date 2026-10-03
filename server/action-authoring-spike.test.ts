@@ -81,7 +81,12 @@ describe('application-owned offline action authoring', () => {
     const generatedAction = record(generated.actionDocuments[0].parse());
     expect(generatedAction.data_exposure).toEqual(calculationDataExposure());
     const { input_schema_hash: oldHash, ...oldMetadata } = baselineAction;
-    const { input_schema_hash: newHash, ...newMetadata } = generatedAction;
+    const {
+      input_schema_hash: newHash,
+      input_hash_profile: inputProfile,
+      ...newMetadata
+    } = generatedAction;
+    expect(inputProfile).toBe('asp-jcs-sha-256');
     expect(newMetadata).toEqual(oldMetadata);
     expect(generated.schemaResources).toHaveLength(2);
     expect(generated.actionDocuments).toHaveLength(1);
@@ -135,7 +140,15 @@ describe('application-owned offline action authoring', () => {
         !generated.schemaResources.some((other) => other.uri === item.uri),
     );
     const { surface_hash: oldSurfaceHash, ...withoutHash } = baselineValue;
-    const candidateValue = { ...withoutHash, actions: [generatedAction] };
+    // Reconstruct the historical profile-absent shape for immutable migration
+    // oracles. The current profile-bearing live manifest is qualified separately.
+    const historicalAction = { ...newMetadata, input_schema_hash: newHash };
+    const candidateValue = { ...withoutHash, actions: [historicalAction] };
+    expect(
+      new SurfaceSnapshot(
+        json({ ...withoutHash, actions: [generatedAction] }),
+      ).hash(),
+    ).not.toBe(golden.candidateSurfaceHash);
     const surfaceHash = new SurfaceSnapshot(json(candidateValue)).hash();
     const candidate = new OfflineProposalManifest(
       json({ ...candidateValue, surface_hash: surfaceHash }),

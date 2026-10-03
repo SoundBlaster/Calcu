@@ -95,10 +95,7 @@ function createPolicyDecision(
         role === 'runtime' ? 'calcu-runtime-admission' : 'calcu-app-admission',
       version: '0.1.0',
     },
-    reason_code:
-      role === 'runtime'
-        ? 'local_forwarding_policy_allowed'
-        : 'proposal_action_within_active_grant',
+    reason_code: 'policy_allowed',
     matched_rules:
       role === 'runtime'
         ? ['grant.local_snapshot_present', 'action.selected_for_forwarding']
@@ -288,6 +285,7 @@ function verifyReceipt(
         ? context.runtime_id
         : context.app_id) ||
     decision.outcome !== 'allow' ||
+    decision.reason_code !== 'policy_allowed' ||
     policy.id !==
       (expected.receiptType === 'runtime'
         ? 'calcu-runtime-admission'

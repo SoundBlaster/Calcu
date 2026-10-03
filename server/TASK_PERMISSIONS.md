@@ -75,7 +75,7 @@ natural-language intent.
 
 ## Evidence and non-claims
 
-The current broker and executor share the SDK-authored version `0.1.2`
+The current broker and executor share the SDK-authored version `0.1.3`
 snapshot. Browser offers cannot select its version/schema namespace. Retirement
 invalidates both outstanding offers and accepted-but-unclaimed permits, stops
 issuance and cancels active work. A replacement has a fresh cookie and requires
