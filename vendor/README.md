@@ -1,8 +1,30 @@
 # ASP SDK package snapshots
 
-## Current input-profile candidate
+## Current inline receipt pilot candidate
 
-The installed archive is `0al-agent-surface-0.1.0-experimental.0-e5321de.tgz`,
+Installed base: `0al-agent-surface-0.1.0-experimental.0-5f044d5.tgz`.
+Test-only dev dependency: `0al-offline-proposal-exchange-experiment-0.0.0-experiment-5f044d5.tgz`.
+Both come from exact SDK commit `5f044d5ca918e8438777a7594bf6c9c57e9bdbd4`
+([SDK PR #40](https://github.com/0al-spec/agent-surface-js/pull/40)), deliberately
+not merged or published. The base's embedded source lock pins merged ASP commit
+`814084f4d7d06ac85be358ba84533d0718607746`. Archive SHA-256 values:
+
+- Base: `43707d67175925ddccf58edd1107f3984e855436f6dcc462114d63620c15754d`.
+- Private experiment: `218597978b5b9d1c33c0d3246fe84d2d4a3e558b122de968a9c5a540fb53d60d`.
+
+The private experiment is Node-only and used only by the test fixture; no
+browser or live demo import is added. Its MIT notice is retained in
+`offline-proposal-exchange-LICENSE.txt`; the base archive contains LICENSE.
+Reproduce from a clean checkout at that commit: `npm ci`,
+`npm run test:proposal-exchange`, then pack the base and
+`./experiments/offline-proposal-exchange` into a new empty staging directory and
+rename to the commit-qualified paths. The lockfile pins both archive integrities.
+The default Calcu surface remains `0.1.3`; only the opt-in pilot selects the new
+descriptor. See [pilot evidence](../docs/INLINE_RECEIPT_PILOT.md).
+
+## Historical input-profile candidate
+
+The previously installed archive is `0al-agent-surface-0.1.0-experimental.0-e5321de.tgz`,
 built from exact SDK candidate commit
 `e5321deab9231782cb375cd7dc4851daad625124`
 ([SDK PR #39](https://github.com/0al-spec/agent-surface-js/pull/39)).

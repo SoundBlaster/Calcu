@@ -56,6 +56,20 @@ and requires `policy_allowed` in both local receipt decisions. See
 
 ## Manual live evidence
 
+### Separate inline receipt pilot (2026-10-03 UTC)
+
+The opt-in `0.1.4-inline-pilot` surface uses SDK PR #40 snapshots, a real
+issuer-retained prepared Grant and the exact advertised loopback HTTPS endpoint.
+Complete Runtime/App Receipts cross the namespaced carrier; SDK pair integrity
+is composed with the existing Calcu authority fence and native result checks.
+The default `0.1.3` demo is not activated on this wire. HTTPS client success now
+also requires exact `Cache-Control: no-store`. See
+[pilot scope and test evidence](../docs/INLINE_RECEIPT_PILOT.md).
+This is deterministic application integration evidence, not live Codex evidence,
+production identity, Proof-Bound authentication or portable signed receipts.
+
+### Historical live Codex smoke
+
 On 2026-09-05, `npm run agent:demo` was run with authenticated Codex CLI
 `0.145.0`, model `gpt-5.6-luna` and effort `low`. The live task called
 `calculation_propose` once and the application returned `240 × 0.15 = 36` through

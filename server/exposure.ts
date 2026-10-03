@@ -1,4 +1,6 @@
 // Application-owned policy: these IDs are not an ASP-wide data taxonomy.
+import { INLINE_EXTENSION } from './inlineReceiptWire';
+
 const content = 'calculation.content';
 const context = 'calculation.runtime_context';
 const status = 'calculation.status';
@@ -81,10 +83,23 @@ const response: Rule = {
     receipt,
   },
 };
+const inlineResponse: Rule = {
+  type: status,
+  payload: {
+    ...fields(
+      'session_id session_generation grant_id grant_hash surface_hash idempotency_key trace_id span_id execution_hash receipt_id receipt_hash',
+    ),
+    action_id: status,
+    result: status,
+    execution,
+    output: fields('operator left right result', content),
+    [INLINE_EXTENSION]: { profile: status, app_receipt: receipt },
+  },
+};
 
 // Coverage complements schema/hash validation; it does not replace them or
 // infer sensitivity from a value. Unknown fields fail before serialization.
-export function calculationResponseCoverage(value: unknown) {
+export function calculationResponseCoverage(value: unknown, inline = false) {
   const coverage: Record<string, string> = {};
   function visit(node: unknown, rule: Rule, path: string) {
     if (typeof rule === 'string') {
@@ -114,11 +129,11 @@ export function calculationResponseCoverage(value: unknown) {
       visit(item, (rule as Record<string, Rule>)[key], `${path}/${key}`);
     }
   }
-  visit(value, response, '');
+  visit(value, inline ? inlineResponse : response, '');
   return coverage;
 }
 
-export function serializeCalculationResponse(value: unknown) {
-  calculationResponseCoverage(value);
+export function serializeCalculationResponse(value: unknown, inline = false) {
+  calculationResponseCoverage(value, inline);
   return JSON.stringify(value);
 }

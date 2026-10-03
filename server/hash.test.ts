@@ -139,7 +139,7 @@ describe('ASP hash profiles', () => {
   it('pins the installed SDK package artifact and ASP evidence revision', () => {
     const tarball = readFileSync(
       new URL(
-        '../vendor/0al-agent-surface-0.1.0-experimental.0-e5321de.tgz',
+        '../vendor/0al-agent-surface-0.1.0-experimental.0-5f044d5.tgz',
         import.meta.url,
       ),
     );
@@ -147,10 +147,10 @@ describe('ASP hash profiles', () => {
       readFileSync(new URL('../package-lock.json', import.meta.url), 'utf8'),
     );
     expect(createHash('sha256').update(tarball).digest('hex')).toBe(
-      'a94816c7a180822667108aadcc22c149050f4e3bc1be62fdc8a2af368ee4773b',
+      '43707d67175925ddccf58edd1107f3984e855436f6dcc462114d63620c15754d',
     );
     expect(lock.packages['node_modules/@0al/agent-surface'].resolved).toBe(
-      'file:vendor/0al-agent-surface-0.1.0-experimental.0-e5321de.tgz',
+      'file:vendor/0al-agent-surface-0.1.0-experimental.0-5f044d5.tgz',
     );
     expect(
       lock.packages['node_modules/@0al/offline-action-authoring-prototype'],
@@ -164,7 +164,7 @@ describe('ASP hash profiles', () => {
         'utf8',
       ),
     );
-    expect(sdkLock.commit).toBe('da550fde6f8be4ff0c1ded15524afb66c2912287');
+    expect(sdkLock.commit).toBe('814084f4d7d06ac85be358ba84533d0718607746');
     expect(sdkLock.sources).toHaveLength(5);
     expect(
       sdkLock.sources.map((source: { path: string }) => source.path),
@@ -175,5 +175,32 @@ describe('ASP hash profiles', () => {
       'drafts/modules/evidence.md',
       'drafts/modules/safe-effects.md',
     ]);
+    const privateArtifact = readFileSync(
+      new URL(
+        '../vendor/0al-offline-proposal-exchange-experiment-0.0.0-experiment-5f044d5.tgz',
+        import.meta.url,
+      ),
+    );
+    expect(createHash('sha256').update(privateArtifact).digest('hex')).toBe(
+      '218597978b5b9d1c33c0d3246fe84d2d4a3e558b122de968a9c5a540fb53d60d',
+    );
+    const privateLock =
+      lock.packages['node_modules/@0al/offline-proposal-exchange-experiment'];
+    expect(privateLock.dev).toBe(true);
+    expect(privateLock.resolved).toBe(
+      'file:vendor/0al-offline-proposal-exchange-experiment-0.0.0-experiment-5f044d5.tgz',
+    );
+    expect(privateLock.integrity).toBe(
+      `sha512-${createHash('sha512').update(privateArtifact).digest('base64')}`,
+    );
+    const historical = readFileSync(
+      new URL(
+        '../vendor/0al-agent-surface-0.1.0-experimental.0-e5321de.tgz',
+        import.meta.url,
+      ),
+    );
+    expect(createHash('sha256').update(historical).digest('hex')).toBe(
+      'a94816c7a180822667108aadcc22c149050f4e3bc1be62fdc8a2af368ee4773b',
+    );
   });
 });
